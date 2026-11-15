@@ -1,0 +1,32 @@
+[
+ {
+  "step": "log rows read",
+  "rows": 210000,
+  "note": "14 branch files"
+ },
+ {
+  "step": "exact copies dropped",
+  "rows": 209620,
+  "note": "380 rows whose every field, log_id included, repeats"
+ },
+ {
+  "step": "keys repaired",
+  "rows": 209620,
+  "note": "2446 keys: case, spaces, hyphen, letter O"
+ },
+ {
+  "step": "set aside: key not in the register",
+  "rows": 421,
+  "note": "kept in set_aside.csv with the reason"
+ },
+ {
+  "step": "set aside: blank key",
+  "rows": 311,
+  "note": "kept in set_aside.csv with the reason"
+ },
+ {
+  "step": "log rows joined to a household",
+  "rows": 208888,
+  "note": "many handouts to one household, tested"
+ }
+]

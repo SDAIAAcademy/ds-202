@@ -285,7 +285,7 @@
                 "minutes": 5
               }
             ],
-            "stretch": "Names in Latin letters: one key for both scripts"
+            "stretch": "Names in Latin letters: case and hyphens"
           },
           "summary": "One file, several encodings: decide line by line, repair, and match on a normalised key"
         },
@@ -341,27 +341,27 @@
             "id": "2.3",
             "title": "300 records without a key",
             "minutes": 25,
-            "summary": "Match 300 walk-in records to the register of two branches by normalised name and phone, measure false and missed matches on staff-labelled pairs at three thresholds, and choose one.",
+            "summary": "Match 300 walk-in records to the register of two branches by normalised name, measure false and missed matches on staff-labelled pairs at three thresholds, add the phone as a second field, and choose the rule to run.",
             "href": "D2_3_match_300_records.ipynb",
             "steps": [
               {
                 "text": "Normalise and block",
-                "minutes": 6
+                "minutes": 5
               },
               {
                 "text": "Score the candidate pairs",
-                "minutes": 7
+                "minutes": 6
               },
               {
                 "text": "False matches at three thresholds",
-                "minutes": 8
+                "minutes": 7
               },
               {
-                "text": "Choose a threshold and say what it costs",
-                "minutes": 4
+                "text": "Add the phone, measure again, choose",
+                "minutes": 7
               }
             ],
-            "stretch": "Let an agreeing phone number vouch for a weak name"
+            "stretch": "The review queue"
           },
           "summary": "Block, score and choose a threshold on labelled pairs: a false match costs most"
         },

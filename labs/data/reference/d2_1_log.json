@@ -1,0 +1,34 @@
+[
+ {
+  "what": "lines decoded as UTF-8",
+  "count": 34542
+ },
+ {
+  "what": "lines decoded as Windows-1256",
+  "count": 5458
+ },
+ {
+  "what": "names repaired (decoded twice)",
+  "count": 2732
+ },
+ {
+  "what": "national ids rewritten in Western digits",
+  "count": 2784
+ },
+ {
+  "what": "distinct Arabic names as typed",
+  "count": 24355
+ },
+ {
+  "what": "distinct Arabic name keys",
+  "count": 21252
+ },
+ {
+  "what": "distinct national ids as typed",
+  "count": 39851
+ },
+ {
+  "what": "distinct national ids after the digit rule",
+  "count": 39820
+ }
+]

@@ -1,0 +1,30 @@
+[
+ {
+  "rule": "name ≥ 70",
+  "accepted": 309,
+  "false": 86,
+  "false_rate": 0.278,
+  "missed": 32
+ },
+ {
+  "rule": "name ≥ 85",
+  "accepted": 149,
+  "false": 11,
+  "false_rate": 0.074,
+  "missed": 117
+ },
+ {
+  "rule": "name ≥ 95",
+  "accepted": 117,
+  "false": 4,
+  "false_rate": 0.034,
+  "missed": 142
+ },
+ {
+  "rule": "names alike and phone agrees",
+  "accepted": 172,
+  "false": 0,
+  "false_rate": 0.0,
+  "missed": 83
+ }
+]

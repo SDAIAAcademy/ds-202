@@ -1,158 +1,459 @@
 <section class="slide title" id="title" data-auto="title">
-  <aside class="notes">REPLACE: welcome; introduce yourself; one question to the room that calibrates the pace; the rhythm of the day</aside>
+  <aside class="notes"><p>Yesterday described the sources without changing a value. Today every session changes values, and the discipline is the same in all four: a repair is a rule, the rule has a count, and the original is kept. Each lab starts from the raw files, so nobody depends on yesterday's outputs or on an earlier lab of today.</p></aside>
+</section>
+
+<section class="slide" id="review-day-1" data-lo="LO2">
+  <div class="kicker">Review of Day 1</div>
+  <h2>A count that nobody can check</h2>
+  <div class="quiz" data-type="single" data-lo="LO2">
+    <p class="lead">The inventory of Day 1 shows 210,000 log rows from 14 files, and the logs state no total of their own. What does that line of the inventory allow you to say?</p>
+    <div class="opts">
+      <div class="opt" data-why="Takes the absence of a contradiction for a confirmation; nothing was compared">The logs are complete: 210,000 rows arrived</div>
+      <div class="opt" data-ok>210,000 rows arrived; whether any are missing or doubled is unknown</div>
+      <div class="opt" data-why="Believes a large round number signals an error by itself">The logs are wrong: a round number is suspicious</div>
+      <div class="opt" data-why="Discards a source for lacking metadata instead of recording the limit and testing for it">The logs cannot be used until the branches state totals</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> A count with nothing to reconcile against is a fact about what arrived, not about what happened. Today finds a week that arrived twice; Day 3 finds days that never arrived.</div>
+  </div>
+  <aside class="notes"><p>Answer: B. The limit was written into the provenance record of the logs: "a week can be uploaded twice or be missing, and no file says so". Lab 2.2 finds the 380 doubled rows of B02.</p></aside>
 </section>
 
 <section class="slide" id="agenda" data-auto="agenda"></section>
 
-<!-- Session 1 -->
-
+<!-- ======================= SESSION 1 ======================= -->
 <section class="slide section" id="s1" data-auto="section" data-session="1"></section>
 
-<section class="slide" id="s1-idea" data-lo="LO6">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
-  </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+<section class="slide" id="three-states" data-lo="LO6">
+  <div class="kicker">One file, appended from 14 exports</div>
+  <h2>A line of the register is in one of three states, and no encoding reads them all</h2>
+  <table class="t small">
+    <tr><th>State</th><th>What you see</th><th>Lines</th></tr>
+    <tr><td>UTF-8, correct</td><td><span dir="rtl">ماجد محمد باوزير</span></td><td>most</td></tr>
+    <tr><td>Windows-1256 bytes (B03, B11)</td><td>fails as UTF-8</td><td>5,458</td></tr>
+    <tr><td>UTF-8 that was decoded twice (B06)</td><td><span dir="rtl">ط¨ظ†ط¯ط± …</span>: valid UTF-8, wrong letters</td><td>2,732 names</td></tr>
+  </table>
+  <div class="callout warn mt"><b>What goes wrong.</b> Reading the whole file as Windows-1256 raises no error: every byte is a letter in that code page. The 34,542 UTF-8 lines become nonsense, quietly.</div>
+  <aside class="notes"><p>FN-104 taught the two repairs on separate files (Lab 4.2 there). What is new is the mixture inside one file, which is what appending branch exports produces. Numbers from the Lab 2.1 run: 34,542 lines decode as UTF-8, 5,458 only as Windows-1256, 2,732 names at B06 were decoded twice. No error is not the same as correct: say it twice.</p></aside>
 </section>
 
-<section class="slide" id="s1-steps" data-lo="LO6">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="line-by-line" data-lo="LO6">
+  <div class="kicker">The decision rule</div>
+  <h2>Decide per line: valid UTF-8 is UTF-8; what is not is the legacy code page</h2>
+  <div class="cols cols-2">
+    <pre class="code" data-file="Lab 2.1 · decode"><code class="language-python">def decode(b: bytes):
+    try:
+        return b.decode("utf-8"), "utf-8"
+    except UnicodeDecodeError:
+        return b.decode("cp1256"), "cp1256"</code></pre>
+    <ul class="bullets small">
+      <li>Arabic in Windows-1256 is almost never valid UTF-8, so the test is safe in this direction</li>
+      <li>Return the encoding with the text and <b>count</b> it</li>
+      <li>The count has a shape: all 5,458 lines are from two branches. A scatter over all branches would mean the rule is wrong</li>
+    </ul>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <aside class="notes"><p>The order matters: try the strict encoding first. UTF-8 has structure (lead and continuation bytes) that random legacy bytes almost never satisfy; cp1256 accepts anything. Lines with only Latin letters and digits are the same bytes in both and decode as UTF-8, which is harmless. Sources: Python codecs documentation.</p></aside>
+</section>
+
+<section class="slide" id="decoded-twice" data-lo="LO6">
+  <div class="kicker">The state that raises no error anywhere</div>
+  <h2>Undo the wrong step, and prove the rule leaves correct text alone</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>1 · Typed</b><span dir="rtl">بندر</span> stored as UTF-8 bytes</div>
+    <div class="arrow">→</div><div class="step c-coral"><b>2 · Misread</b>the branch system read the bytes as Windows-1256 and saved the result</div>
+    <div class="arrow">→</div><div class="step c-purple"><b>3 · Repair</b><code>s.encode("cp1256").decode("utf-8")</code></div>
+  </div>
+  <ul class="bullets small mt">
+    <li>Correct Arabic does not survive that round trip: the decode fails and the function returns the text unchanged</li>
+    <li>So the function is safe on all 40,000 names, and changes 2,732, every one at B06</li>
+  </ul>
+  <aside class="notes"><p>The tell is the repeated ط and ظ: the bytes D8 and D9 that begin every Arabic letter in UTF-8. Show head_name_raw beside head_name for three rows of B06. The check that all repaired rows are at one branch is the evidence that the rule did what it claims.</p></aside>
+</section>
+
+<section class="slide" id="letters-and-keys" data-lo="LO6">
+  <div class="kicker">After the bytes, the letters</div>
+  <h2>A key is a normalised copy for matching; the stored name is never replaced</h2>
+  <table class="t small">
+    <tr><th>Rule</th><th>Example</th></tr>
+    <tr><td>drop marks and the stretch mark</td><td><span dir="rtl">مُحمّد</span> → <span dir="rtl">محمد</span></td></tr>
+    <tr><td>one alef; <span dir="rtl">ى</span> → <span dir="rtl">ي</span>; <span dir="rtl">ة</span> → <span dir="rtl">ه</span></td><td><span dir="rtl">أحمد</span> → <span dir="rtl">احمد</span></td></tr>
+    <tr><td>join <span dir="rtl">عبد</span> to the next word</td><td><span dir="rtl">عبد الله</span> → <span dir="rtl">عبدالله</span></td></tr>
+    <tr><td>one space between words</td><td>trailing and double spaces go</td></tr>
+  </table>
+  <p class="small mt-s">24,355 distinct Arabic names as typed are 21,252 distinct keys: about one "different" name in eight was a spelling variant.</p>
+  <aside class="notes"><p>Recap of FN-104, in one slide. The key loses information on purpose (ة and ه are different letters), which is why it sits in its own column. Unicode normalisation form NFKC folds presentation forms first. Sources: Unicode Standard Annex 15; Python unicodedata documentation. Numbers from the Lab 2.1 repair log.</p></aside>
+</section>
+
+<section class="slide" id="digits-hide" data-lo="LO3 LO6">
+  <div class="kicker">Digits are text too</div>
+  <h2>An ID number typed in Arabic-Indic digits is a different string</h2>
+  <div class="cols cols-2">
+    <div class="stack">
+      <div class="stat"><div class="big">39,851 → 39,820</div><div class="lbl">distinct national ids, before and after the digit rule</div></div>
+    </div>
+    <ul class="bullets">
+      <li>One branch typed 2,784 ID numbers as <span dir="rtl">١٠٩٠…</span></li>
+      <li>31 households registered there and again elsewhere: one person, two strings</li>
+      <li>A count of distinct people, or a join on the id, was wrong with no error</li>
+      <li>Normalise digits in every key before you compare it with anything</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From the Lab 2.1 run. The rule maps both the Arabic-Indic digits and the Eastern (Persian) forms to 0 to 9. After it, distinct ids equal the 39,820 households of yesterday's SQL count, which is the reconciliation that tells you the rule is complete.</p></aside>
+</section>
+
+<section class="slide" id="repair-log" data-lo="LO6">
+  <div class="kicker">The habit of the day</div>
+  <h2>A repair that is not counted cannot be checked, repeated or reversed</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>A rule</h4><p class="small mb0">Written as code, applied to every row, never by hand to a few.</p></div>
+    <div class="card c-cyan"><h4>A count</h4><p class="small mb0">One line per rule in a log: how many rows it changed, and where.</p></div>
+    <div class="card c-purple"><h4>The original</h4><p class="small mb0">Kept beside the repaired value, so a reviewer can disagree.</p></div>
+  </div>
+  <div class="callout tip mt"><b>The same three in every lab today:</b> a repair log, a join log, a threshold table, a change log.</div>
+  <aside class="notes"><p>These four files are sections of the quality report on Day 4, and of the capstone README: the rubric gives 25 points to joins and reconciliation and 25 to cleaning and validation, and the evidence for both is counts per step.</p></aside>
+</section>
+
+<section class="slide" id="check-encoding" data-lo="LO6">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which loader do you trust?</h2>
+  <div class="quiz" data-type="single" data-lo="LO6">
+    <p class="lead">A file was appended from several systems. Four loaders are proposed. Which one do you run?</p>
+    <div class="opts">
+      <div class="opt" data-why="Believes the absence of an error proves a correct reading; this code page accepts every byte">Read it all as Windows-1256: it raises no error</div>
+      <div class="opt" data-why="Keeps the file loading by throwing away the bytes that carry the names">Read it as UTF-8 and replace undecodable bytes with a mark</div>
+      <div class="opt" data-why="Lets a library guess one encoding for a file that has several">Let a detection library pick the encoding of the file</div>
+      <div class="opt" data-ok>Decode line by line, UTF-8 first, and count the lines of each encoding</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The file has no single encoding, so the decision has to be made where the encoding changes, per line, and the count per encoding is the check on the decision.</div>
+  </div>
+  <aside class="notes"><p>Answer: D. Option B is the common one in practice (errors="replace") and destroys 5,458 names for good. A detection library answers a different question: the most likely single encoding.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-2-1" data-auto="lab" data-lab="2.1">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-tutor, hinting only, for regular expressions. Typical problems: trying cp1256 before UTF-8 (everything "decodes"); a repair function without the except branch, which fails on the first correct name; mapping digits in the name. If decode is not finished the next cells use G.decode_line, and the reference steps of build_dataset stand in for the others, so everyone reaches the log. The lab starts from the bytes of the extract and needs nothing from Day 1.</p></aside>
 </section>
 
-<!-- Session 2 -->
-
+<!-- ======================= SESSION 2 ======================= -->
 <section class="slide section" id="s2" data-auto="section" data-session="2"></section>
 
-<section class="slide" id="s2-idea" data-lo="LO3">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
+<section class="slide" id="three-silent-failures" data-lo="LO3">
+  <div class="kicker">Many handouts, one household</div>
+  <h2>A join can lose rows, add rows, and report neither</h2>
+  <div class="cols cols-3">
+    <div class="card c-coral"><h4>Lost</h4><p class="small mb0">A key typed by hand does not match. In an inner join the handout disappears.</p></div>
+    <div class="card c-purple"><h4>Added</h4><p class="small mb0">A household that is in the register twice gets every handout twice.</p></div>
+    <div class="card c-amber"><h4>Unnoticed</h4><p class="small mb0">The result is a table of plausible size. Nothing compares it with what went in.</p></div>
   </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+  <p class="small mt">The remedy has three parts, in this order: repair keys by rule, test the cardinality, count rows at every step.</p>
+  <aside class="notes"><p>FN-104 showed fan-out in SQL and validate= in pandas. Outcome LO3 asks for more: a join log of row counts per step and set-aside rows with reasons. That log is 25 of the 100 points of the capstone rubric.</p></aside>
 </section>
 
-<section class="slide" id="s2-steps" data-lo="LO3">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="key-repair" data-lo="LO3">
+  <div class="kicker">Lab 2.2, step 1</div>
+  <h2>A repair is safe when it cannot change which household is meant</h2>
+  <table class="t small">
+    <tr><th>As typed</th><th>Rule</th><th>Safe because</th></tr>
+    <tr><td><code>h482913</code></td><td>upper-case</td><td>case carries no information in this id</td></tr>
+    <tr><td><code>&nbsp;H482913&nbsp;&nbsp;</code></td><td>strip spaces</td><td>nor do spaces</td></tr>
+    <tr><td><code>H-482913</code></td><td>remove the hyphen</td><td>nor a separator</td></tr>
+    <tr><td><code>H48O913</code></td><td>letter O to digit 0</td><td>after the H only digits are possible</td></tr>
+  </table>
+  <div class="callout warn mt"><b>Never a repair:</b> replacing an id by "the most similar one in the register". That picks a household, and it can pick the wrong one.</div>
+  <aside class="notes"><p>From the Lab 2.2 run: 2,757 keys are not in the form H plus six digits; 2,446 are repaired by the four rules; 311 are blank. Ask the room about the O rule: it is safe only because the form of the id is known. In an id that mixes letters and digits it would be a guess.</p></aside>
+</section>
+
+<section class="slide" id="cardinality-test" data-lo="LO3">
+  <div class="kicker">Lab 2.2, step 2</div>
+  <h2>Without the test, 209,620 rows went in and 210,585 came out</h2>
+  <div class="cols cols-2">
+    <pre class="code" data-file="Lab 2.2"><code class="language-python">logs.merge(reg, on="household_id",
+           how="left",
+           validate="many_to_one")
+# MergeError: Merge keys are not unique
+# in right dataset</code></pre>
+    <ul class="bullets small">
+      <li>A left join never loses a left row; it <b>adds</b> one for every extra match on the right</li>
+      <li>180 household ids are in the register twice: +965 rows, every one a handout counted double</li>
+      <li><code>validate</code> turns the assumption "one row per household" into a test that stops the join</li>
+    </ul>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <aside class="notes"><p>Run both lines live. Then the rule of the network, which is a decision and not a technical default: the first registration stands; the 180 later registrations of the same id are set aside and reported to Widad. Keeping the latest one instead would date some households after their own handouts. Sources: pandas documentation, DataFrame.merge.</p></aside>
+</section>
+
+<section class="slide" id="set-aside" data-lo="LO3">
+  <div class="kicker">What cannot be joined</div>
+  <h2>Rows without a household are set aside with a reason, not deleted</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Reason</th><th>Rows</th></tr>
+      <tr><td>key not in the register</td><td>421</td></tr>
+      <tr><td>blank key</td><td>311</td></tr>
+      <tr class="hl"><td>set aside</td><td>732</td></tr>
+    </table>
+    <ul class="bullets small">
+      <li>They are handouts that happened: deleting them is an undercount with no trace</li>
+      <li>The file goes to the owner of the logs; a corrected key enters the next build</li>
+      <li>Unknown keys are spread over every branch: well-formed typing errors</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>732 rows are 0.35% of the logs. Whether that matters is not for the cleaning step to decide: the join log states it and the quality report carries it. The stretch finds 79 more rows whose key exists and is still wrong, because the handout is dated before the household registered; the reference build sets those aside as well.</p></aside>
+</section>
+
+<section class="slide" id="join-log" data-lo="LO3">
+  <div class="kicker">The evidence of LO3</div>
+  <h2>The join log: every row that came in is on one of its lines</h2>
+  <table class="t small">
+    <tr><th>Step</th><th>Rows</th><th>Note</th></tr>
+    <tr><td>log rows read</td><td>210,000</td><td>14 branch files</td></tr>
+    <tr><td>exact copies dropped</td><td>209,620</td><td>380 rows: a week of B02 uploaded twice</td></tr>
+    <tr><td>keys repaired</td><td>209,620</td><td>2,446 keys by four rules</td></tr>
+    <tr><td>set aside</td><td>732</td><td>421 unknown, 311 blank</td></tr>
+    <tr class="hl"><td>joined to a household</td><td>208,888</td><td>many to one, tested</td></tr>
+  </table>
+  <p class="small mt-s">210,000 = 380 copies + 732 set aside + 208,888 joined.</p>
+  <aside class="notes"><p>The 380 copies are safe to drop because the log_id itself repeats with every field equal: a copy of a record, not a second handout. Two handouts to one household on one day with different log ids are not duplicates. Ask participants to do the sum on the slide; a log whose lines do not add up is the first thing an assessor checks.</p></aside>
+</section>
+
+<section class="slide" id="check-join" data-lo="LO3">
+  <div class="kicker">Checkpoint</div>
+  <h2>More rows out than in</h2>
+  <div class="quiz" data-type="single" data-lo="LO3">
+    <p class="lead">A left join of 209,620 log rows to the register returns 210,585 rows and no error. What is the first thing you check?</p>
+    <div class="opts">
+      <div class="opt" data-ok>Whether household_id is unique in the register</div>
+      <div class="opt" data-why="Looks for unmatched keys, which leave the row count of a left join unchanged">How many log keys have no match in the register</div>
+      <div class="opt" data-why="Suspects the reader, when the two tables had their expected sizes before the join">Whether a branch file was loaded twice</div>
+      <div class="opt" data-why="Removes the symptom after the join; the repeated rows differ in register columns and stay">Nothing: drop duplicate rows from the result</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Only a key that matches several rows on the right can add rows to a left join. Test uniqueness on the right before joining, and the join cannot surprise you.</div>
+  </div>
+  <aside class="notes"><p>Answer: A. If the room says B, draw a left join on the board: an unmatched left row stays exactly one row. D is what happens under time pressure, and it hides the fan-out without removing it.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-2-2" data-auto="lab" data-lab="2.2">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-off for the first attempt at the join. Typical problems: forgetting keep_default_na=False somewhere, so a blank key becomes NaN and never equals ""; replacing every O in the whole id including a possible letter position; keeping the latest registration; an inner join, after which the counts cannot add up. The lab starts from G.logs_raw() and G.registry_text(). The last check prints the sum 210,000 = 380 + 732 + 208,888: nobody leaves without seeing it.</p></aside>
 </section>
 
-<!-- Session 3 -->
-
+<!-- ======================= SESSION 3 ======================= -->
 <section class="slide section" id="s3" data-auto="section" data-session="3"></section>
 
-<section class="slide" id="s3-idea" data-lo="LO3">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
+<section class="slide" id="no-key" data-lo="LO3">
+  <div class="kicker">The problem</div>
+  <h2>300 handouts were written on paper, with a name and no id</h2>
   <div class="cols cols-2">
     <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
+      <li>A satellite point of B04 and B05, during Ramadan</li>
+      <li>A name, a district ticked on the form, a phone for seven in ten</li>
+      <li>4,937 active households of the two branches to search</li>
+      <li>Staff labelled 848 candidate pairs by hand: 255 true, 593 not</li>
     </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
+    <div class="card c-coral"><h4>Two errors, two prices</h4><p class="small mb0"><b>Missed match:</b> a handout stays uncounted, and you can see it.<br><b>False match:</b> one family is credited with another's parcels, and it looks like a success.</p></div>
   </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+  <aside class="notes"><p>The labelled pairs are the most valuable file of the session: without them a threshold is an opinion. In real work, labelling a few hundred pairs is half a day for two people and is always worth it. The 593 non-matches were chosen to be hard: same first name and family name, another person.</p></aside>
 </section>
 
-<section class="slide" id="s3-steps" data-lo="LO3">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
+<section class="slide" id="block-score-decide" data-lo="LO3">
+  <div class="kicker">Three steps</div>
+  <h2>Block, score, decide</h2>
   <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+    <div class="step c-teal"><b>1 · Block</b>compare only pairs that agree on a reliable field: the district</div>
+    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · Score</b>how alike are the two name keys, from 0 to 100</div>
+    <div class="arrow frag" data-frag="c">→</div><div class="step c-purple frag" data-frag="c"><b>3 · Decide</b>accept, reject, or send to a person</div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <ul class="bullets small mt frag">
+    <li>Blocking: 311,703 candidate pairs instead of 1,481,100, and all 255 true pairs survive it</li>
+    <li>A true pair that disagrees on the blocking field is never compared: check that on the labelled pairs</li>
+  </ul>
+  <aside class="notes"><p>The score in the lab is token_sort_ratio from RapidFuzz: sort the words, then an edit-based similarity. It is one of many; the method of measuring does not depend on the choice. Sources: RapidFuzz documentation.</p></aside>
+</section>
+
+<section class="slide" id="threshold-trade" data-lo="LO3">
+  <div class="kicker">Measured on the 848 labelled pairs</div>
+  <h2>A higher threshold buys fewer false matches with more missed ones</h2>
+  <table class="t small">
+    <tr><th>Rule</th><th>Accepted</th><th>False</th><th>False-match rate</th><th>Missed of 255</th></tr>
+    <tr><td>name score ≥ 70</td><td>309</td><td>86</td><td>27.8%</td><td>32</td></tr>
+    <tr><td>name score ≥ 85</td><td>149</td><td>11</td><td>7.4%</td><td>117</td></tr>
+    <tr><td>name score ≥ 95</td><td>117</td><td>4</td><td>3.4%</td><td>142</td></tr>
+  </table>
+  <div class="callout warn mt"><b>No threshold gives both.</b> Even at 95, four accepted pairs are the wrong family, and more than half of the true pairs are missed.</div>
+  <aside class="notes"><p>From the Lab 2.3 run. The four false matches at 95 are pairs with identical name keys: two people called the same. No amount of tuning the name score can separate them. Ask: which of these three would you run on the register? None is acceptable, which is the point of the next slide.</p></aside>
+</section>
+
+<section class="slide" id="second-field" data-lo="LO3">
+  <div class="kicker">Lab 2.3, step 4</div>
+  <h2>A second field breaks the trade</h2>
+  <div class="cols cols-2">
+    <div class="stack">
+      <div class="stat"><div class="big">172 · 0</div><div class="lbl">pairs accepted and false matches, when names are alike and phones agree on nine of ten digits</div></div>
+    </div>
+    <ul class="bullets">
+      <li>Two fields that agree by accident are rare; one field that agrees by accident is common</li>
+      <li>83 true pairs are not accepted: mostly walk-ins who gave no phone</li>
+      <li>They go to a <b>review queue</b> for a person, not through a lower threshold</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From the Lab 2.3 run: 172 accepted, 0 false, 83 for review. Be exact about the claim: zero false matches on 848 labelled pairs, not zero in general. Tools for probabilistic record linkage, Splink for example, estimate how much weight each field deserves from the data; the measurement on labelled pairs is the same. Sources: Splink documentation.</p></aside>
+</section>
+
+<section class="slide" id="three-outcomes" data-lo="LO3">
+  <div class="kicker">The decision has three outcomes</div>
+  <h2>Accept, reject, or ask a person</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>Accept automatically</h4><p class="small mb0">The rule that showed no false match on labelled pairs. 172 of 300 walk-ins.</p></div>
+    <div class="card c-purple"><h4>Review</h4><p class="small mb0">Likely names without a phone, or several candidates. A person decides, and the decision is recorded.</p></div>
+    <div class="card c-coral"><h4>Leave unmatched</h4><p class="small mb0">45 walk-ins are new households. An unmatched record is an honest result.</p></div>
+  </div>
+  <div class="callout note mt"><b>Report it like a join:</b> 300 records in, so many matched by rule, so many by review, so many unmatched.</div>
+  <aside class="notes"><p>The 45 new households are known only because the data is synthetic; in real work the unmatched pile mixes new people with missed matches, and the review queue is how you find out. The stretch counts 128 walk-ins with no accepted candidate.</p></aside>
+</section>
+
+<section class="slide" id="check-threshold" data-lo="LO3">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which rule goes into the build?</h2>
+  <div class="quiz" data-type="single" data-lo="LO3">
+    <p class="lead">A false match credits one family with another's parcels. On labelled pairs: name ≥ 70 accepts 309 with 86 false; name ≥ 95 accepts 117 with 4 false; name and phone accepts 172 with 0 false. Which do you automate?</p>
+    <div class="opts">
+      <div class="opt" data-why="Counts matches found, not matches that are right: more than one in four would be wrong">Name ≥ 70: it finds the most matches</div>
+      <div class="opt" data-why="Accepts a small rate of the costly error when a rule without it exists">Name ≥ 95: 3.4% false is good enough</div>
+      <div class="opt" data-ok>Name and phone, with the rest sent to review</div>
+      <div class="opt" data-why="Gives up automation entirely, although a rule with no false match on labelled pairs handles most records">None: match all 300 by hand</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The costly error decides. Automate the rule that did not make it on labelled pairs, and spend human time on the records the rule leaves.</div>
+  </div>
+  <aside class="notes"><p>Answer: C. If someone argues for B, ask them to explain to the four families what happened. Then ask what would change the answer: if a false match were cheap (a mailing list, say), the name-only rule might be fine. The threshold follows from the cost, not from the score.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-2-3" data-auto="lab" data-lab="2.3">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-tutor, hinting only. The register used here is the reference clean register (B.clean_registry), so the lab does not depend on Lab 2.1. Typical problems: scoring raw names instead of keys; blocking on the family name, which loses pairs with a typing error there; computing the false-match rate over all labelled pairs instead of over the accepted ones. Scoring 311,703 pairs takes a few seconds on a laptop CPU.</p></aside>
 </section>
 
-<!-- Session 4 -->
-
+<!-- ======================= SESSION 4 ======================= -->
 <section class="slide section" id="s4" data-auto="section" data-session="4"></section>
 
-<section class="slide" id="s4-idea" data-lo="LO6">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
+<section class="slide" id="value-has-no-evidence" data-lo="LO6">
+  <div class="kicker">The same string, two days</div>
+  <h2><code>03/07/2026</code> is 3 July at one branch and 7 March at another</h2>
   <div class="cols cols-2">
     <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
+      <li>8 branches write <code>2026-07-03</code></li>
+      <li>4 branches write day first: <code>03/07/2026</code></li>
+      <li>2 branches, on donated software, write month first: <code>07/03/2026</code></li>
+      <li>No file says which</li>
     </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
+    <div class="stat"><div class="big">36,002 of 91,403</div><div class="lbl">slash dates in which both parts are 12 or less: the value alone cannot be read</div></div>
   </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+  <aside class="notes"><p>From the Lab 2.4 run. FN-104 covered calendars (Hijri to Gregorian) and time zones; that is not repeated here. The problem today is more ordinary and more common: the same calendar written in different orders by different systems.</p></aside>
 </section>
 
-<section class="slide" id="s4-steps" data-lo="LO6">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
+<section class="slide" id="layout-per-source" data-lo="LO6">
+  <div class="kicker">Where the evidence is</div>
+  <h2>A layout belongs to the source: one unambiguous date settles the whole file</h2>
   <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+    <div class="step c-teal"><b>1 · Group by branch</b>a branch uses one layout</div>
+    <div class="arrow">→</div><div class="step c-cyan"><b>2 · Look for a part above 12</b>if the first part ever exceeds 12 it is the day</div>
+    <div class="arrow">→</div><div class="step c-purple"><b>3 · Parse strictly</b>with that one format; a value that does not fit is an error</div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <div class="callout tip mt"><b>And then test the result.</b> Every branch has handouts in every month. A branch read with the wrong layout would have none after day 12.</div>
+  <aside class="notes"><p>Two details. Raise an error when the evidence does not decide, rather than defaulting: a file of twelve days could be honestly ambiguous. And use an explicit format in pd.to_datetime; the convenient options (dayfirst, errors="coerce") are how wrong dates get in.</p></aside>
+</section>
+
+<section class="slide" id="guessing-cost" data-lo="LO6">
+  <div class="kicker">The stretch of Lab 2.4</div>
+  <h2>Guessing day first for a month-first branch loses 61% and corrupts 36%</h2>
+  <div class="bars">
+    <div class="row"><span>lost: no such date</span><div class="bar c-coral" style="--w:61%"></div><span class="val">11,625</span></div>
+    <div class="row"><span>wrong, silently</span><div class="bar c-purple" style="--w:36%"></div><span class="val">6,960</span></div>
+    <div class="row"><span>right by luck</span><div class="bar c-teal" style="--w:3%"></div><span class="val">620</span></div>
+  </div>
+  <p class="small mt">The 19,205 handouts of B05, parsed day first with unreadable values turned into "no date". The 6,960 are the dangerous ones: a real-looking date, in the wrong month.</p>
+  <aside class="notes"><p>From the Lab 2.4 stretch. The 620 that come out right are the dates whose day equals their month. A quarter built on these dates would move thousands of handouts between quarters and nothing would fail.</p></aside>
+</section>
+
+<section class="slide" id="units-evidence" data-lo="LO6">
+  <div class="kicker">Lab 2.4, step 3</div>
+  <h2>The weight per parcel shows which unit a number is in</h2>
+  <table class="t small">
+    <tr><th>Branch, unit as labelled</th><th>Median per parcel</th><th>Reading</th></tr>
+    <tr><td>B01, kg</td><td>12.0</td><td>kilograms: the packing standard</td></tr>
+    <tr><td>B05, lb</td><td>26.4</td><td>pounds, labelled as pounds</td></tr>
+    <tr><td>B13, kg (1,312 rows)</td><td>26.4</td><td>pounds labelled as kilograms</td></tr>
+    <tr><td>B09, kg (150 rows)</td><td>above 9,000</td><td>grams typed into a kilogram field</td></tr>
+  </table>
+  <p class="small mt-s">Between 15 and 19.8 per parcel there is no value at all: the two clouds do not touch, so a rule can separate them.</p>
+  <aside class="notes"><p>From the Lab 2.4 run: 37,360 rows converted from labelled pounds, 1,312 rows at B13 from 14 September relabelled, 150 gram rows at B09. One pound is 0.45359237 kg. The mislabelled rows are all one branch after one date, which is what makes the rule defensible, and why the change log names branches.</p></aside>
+</section>
+
+<section class="slide" id="blanks-stay" data-lo="LO1 LO6">
+  <div class="kicker">What cleaning must not do</div>
+  <h2>734 blank weights stay blank</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>All at B09, 4 to 17 May: the scale was away for repair</li>
+      <li>A blank is not zero and is not 12 kg per parcel</li>
+      <li>Filling it is a decision about missing data, with consequences for every average of weight</li>
+      <li>The change log says "left missing", with the count</li>
+    </ul>
+    <div class="card c-purple"><h4>Tomorrow</h4><p class="small mb0">Day 3 asks why a value is missing before deciding what to do about it. This one has a known cause and a recorded date range.</p></div>
+  </div>
+  <aside class="notes"><p>The provenance record of the logs already holds this limit. It is the fourth of the six patterns of Lab 3.1. The headline counts parcels and is not touched; a weight-based question would be.</p></aside>
+</section>
+
+<section class="slide" id="change-log" data-lo="LO6">
+  <div class="kicker">Lab 2.4, step 4</div>
+  <h2>The change log names every rule, its rows and its branches</h2>
+  <table class="t small">
+    <tr><th>Change</th><th>Rows</th><th>Branches</th></tr>
+    <tr><td>dates read as ISO</td><td>118,217</td><td>8 branches</td></tr>
+    <tr><td>dates read day first</td><td>52,731</td><td>B03, B08, B10, B11</td></tr>
+    <tr><td>dates read month first</td><td>38,672</td><td>B05, B13</td></tr>
+    <tr><td>pounds to kilograms</td><td>37,360</td><td>B05, B13</td></tr>
+    <tr><td>pounds labelled kg</td><td>1,312</td><td>B13</td></tr>
+    <tr><td>grams to kilograms</td><td>150</td><td>B09</td></tr>
+    <tr><td>weight missing, left missing</td><td>734</td><td>B09</td></tr>
+  </table>
+  <aside class="notes"><p>The date lines add up to the 209,620 rows after copies were dropped, and so do the weight lines once the 170,064 unchanged rows are added. Hazem can confirm each line with one telephone call per branch: that is what a change log is for.</p></aside>
+</section>
+
+<section class="slide" id="check-date" data-lo="LO6">
+  <div class="kicker">Checkpoint</div>
+  <h2>A date that could be two days</h2>
+  <div class="quiz" data-type="single" data-lo="LO6">
+    <p class="lead">A branch file holds <code>05/06/2026</code> and, further down, <code>09/27/2026</code>. How do you read the first date?</p>
+    <div class="opts">
+      <div class="opt" data-why="Applies the local habit to a file whose own rows contradict it">5 June: day first is the convention here</div>
+      <div class="opt" data-ok>6 May: the file holds a second part above 12, so the month comes first</div>
+      <div class="opt" data-why="Treats each value alone and discards what the rest of the file says">It cannot be known: set it aside as ambiguous</div>
+      <div class="opt" data-why="Lets a library decide value by value, which can read one file both ways">Either: let the date parser infer it</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> 27 cannot be a month, so in this file the second part is the day, for every row. The evidence is in the source, not in the value.</div>
+  </div>
+  <aside class="notes"><p>Answer: B. If C is popular, agree that the value alone is ambiguous and ask what else they know about it: which file it came from.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-2-4" data-auto="lab" data-lab="2.4">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-tutor, hinting only, for format codes. Typical problems: deciding the layout on the first rows only (January dates are all ambiguous); pd.to_datetime with dayfirst=True and no format; converting the mislabelled pounds before computing the per-parcel evidence; filling blank weights. Every check prints a count; the last one verifies that the log lines add up to 209,620. The lab starts from G.logs_raw().</p></aside>
 </section>
 
+<!-- ======================= CLOSING ======================= -->
 <section class="slide" id="wrap-up">
   <div class="kicker">Day 2 · wrap-up</div>
   <h2>Three things to keep</h2>
   <div class="cols cols-3">
-    <div class="card c-teal"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
-    <div class="card c-coral"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
-    <div class="card c-purple"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
+    <div class="card c-teal"><h4>No error is not correct</h4><p class="small mb0">The wrong encoding, the wrong date order and a doubled household all run without a message.</p></div>
+    <div class="card c-purple"><h4>Rows in = rows out + rows set aside</h4><p class="small mb0">210,000 = 380 + 732 + 208,888. Each line has a reason.</p></div>
+    <div class="card c-coral"><h4>Evidence lives in the source</h4><p class="small mb0">The layout, the unit and the encoding are decided per file or per line, and measured before they are trusted.</p></div>
   </div>
+  <aside class="notes"><p>Ask which of the four logs they would least like to defend to an assessor, and why. That is the one to rehearse before the capstone.</p></aside>
 </section>
 
-<section class="slide dark" id="next" data-label="Next">
-  <div class="kicker">Next</div>
-  <h2>Day 3: Missing data and measurement</h2>
-  <p class="lead">REPLACE: what participants prepare before then; unfinished labs can be finished at home</p>
-  <aside class="notes">REPLACE: accounts, installs or reading participants need before the next unit</aside>
+<section class="slide dark" id="next" data-label="Day 3">
+  <div class="kicker">Next · Day 3</div>
+  <h2>Missing data and measurement: how far can the headline move?</h2>
+  <ul class="bullets">
+    <li>Household size is blank for 18% of the population of the question</li>
+    <li>Three reasons for a blank, and what each does to the estimate</li>
+    <li>Three estimates of one number, then a range you can defend</li>
+    <li>Sizes that are recorded, and wrong</li>
+  </ul>
+  <aside class="notes"><p>Nothing to prepare. Day 3 starts from a supplied household table, so a participant who struggled today is not behind tomorrow. Ask them to reread the limits in the source note of the register tonight: two of them explain tomorrow's first lab.</p></aside>
 </section>
