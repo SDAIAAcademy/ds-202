@@ -1,0 +1,15 @@
+step,rows,note
+register rows read,40000,
+names repaired (decoded twice),40000,2732 names
+digits made Western,40000,2784 national ids
+one row per household_id,39820,180 later registrations of the same id set aside
+log rows read,210000,14 branch files
+exact copies dropped,209620,380 rows uploaded twice
+keys repaired,209620,"2446 keys: case, spaces, hyphen, letter O"
+set aside: key not in the register,421,kept in set_aside.csv
+set aside: blank key,311,kept in set_aside.csv
+set aside: handout before registration,79,kept in set_aside.csv
+log rows kept,208809,every row has a household in the register
+joined to the register,208809,many handouts to one household
+handouts of the quarter,73264,2026-07-01 to 2026-09-30
+households of the target population,35665,"active, registered before the quarter"

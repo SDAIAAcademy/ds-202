@@ -1,0 +1,38 @@
+[
+ {
+  "district_id": "D04",
+  "complete_case": 1.997,
+  "median": 2.031,
+  "within_groups": 2.069
+ },
+ {
+  "district_id": "D08",
+  "complete_case": 1.908,
+  "median": 1.965,
+  "within_groups": 2.019
+ },
+ {
+  "district_id": "D09",
+  "complete_case": 1.945,
+  "median": 1.966,
+  "within_groups": 2.013
+ },
+ {
+  "district_id": "D12",
+  "complete_case": 1.987,
+  "median": 2.051,
+  "within_groups": 2.079
+ },
+ {
+  "district_id": "D17",
+  "complete_case": 1.921,
+  "median": 1.952,
+  "within_groups": 2.009
+ },
+ {
+  "district_id": "D24",
+  "complete_case": 1.959,
+  "median": 1.977,
+  "within_groups": 2.02
+ }
+]

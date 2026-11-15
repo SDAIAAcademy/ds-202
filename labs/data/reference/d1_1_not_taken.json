@@ -1,0 +1,7 @@
+{
+ "national_id": "household_id already links the sources; the question needs no national identifier",
+ "head_name": "no step of the answer uses a name",
+ "phone": "nobody is contacted in this analysis",
+ "collected_by": "who collected does not change the count of parcels",
+ "note": "free text can hold anything about a person and is not used"
+}

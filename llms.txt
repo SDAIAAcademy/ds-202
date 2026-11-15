@@ -1,0 +1,47 @@
+# Data Acquisition, Preparation and Quality
+
+> Turn four raw sources into an analysis dataset that rebuilds with one command, with its provenance, its rules and an honest account of what is missing. SDAIA Academy course DS-202, version 2027.1.0, in English.
+
+Each slide is a heading such as "#### [day1#slide-id] Title": cite slides by that id, and each citation is a link (slides/day1.html#slide-id). These files are what a trainee sees: no speaker notes and no answer keys.
+
+## Course
+
+- [Course page](https://sdaiaacademy.github.io/ds-202/index.md): overview, outcomes, schedule and labs; the page itself is https://sdaiaacademy.github.io/ds-202/index.html
+- [The whole course](https://sdaiaacademy.github.io/ds-202/llms-full.txt): every unit, session and slide in one file, about 21,977 tokens
+- [Practice questions](https://sdaiaacademy.github.io/ds-202/practice.html): questions to check yourself, with feedback after each answer
+
+## Slides
+
+- [Day 1: Find and document the sources](https://sdaiaacademy.github.io/ds-202/slides/day1.md): The question, the four sources, their provenance and who they leave out; sessions: Start from the question, not the files, Files, APIs and databases, Provenance and sharing basis, Coverage and sampling frames; page: https://sdaiaacademy.github.io/ds-202/slides/day1.html; about 5,265 tokens
+- [Day 2: Join and clean](https://sdaiaacademy.github.io/ds-202/slides/day2.md): Bytes, keys, people without keys, dates and units, each repair counted; sessions: Encodings and Arabic text, Keys and cardinality, Matching without a clean key, Types, units and dates; page: https://sdaiaacademy.github.io/ds-202/slides/day2.html; about 4,597 tokens
+- [Day 3: Missing data and measurement](https://sdaiaacademy.github.io/ds-202/slides/day3.md): Why values are missing, what each remedy assumes, and how far the headline can move; sessions: Why data go missing, Imputation and its cost, Sensitivity ranges, Measurement error and proxies; page: https://sdaiaacademy.github.io/ds-202/slides/day3.html; about 5,148 tokens
+- [Day 4: Validate and protect](https://sdaiaacademy.github.io/ds-202/slides/day4.md): Rules that run on every rebuild, identifiers that hold, and a report that says what the dataset is good for; sessions: Quality dimensions as rules, Cross-field and cross-source checks, Minimise and pseudonymise, A data-quality report; page: https://sdaiaacademy.github.io/ds-202/slides/day4.html; about 5,624 tokens
+- [Capstone: Capstone project presentations](https://sdaiaacademy.github.io/ds-202/slides/capstone.md): Each participant rebuilds a dataset from raw files, live, and defends it: eight minutes, then four minutes of questions; page: https://sdaiaacademy.github.io/ds-202/slides/capstone.html; about 849 tokens
+
+## Labs
+
+- [Lab 1.1: The question before the files](https://sdaiaacademy.github.io/ds-202/labs/D1_1_list_variables_question.ipynb): Day 1, Session 1, 25 min
+- [Lab 1.2: Three ways in](https://sdaiaacademy.github.io/ds-202/labs/D1_2_load_logs_page.ipynb): Day 1, Session 2, 25 min
+- [Lab 1.3: Two provenance records](https://sdaiaacademy.github.io/ds-202/labs/D1_3_write_provenance_records.ipynb): Day 1, Session 3, 25 min
+- [Lab 1.4: Who is not in the register](https://sdaiaacademy.github.io/ds-202/labs/D1_4_compare_registrations_open.ipynb): Day 1, Session 4, 25 min
+- [Lab 2.1: One file, three encodings](https://sdaiaacademy.github.io/ds-202/labs/D2_1_repair_mixed_encodings.ipynb): Day 2, Session 1, 25 min
+- [Lab 2.2: A join that loses nothing](https://sdaiaacademy.github.io/ds-202/labs/D2_2_join_logs_registrations.ipynb): Day 2, Session 2, 25 min
+- [Lab 2.3: 300 records without a key](https://sdaiaacademy.github.io/ds-202/labs/D2_3_match_300_records.ipynb): Day 2, Session 3, 25 min
+- [Lab 2.4: One calendar, one unit](https://sdaiaacademy.github.io/ds-202/labs/D2_4_standardise_three_date.ipynb): Day 2, Session 4, 25 min
+- [Lab 3.1: Six gaps, six mechanisms](https://sdaiaacademy.github.io/ds-202/labs/D3_1_classify_six_missingness.ipynb): Day 3, Session 1, 25 min
+- [Lab 3.2: Three estimates of one number](https://sdaiaacademy.github.io/ds-202/labs/D3_2_estimate_parcels_per.ipynb): Day 3, Session 2, 25 min
+- [Lab 3.3: How far could it move?](https://sdaiaacademy.github.io/ds-202/labs/D3_3_bound_estimate_under.ipynb): Day 3, Session 3, 25 min
+- [Lab 3.4: When the answer itself is wrong](https://sdaiaacademy.github.io/ds-202/labs/D3_4_simulate_self_report.ipynb): Day 3, Session 4, 25 min
+- [Lab 4.1: Rules for the joined table](https://sdaiaacademy.github.io/ds-202/labs/D4_1_write_type_range.ipynb): Day 4, Session 1, 25 min
+- [Lab 4.2: Three rules across fields and sources](https://sdaiaacademy.github.io/ds-202/labs/D4_2_add_three_consistency.ipynb): Day 4, Session 2, 25 min
+- [Lab 4.3: A pseudonym that holds](https://sdaiaacademy.github.io/ds-202/labs/D4_3_replace_national_id.ipynb): Day 4, Session 3, 25 min
+- [Lab 4.4: The quality report](https://sdaiaacademy.github.io/ds-202/labs/D4_4_draft_quality_report.ipynb): Day 4, Session 4, 25 min
+
+## Context files
+
+- [context/course.md](https://sdaiaacademy.github.io/ds-202/context/course.md): the whole course, for an assistant that takes a file, about 21,977 tokens
+- [context/day1.md](https://sdaiaacademy.github.io/ds-202/context/day1.md): Day 1, about 5,265 tokens
+- [context/day2.md](https://sdaiaacademy.github.io/ds-202/context/day2.md): Day 2, about 4,597 tokens
+- [context/day3.md](https://sdaiaacademy.github.io/ds-202/context/day3.md): Day 3, about 5,148 tokens
+- [context/day4.md](https://sdaiaacademy.github.io/ds-202/context/day4.md): Day 4, about 5,624 tokens
+- [context/capstone.md](https://sdaiaacademy.github.io/ds-202/context/capstone.md): Capstone, about 849 tokens

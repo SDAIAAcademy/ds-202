@@ -1,0 +1,17 @@
+[
+ {
+  "index": "complete case",
+  "estimate": 1.985,
+  "districts_below_standard": 13
+ },
+ {
+  "index": "median imputed",
+  "estimate": 2.003,
+  "districts_below_standard": 11
+ },
+ {
+  "index": "imputed within groups",
+  "estimate": 2.06,
+  "districts_below_standard": 7
+ }
+]

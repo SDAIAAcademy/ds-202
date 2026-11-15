@@ -1,0 +1,9 @@
+{
+ "unit": "household",
+ "population": "active households registered before 2026-07-01 whose income per member is at most 1000 SAR",
+ "period": [
+  "2026-07-01",
+  "2026-09-30"
+ ],
+ "groups": "district_id"
+}

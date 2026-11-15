@@ -1,0 +1,30 @@
+{
+ "branch_logs": {
+  "origin": "Handout logs kept by each of the 14 branches, uploaded weekly by branch supervisors",
+  "owner": "Hazem Al-Sulaim, branch operations lead",
+  "coverage": "One row per handout, 1 January to 30 September 2026, all 14 branches",
+  "sharing_basis": "Operational records of the network, used for planning under internal approval DS-2026-041",
+  "refresh_date": "2026-10-03",
+  "limits": [
+   "date layout, weight unit and text encoding differ by branch and are not stated",
+   "household_id is typed by hand at some desks",
+   "a week can be uploaded twice or be missing, and no file says so",
+   "the scale of B09 was away from 4 to 17 May 2026"
+  ],
+  "classification": "Restricted"
+ },
+ "donations_api": {
+  "origin": "Donations intake service of the network, read through its API, page by page",
+  "owner": "Talal Al-Wabil, donations systems engineer",
+  "coverage": "One record per delivery of food to a branch, 1 January to 28 September 2026",
+  "sharing_basis": "Internal operational data without donor names, used under internal approval DS-2026-041",
+  "refresh_date": "2026-10-04",
+  "limits": [
+   "donor_type is null when an individual donor asked to stay anonymous",
+   "some retailers report pounds; the unit field says which",
+   "est_value_sar is an estimate made by the receiving clerk",
+   "records arrive while paging, so pages can repeat a record"
+  ],
+  "classification": "Restricted"
+ }
+}

@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-ax="deck" data-track="data-science">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 4 · Validate and protect · Data Acquisition, Preparation and Quality</title>
+<meta name="generator" content="SDAIA Academy engine 1.0.0">
+<link rel="icon" href="../_engine/icon.svg">
+<link rel="alternate" type="text/markdown" href="day4.md">
+<link rel="describedby" href="../llms.txt">
+<link rel="stylesheet" href="../_engine/academy.css">
+</head>
+<body>
+<div class="deck" data-course="Data Acquisition, Preparation and Quality" data-track="data-science" data-day="Day 4">
+<section class="slide title" id="title" data-auto="title" data-label="Welcome" data-n="1">
+  <div class="kicker">SDAIA Academy · Data Acquisition, Preparation and Quality</div>
+  <h1>Validate and protect</h1>
+  <p class="lead mt">Day 4: Rules that run on every rebuild, identifiers that hold, and a report that says what the dataset is good for</p>
+  <div class="meta"><span class="track">Data Science Track</span><span>4 teaching days + capstone day</span><span>4 sessions · 4 labs</span><span>DS-202</span></div>
+  <aside class="notes"><p>Three days produced a dataset and an estimate with a range. Today makes both last: rules that run on every rebuild, identifiers that cannot be linked back, and one page that says what the dataset can and cannot support. Every lab starts from a supplied state: the joined table data/reference/joined_q3.csv.gz, the October batches, or the reference build. The capstone brief is handed out in the last session.</p></aside>
+</section>
+
+<section class="slide" id="review-day-3" data-lo="LO5" data-n="2">
+  <div class="kicker">Review of Day 3</div>
+  <h2>One number, or a number with a range</h2>
+  <div class="quiz" data-type="single" data-lo="LO5" data-id="review-day-3-q1">
+    <p class="lead">Complete cases give 1.985 parcels per eligible household per month; imputing within groups gives 2.060; the scenarios about the missing sizes run from 2.02 to 2.07. The standard is 2. What goes to Sumayyah?</p>
+    <div class="opts">
+      <div class="opt" data-why="Treats dropping rows as the method that assumes nothing, although the dropped households are the larger ones" data-k="A">1.985: it uses only values that were recorded</div>
+      <div class="opt" data-why="Reports the best single estimate and hides that it rests on an assumption about 18% of the households" data-k="B">2.060: it is the best estimate, so it is the answer</div>
+      <div class="opt" data-ok data-k="C">2.06, between 2.02 and 2.07, with the reason and the districts that stay below</div>
+      <div class="opt" data-why="Averages methods as if each were an equally good measurement of the same thing" data-k="D">2.02: the mean of the two methods, to be fair to both</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The audit showed that blank sizes are large sizes, so complete cases are biased low. The range says how far the remaining assumption can move the figure.</div>
+  </div>
+  <aside class="notes"><p>Answer: C. Seven districts are below the standard in every scenario and three change their verdict with the assumption. Today's last lab turns exactly this sentence into the headline of the quality report.</p></aside>
+</section>
+
+<section class="slide" id="agenda" data-auto="agenda" data-label="Agenda" data-n="3">
+  <div class="kicker">Today</div>
+  <h2>Validate and protect</h2>
+  <div class="agenda"><div class="item"><div><b>Session 1 · Quality dimensions as rules</b><small>Completeness, validity, uniqueness and type, written from the data dictionary</small></div></div><div class="item"><div><b>Session 2 · Cross-field and cross-source checks</b><small>Faults that show only between two fields or two sources, reported so a branch can act</small></div></div><div class="item"><div><b>Session 3 · Minimise and pseudonymise</b><small>A plain hash falls to a list; a keyed hash holds; quasi-identifiers still single people out</small></div></div><div class="item"><div><b>Session 4 · A data-quality report</b><small>Row counts, rule results, what is missing, how far the estimate moves, what may leave</small></div></div></div>
+</section>
+
+<!-- ======================= SESSION 1 ======================= -->
+<section class="slide section" id="s1" data-auto="section" data-session="1" data-n="4">
+  <div class="kicker">Session 1</div>
+  <h1>Quality dimensions as rules</h1>
+  <ul class="bullets outcomes"><li>Translate a data dictionary into column rules</li><li>Name the quality dimension of each rule</li><li>Run the suite on a build and read its failures</li></ul>
+  <div class="sess-no">01</div>
+</section>
+
+<section class="slide" id="repair-and-rule" data-lo="LO4" data-n="5" data-session="1">
+  <div class="kicker">Two different things</div>
+  <h2>A repair fixes this file. A rule protects every file after it</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Day 2 repaired what was found: encodings, keys, date layouts, units</li>
+      <li>The next extract arrives in three months, from the same 14 branches, with faults nobody has seen yet</li>
+      <li>A <b>rule</b> states what must hold. A program checks it on every rebuild and says which rows break it</li>
+    </ul>
+    <div class="card c-teal"><h4>The evidence of LO4</h4><p class="small mb0">A rule suite that passes on the clean build and fails, readably, on a corrupted batch.</p></div>
+  </div>
+  <aside class="notes"><p>Ask who has opened a dataset, looked at df.describe() and called that validation. Looking is not a rule: it is not written down, it does not run next time, and it finds only what the person thought of on that day.</p></aside>
+</section>
+
+<section class="slide" id="dimensions" data-lo="LO4" data-n="6" data-session="1">
+  <div class="kicker">Quality dimensions</div>
+  <h2>Each dimension becomes a kind of rule</h2>
+  <table class="t small">
+    <tr><th>Dimension</th><th>The question</th><th>A rule for the joined table</th></tr>
+    <tr><td><b>Type</b></td><td>Is it the kind of value the column holds?</td><td><code>handout_date</code> is written YYYY-MM-DD</td></tr>
+    <tr><td><b>Completeness</b></td><td>Is a required value there?</td><td><code>household_key</code> is never blank</td></tr>
+    <tr><td><b>Validity</b></td><td>Is it a value the dictionary allows?</td><td><code>parcels</code> between 1 and 3</td></tr>
+    <tr><td><b>Uniqueness</b></td><td>Does a key identify one row?</td><td><code>log_id</code> never repeats</td></tr>
+    <tr><td><b>Consistency</b></td><td>Do fields and sources agree?</td><td>weight is 9 to 15 kg per parcel</td></tr>
+  </table>
+  <p class="small mt-s">Frameworks name and count the dimensions differently. The names matter less than this: every rule in your suite says which one it tests.</p>
+  <aside class="notes"><p>Session 1 covers the first four, which need one column each. Consistency needs two columns or two sources and is Session 2. Timeliness, which many frameworks add, belongs to the provenance record of Day 1 (the refresh date), not to a row rule.</p></aside>
+</section>
+
+<section class="slide" id="dictionary-to-rules" data-lo="LO4" data-n="7" data-session="1">
+  <div class="kicker">Lab 4.1, steps 1 to 3</div>
+  <h2>The data dictionary, written so that a program can check it</h2>
+  <div class="cols cols-2">
+    <pre class="code" data-file="Lab 4.1 · Pandera"><code class="language-python">schema = pa.DataFrameSchema({
+  <span class="hljs-string">&quot;log_id&quot;</span>: pa.Column(<span class="hljs-built_in">str</span>, unique=<span class="hljs-literal">True</span>),
+  <span class="hljs-string">&quot;parcels&quot;</span>: pa.Column(
+      <span class="hljs-built_in">int</span>, pa.Check.in_range(<span class="hljs-number">1</span>, <span class="hljs-number">3</span>)),
+  <span class="hljs-string">&quot;weight_kg&quot;</span>: pa.Column(
+      <span class="hljs-built_in">float</span>, pa.Check.in_range(<span class="hljs-number">5</span>, <span class="hljs-number">50</span>),
+      nullable=<span class="hljs-literal">True</span>),
+  <span class="hljs-string">&quot;handout_date&quot;</span>: pa.Column(
+      <span class="hljs-built_in">str</span>, pa.Check.str_matches(ISO)),
+}, strict=<span class="hljs-literal">True</span>)
+schema.validate(df, lazy=<span class="hljs-literal">True</span>)</code></pre>
+    <ul class="bullets small">
+      <li>"Required: yes" in the dictionary is <code>nullable=False</code>, the default: the completeness rule</li>
+      <li><code>strict=True</code>: a missing or an extra column fails</li>
+      <li><code>lazy=True</code>: every rule runs, and all failures come back together</li>
+      <li>Dates stay text with a pattern: a date in another layout fails; it is not guessed</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>FN-104 (Lab 4.4) declared a Pandera schema on a daily file and reported failures lazily; treat the syntax as known. New here: the rules are written from the data dictionary of a joined table, each is named by its dimension, and each is shown to fail on a copy broken on purpose. The lab uses Pandera because the rules are plain Python next to the data frame. Great Expectations does the same job with a larger apparatus (suites, checkpoints, rendered documentation) and is the usual choice when a team shares the rules; name it and move on. Sources: Pandera documentation; Great Expectations documentation.</p></aside>
+</section>
+
+<section class="slide" id="readable-failure" data-lo="LO4" data-n="8" data-session="1">
+  <div class="kicker">Lab 4.1, step 4</div>
+  <h2>A failure that reads like a sentence</h2>
+  <table class="t small">
+    <tr><th>Rule</th><th>Column</th><th>Rows</th><th>Examples</th></tr>
+    <tr><td>uniqueness: no value repeats</td><td>log_id</td><td>2</td><td>B01-0007639</td></tr>
+    <tr><td>completeness: no value is missing</td><td>household_key</td><td>3</td><td></td></tr>
+    <tr><td>validity: parcels between 1 and 3</td><td>parcels</td><td>4</td><td>9</td></tr>
+    <tr><td>validity: district_id is one of the 30 districts</td><td>district_id</td><td>2</td><td>D99</td></tr>
+    <tr><td>type: handout_date is a date written YYYY-MM-DD</td><td>handout_date</td><td>5</td><td>03/07/2026</td></tr>
+  </table>
+  <p class="small mt-s">The first 2,000 rows of the clean build, broken on purpose in five places. The same table, without the suite, raises no error anywhere.</p>
+  <aside class="notes"><p>Each rule is given a name: the dimension, then what must hold. Without the name the library reports the check in its own words, which the owner of the data cannot read. The repeated log_id counts two rows because both copies fail.</p></aside>
+</section>
+
+<section class="slide" id="never-failed" data-lo="LO4" data-n="9" data-session="1">
+  <div class="kicker">Testing the test</div>
+  <h2>A suite that has never failed has never been tested</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>The suite passes on all 73,264 rows of the clean build. That proves little</li>
+      <li>A typing mistake in a pattern, or a range that is too wide, passes every build for ever</li>
+      <li>Break a copy on purpose, one fault per rule, and watch each rule fail</li>
+      <li>Decide in advance, per rule: does a failure <b>stop</b> the build, or <b>warn</b>?</li>
+    </ul>
+    <div class="callout warn"><b>What goes wrong.</b> A suite is written after the cleaning, from the cleaned data, so that it passes. It then describes this file and protects nothing.</div>
+  </div>
+  <aside class="notes"><p>Stop or warn is the stretch of Lab 4.1. A repeated key or an unknown district corrupts every count: stop. An odd weight leaves the parcel count intact: warn, and count it in the log. The decision is the network's, and it is written down before the failure happens.</p></aside>
+</section>
+
+<section class="slide" id="valid-not-true" data-lo="LO4" data-n="10" data-session="1">
+  <div class="kicker">The limit of a rule</div>
+  <h2>Valid is not the same as true</h2>
+  <div class="cols cols-2">
+    <div class="stack">
+      <div class="stat"><div class="big">0</div><div class="lbl">rows of the clean build fail "household_size between 1 and 20"</div></div>
+    </div>
+    <ul class="bullets">
+      <li>Lab 3.4: the audit found recorded sizes that differ from the verified size, more often above than below</li>
+      <li>Every one of those sizes is a whole number between 1 and 20</li>
+      <li>A rule tests what a value <b>may be</b>. Whether it <b>is</b> so needs a second measurement</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>Keep this slide short: it prevents the most common overclaim of a quality report, "the data passed validation", read by a manager as "the data is correct". The report of Session 4 lists self-reported size under limits for this reason.</p></aside>
+</section>
+
+<section class="slide" id="check-dimension" data-lo="LO4" data-n="11" data-session="1">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which rule, and which dimension?</h2>
+  <div class="quiz" data-type="single" data-lo="LO4" data-id="check-dimension-q1">
+    <p class="lead">In the joined table, one row is one handout, and a household has many handouts. A week of one branch is uploaded twice. Which rule catches it?</p>
+    <div class="opts">
+      <div class="opt" data-why="Puts uniqueness on a column that repeats by design: every household with two handouts would fail" data-k="A">Uniqueness of <code>household_key</code></div>
+      <div class="opt" data-ok data-k="B">Uniqueness of <code>log_id</code></div>
+      <div class="opt" data-why="Looks for blanks, although a row uploaded twice is complete in every field" data-k="C">Completeness of <code>log_id</code></div>
+      <div class="opt" data-why="Checks each value alone; a repeated row has the same valid values as the first copy" data-k="D">Validity of <code>handout_date</code></div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Uniqueness belongs to the key of the grain. The grain here is the handout, so its key, <code>log_id</code>, must never repeat.</div>
+  </div>
+  <aside class="notes"><p>Answer: B. Ask for the grain before asking for the rule: participants who state "one row per handout" aloud do not pick A. Day 2 found exactly this fault: the week of 8 to 14 March at B02, 380 rows.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-4-1" data-auto="lab" data-lab="4.1" data-label="Lab 4.1" data-n="12" data-session="1">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 4.1 · 25 min</div><h2>Rules for the joined table</h2><p class="lead small">Write type, range, uniqueness and completeness rules for the joined table from its data dictionary, run them on the clean build, and watch each fail on a copy you break.</p><a class="nb" href="../labs/D4_1_write_type_range.ipynb">D4_1_write_type_range.ipynb</a></div><ul class="checklist"><li>Types and completeness from the dictionary <span class="min">7 min</span></li><li>Range and validity rules <span class="min">6 min</span></li><li>Uniqueness <span class="min">4 min</span></li><li>Run on the clean build and on a broken copy <span class="min">8 min</span></li><li class="stretch">✱ Stretch: Which rules stop the build and which only warn?</li></ul></div>
+  <aside class="notes"><p>AI-off for the first attempt at each rule; an AI-tutor that only hints may explain Pandera syntax. Typical problems: int for a column that has blanks (use "Int64" and nullable=True); uniqueness put on household_key; a pattern without ^ and $, which then matches almost anything; forgetting to name a rule. The lab starts from G.joined_q3(), 73,264 rows. No model is called.</p></aside>
+</section>
+
+<!-- ======================= SESSION 2 ======================= -->
+<section class="slide section" id="s2" data-auto="section" data-session="2" data-n="13">
+  <div class="kicker">Session 2</div>
+  <h1>Cross-field and cross-source checks</h1>
+  <ul class="bullets outcomes"><li>Write rules across two fields</li><li>Write a rule across two sources</li><li>Produce a failure report a data owner can act on</li></ul>
+  <div class="sess-no">02</div>
+</section>
+
+<section class="slide" id="october-batch" data-lo="LO4" data-n="14" data-session="2">
+  <div class="kicker">Lab 4.2, step 1</div>
+  <h2>A new batch arrives, and seven column rules fail</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Rule that fails</th><th>Rows</th></tr>
+      <tr class="hl"><td>validity: weight_kg between 5 and 50</td><td>278</td></tr>
+      <tr><td>completeness: household_key</td><td>60</td></tr>
+      <tr><td>uniqueness: log_id</td><td>50</td></tr>
+      <tr><td>validity: parcels between 1 and 3</td><td>40</td></tr>
+      <tr><td>validity: district_id</td><td>20</td></tr>
+      <tr><td>type: handout_date</td><td>15</td></tr>
+      <tr><td>validity: household_size</td><td>12</td></tr>
+    </table>
+    <ul class="bullets small">
+      <li>The first week of October: 4,180 rows, built as the quarter was</li>
+      <li>Each line names what somebody can fix</li>
+      <li>Look again at the first line: 278 handouts above 50 kg. Is that all that is wrong with those rows?</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>The batch is supplied: data/raw/batches/joined_2026-10-w1_corrupted.csv, with a clean twin of 4,155 rows. Let participants answer the question on the slide before moving on. The 278 rows are all from one branch, which is the clue.</p></aside>
+</section>
+
+<section class="slide" id="pounds-inside-range" data-lo="LO4" data-n="15" data-session="2">
+  <div class="kicker">What a column rule cannot see</div>
+  <h2>B05 sent pounds. Most of its rows pass the range rule</h2>
+  <div class="cols cols-2">
+    <div class="stack">
+      <div class="stat"><div class="big">278 · 377</div><div class="lbl">rows of B05 caught by "5 to 50 kg", and rows of B05 that are wrong</div></div>
+    </div>
+    <ul class="bullets">
+      <li>A parcel weighs about 12 kg: about 26 in pounds</li>
+      <li>One parcel in pounds: 26, <b>inside</b> 5 to 50. Passes</li>
+      <li>Two or three parcels in pounds: 53 or 79. Fails</li>
+      <li>The value is fine on its own. It is wrong <b>for its number of parcels</b></li>
+    </ul>
+  </div>
+  <aside class="notes"><p>The median weight per parcel at B05 in this batch is 26.4, against about 12 at every other branch. Tightening the range to catch 26 would reject honest two-parcel handouts of 24 kg. No range on one column separates the two cases.</p></aside>
+</section>
+
+<section class="slide" id="cross-field" data-lo="LO4" data-n="16" data-session="2">
+  <div class="kicker">Lab 4.2, step 2</div>
+  <h2>Two rules across fields</h2>
+  <div class="cols cols-2">
+    <pre class="code" data-file="Lab 4.2"><code class="language-python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">not_per_parcel</span>(<span class="hljs-params">df</span>):
+    ok = df.parcels.between(<span class="hljs-number">1</span>, <span class="hljs-number">3</span>)
+    per = df.weight_kg / df.parcels.where(ok)
+    <span class="hljs-keyword">return</span> df[per.notna()
+              &amp; ~per.between(<span class="hljs-number">9</span>, <span class="hljs-number">15</span>)]
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">before_registration</span>(<span class="hljs-params">df</span>):
+    <span class="hljs-keyword">return</span> df[date(df.handout_date)
+              &lt; date(df.registered_on)]</code></pre>
+    <ul class="bullets small">
+      <li>9 to 15 kg per parcel: all <b>377</b> rows of B05, and no row of any other branch</li>
+      <li>Handout on or after registration: <b>30</b> rows in 12 branches. A household cannot collect before it exists: a wrong key or a wrong date</li>
+      <li>Each rule skips rows that another rule already reports, so one fault gives one line</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>The functions return the failing rows, not True or False: the rows are what the branch needs. Rows whose parcels are outside 1 to 3 are left to the validity rule; otherwise 40 rows with parcels of 30 would appear under two rules and the report would count one fault twice.</p></aside>
+</section>
+
+<section class="slide" id="cross-source" data-lo="LO4" data-n="17" data-session="2">
+  <div class="kicker">Lab 4.2, step 3</div>
+  <h2>A branch cannot hand out more food than it received</h2>
+  <div class="bars">
+    <div class="row"><span>B05 · received in the week</span><div class="bar c-teal" style="--w:48%"></div><span class="val">9,574 kg</span></div>
+    <div class="row"><span>B05 · handed out, as recorded</span><div class="bar c-coral" style="--w:100%"></div><span class="val">20,005 kg</span></div>
+  </div>
+  <ul class="bullets small mt">
+    <li>The logs say what went out; the donations source says what came in. No single table holds both</li>
+    <li>To compare them: the same unit, the same week, one row per branch. A small pipeline of its own</li>
+    <li>It catches a whole class of faults that leave every row plausible</li>
+  </ul>
+  <aside class="notes"><p>Every other branch handed out less than it received that week. The rule is coarse: stock carried over from earlier weeks could make an honest branch fail, so in production it would compare over a longer window or include opening stock. Say so: a cross-source rule encodes an assumption about the world, and the assumption belongs in the rule's description.</p></aside>
+</section>
+
+<section class="slide" id="failure-report" data-lo="LO4" data-n="18" data-session="2">
+  <div class="kicker">Lab 4.2, step 4</div>
+  <h2>A failure report says whose rows, and what to look at</h2>
+  <table class="t small">
+    <tr><th>Rule</th><th>Rows</th><th>Whose</th><th>What to look at</th></tr>
+    <tr><td>consistency: 9 to 15 kg per parcel</td><td>377</td><td>B05: 377</td><td>median 26.4 per parcel: pounds entered as kilograms?</td></tr>
+    <tr><td>consistency: handout on or after registration</td><td>30</td><td>12 branches</td><td>the household id or the date of these handouts</td></tr>
+    <tr><td>consistency across sources: handed out no more than received</td><td>1</td><td>B05</td><td>handed 20,005 kg, received 9,574 kg</td></tr>
+  </table>
+  <div class="callout tip mt"><b>Ten lines in all.</b> Seven from the column rules, three from the rules you add. "Validation failed" helps nobody; a line that names the branch gets fixed.</div>
+  <aside class="notes"><p>Without the three new rules, a week of pounds would have entered every weight total, and 30 misattributed handouts every household count, with seven failures reported and a feeling that validation had done its job.</p></aside>
+</section>
+
+<section class="slide" id="reject-or-quarantine" data-lo="LO4" data-n="19" data-session="2">
+  <div class="kicker">Recap of FN-104, as a rule of the build</div>
+  <h2>Reject the file, or set the rows aside?</h2>
+  <div class="cols cols-2">
+    <div class="card c-coral"><h4>Reject the file</h4><p class="small mb0">The fault is in how the file was made: a wrong unit, a wrong layout, a missing column. Every row of B05 is suspect. Send it back.</p></div>
+    <div class="card c-teal"><h4>Quarantine the rows</h4><p class="small mb0">The fault is in single rows: a blank key, a date before registration. Load the rest; set these aside with a reason and count them in the log.</p></div>
+  </div>
+  <p class="small mt">Either way the decision is made per rule, in advance, and the log shows it: rows in equal rows loaded plus rows set aside.</p>
+  <aside class="notes"><p>FN-104 (Lab 4.4) taught the choice on one daily file; do not teach it again, ask the room for the rule. What is new is that the decision is written per rule in the build of a joined table. This is the set-aside file of Day 2 again, now as policy. The third option, repairing silently inside the build, is the dangerous one: the reference build converts weights that are plainly in grams and records each change; ask the room whether a build should do that without telling anyone. It should tell: the change is in the log.</p></aside>
+</section>
+
+<section class="slide" id="check-cross-field" data-lo="LO4" data-n="20" data-session="2">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which rule finds it?</h2>
+  <div class="quiz" data-type="single" data-lo="LO4" data-id="check-cross-field-q1">
+    <p class="lead">From 7 to 9 August a branch writes dates as month/day/year; the build reads that branch as day/month/year. Every date parses, and every one falls inside the quarter. Which rule is most likely to show the fault?</p>
+    <div class="opts">
+      <div class="opt" data-why="Tests the layout of the text; a swapped day and month has the same layout" data-k="A">Type: the date matches the pattern of the file</div>
+      <div class="opt" data-why="Looks for blanks, although every date is present" data-k="B">Completeness: no date is missing</div>
+      <div class="opt" data-why="Checks each date alone against the quarter; every swapped date is inside it" data-k="C">Validity: the date is inside the quarter</div>
+      <div class="opt" data-ok data-k="D">Consistency: rows per branch per day against that branch's usual pattern</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Each swapped date is a possible date. The fault shows only in a relation: the branch has no rows on 7 and 9 August, and about twice its usual rows on 8 July and 8 September.</div>
+  </div>
+  <aside class="notes"><p>Answer: D. Work one date through on the board: 08/07/2026 meant 7 August and is read as 8 July. Day 2 solved the layout for a whole file by looking for a part above 12; three days inside a file leave no such part, so no rule on one value can see the swap. A count of rows per branch per day is the rule that raises the question.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-4-2" data-auto="lab" data-lab="4.2" data-label="Lab 4.2" data-n="21" data-session="2">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 4.2 · 25 min</div><h2>Three rules across fields and sources</h2><p class="lead small">Run the column rules on a corrupted October batch, add two cross-field rules and one cross-source rule that catch what they miss, and write a failure report that says which branch must fix what.</p><a class="nb" href="../labs/D4_2_add_three_consistency.ipynb">D4_2_add_three_consistency.ipynb</a></div><ul class="checklist"><li>Run the column rules on the corrupted batch <span class="min">5 min</span></li><li>Two rules across fields <span class="min">8 min</span></li><li>One rule across sources <span class="min">7 min</span></li><li>A failure report a branch can act on <span class="min">5 min</span></li><li class="stretch">✱ Stretch: Reject the batch or quarantine the rows?</li></ul></div>
+  <aside class="notes"><p>AI-off for the first attempt at each rule. Typical problems: dividing by parcels where parcels is 30, so the rule double-counts another rule's rows; comparing dates as text when one side has another layout; joining donations at row level, which repeats the branch total on every handout. The lab starts from the two supplied batches and B.schema(). No model is called.</p></aside>
+</section>
+
+<!-- ======================= SESSION 3 ======================= -->
+<section class="slide section" id="s3" data-auto="section" data-session="3" data-n="22">
+  <div class="kicker">Session 3</div>
+  <h1>Minimise and pseudonymise</h1>
+  <ul class="bullets outcomes"><li>Re-link a plain hash with a list and by enumeration</li><li>Replace identifiers with a keyed hash</li><li>Measure uniqueness on quasi-identifiers and reduce it by generalising</li></ul>
+  <div class="sess-no">03</div>
+</section>
+
+<section class="slide" id="minimise-first" data-lo="LO6" data-n="23" data-session="3">
+  <div class="kicker">Before any technique</div>
+  <h2>The safest field is the one that never entered the dataset</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Lab 1.1 listed the fields the question needs. A name, a phone number and an ID number are not among them</li>
+      <li>They were needed for <b>one step</b>: matching the 300 walk-in records of Day 2</li>
+      <li>After that step they are dropped, and the dataset keeps a key that says "the same household" and nothing else</li>
+    </ul>
+    <div class="card c-purple"><h4>Minimise, then pseudonymise</h4><p class="small mb0">First ask whether the field is needed at all. Only for what remains: how to replace the identifier so that tables still join.</p></div>
+  </div>
+  <aside class="notes"><p>Under the Personal Data Protection Law, personal data is any data that can lead to identifying a person, directly or indirectly, and collection is limited to what the purpose needs. The purpose here was written down on Day 1: service coverage analysis for the quarter. Sources: Personal Data Protection Law.</p></aside>
+</section>
+
+<section class="slide" id="pseudonymised-or-anonymised" data-lo="LO6" data-n="24" data-session="3">
+  <div class="kicker">Recap of FN-106</div>
+  <h2>Pseudonymised data is still personal data</h2>
+  <div class="cols cols-2">
+    <div class="card c-teal"><h4>Pseudonymised</h4><p class="small mb0">Identifiers are replaced by codes. Linking back needs additional information, which is kept separately under its own controls. Somebody can still link back, so the data stays personal.</p></div>
+    <div class="card c-coral"><h4>Anonymised</h4><p class="small mb0">Nobody can link the data to a person any more, with any reasonable means. A much higher bar, and rarely reached by a table with one row per household.</p></div>
+  </div>
+  <p class="small mt">The national guideline names generalisation and aggregation among the techniques: age bands in place of ages, a year in place of a date. Lab 4.3 uses both.</p>
+  <aside class="notes"><p>FN-106 (Session 3 of its first day) taught the two words, the keyed hash and quasi-identifiers on guardian and student records; keep this slide to two minutes. What is new here is measured: how fast a plain hash falls to enumeration, and how much generalisation it takes to bring re-linkage down on 37,333 households. The guideline defines pseudonymisation as transforming the primary identifiers into codes so that direct identification is not feasible without additional information, which is kept separately; it states that pseudonymised data is considered personal data. Sources: Personal Data Destruction, Anonymization and Pseudonymisation Guideline.</p></aside>
+</section>
+
+<section class="slide" id="plain-hash-falls" data-lo="LO6" data-n="25" data-session="3">
+  <div class="kicker">Lab 4.3, steps 1 and 2</div>
+  <h2>"A hash cannot be reversed." Nobody needs to reverse it</h2>
+  <div class="cols cols-2">
+    <div class="stack">
+      <div class="stat"><div class="big">5,000 of 5,000</div><div class="lbl">people on a known list re-identified in a table of plain SHA-256 hashes</div></div>
+    </div>
+    <ul class="bullets">
+      <li>The same input gives the same hash, for everyone</li>
+      <li><b>List attack</b>: hash the ID numbers you hold; join</li>
+      <li><b>Enumeration</b>: an ID number has ten digits. Hash every possible one</li>
+      <li>The 2,000,000 numbers of the course range take seconds on a laptop; all ten-digit numbers take hours</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From the Lab 4.3 run: two million candidates hashed in 6 to 12 seconds on one core, depending on the laptop, 37,333 of 37,333 households recovered; at that rate ten thousand million numbers take 8 to 17 hours, less on several cores. The ID numbers are synthetic, drawn from a range chosen so that the attack fits in the lab. Adding a fixed text to every number before hashing does not help once the text is known.</p></aside>
+</section>
+
+<section class="slide" id="keyed-hash" data-lo="LO6" data-n="26" data-session="3">
+  <div class="kicker">Lab 4.3, step 3</div>
+  <h2>A keyed hash: without the key, neither attack starts</h2>
+  <div class="cols cols-2">
+    <pre class="code" data-file="Lab 4.3 · HMAC"><code class="language-python"><span class="hljs-keyword">import</span> hmac, hashlib, os
+
+key = os.environ[<span class="hljs-string">&quot;GHILAL_KEY&quot;</span>].encode()
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">pseudonym</span>(<span class="hljs-params">s: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-built_in">str</span>:
+    <span class="hljs-keyword">return</span> hmac.new(key, s.encode(),
+        hashlib.sha256).hexdigest()[:<span class="hljs-number">16</span>]</code></pre>
+    <ul class="bullets small">
+      <li>Stable and unique: the same household has the same pseudonym in every table, so joins still work</li>
+      <li>The key is the "additional information": kept separately, never committed, never sent</li>
+      <li>A list attack without the key: 0 of 5,000</li>
+      <li>A new key gives new pseudonyms: two recipients cannot join their tables to each other</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>HMAC is in the standard library; no package is needed. Where the key lives: an environment variable or a secrets store read at build time. The reference build falls back to a teaching key that is plainly labelled as not a secret, so that the course rebuilds without setup; a capstone repository must not do that. Sources: Python documentation, hmac; RFC 2104.</p></aside>
+</section>
+
+<section class="slide" id="quasi-identifiers" data-lo="LO6" data-n="27" data-session="3">
+  <div class="kicker">Lab 4.3, step 4</div>
+  <h2>The key holds, and ordinary fields still single households out</h2>
+  <div class="bars">
+    <div class="row"><span>district, exact date, exact size</span><div class="bar c-coral" style="--w:93%"></div><span class="val">92.8%</span></div>
+    <div class="row"><span>district, year, size band</span><div class="bar c-teal" style="--w:1%"></div><span class="val">0.0%</span></div>
+  </div>
+  <p class="small mt">Share of the 37,333 households whose combination of fields occurs exactly once.</p>
+  <ul class="bullets small mt-s">
+    <li>"They live in D09, registered on 14 March 2024, seven of them": a neighbour needs no key</li>
+    <li>A combination of ordinary fields that singles a person out is a <b>quasi-identifier</b></li>
+    <li>Generalised, the smallest group has 4 households; the partner can still count shared households</li>
+  </ul>
+  <aside class="notes"><p>Uniqueness is a simple measure and a pessimistic one: it assumes the attacker knows all three fields. It is still the right first number, because it costs one group-by. A smallest group of 4 is not a guarantee of anything; with a sensitive field in the table (income) even a group of 4 can reveal that all four are below the line. The table stays personal data and travels under an agreement.</p></aside>
+</section>
+
+<section class="slide" id="what-travels" data-lo="LO6" data-n="28" data-session="3">
+  <div class="kicker">Who may receive what</div>
+  <h2>The classification of the source decides the conditions of sharing</h2>
+  <div class="cols cols-3">
+    <div class="card c-coral"><h4>Stays inside</h4><p class="small mb0">Raw sources. Rows with identifiers as typed. The key.</p></div>
+    <div class="card c-purple"><h4>Under an agreement</h4><p class="small mb0">Household-level tables, pseudonymised and generalised: to named people, for one purpose, for a stated time.</p></div>
+    <div class="card c-teal"><h4>May be published</h4><p class="small mb0">Aggregates by district that single nobody out, the code, the rules, the report.</p></div>
+  </div>
+  <p class="small mt">The provenance records of Day 1 classified the register and the logs as Restricted. A table derived from them does not become Public by losing a column.</p>
+  <aside class="notes"><p>Ruqayyah Al-Marzouqi, the data protection officer, approves what leaves. The network applies the four national classification levels as its own policy; a charity is not a government entity, and this is a choice of the case, stated in the provenance records. Sources: Data Classification Policy; Data Sharing Policy.</p></aside>
+</section>
+
+<section class="slide" id="check-pseudonym" data-lo="LO6" data-n="29" data-session="3">
+  <div class="kicker">Checkpoint</div>
+  <h2>What must change before the table is sent?</h2>
+  <div class="quiz" data-type="single" data-lo="LO6" data-id="check-pseudonym-q1">
+    <p class="lead">A table for a partner holds, per household: a keyed-hash pseudonym, the district, the exact registration date and the household size. The key is stored safely. What is the remaining risk, and the remedy?</p>
+    <div class="opts">
+      <div class="opt" data-why="Believes a keyed hash can be broken like a plain one; without the key no candidate can be tested" data-k="A">The pseudonym can be enumerated; use a longer hash</div>
+      <div class="opt" data-ok data-k="B">Date, district and size single households out; send the year and a size band</div>
+      <div class="opt" data-why="Takes the absence of names and numbers for anonymity, and ignores what the other fields reveal together" data-k="C">None: without names and ID numbers the table is anonymous</div>
+      <div class="opt" data-why="Removes the one field the partner needs to count shared households, and leaves the identifying ones" data-k="D">The pseudonym links tables; remove it and keep the other fields</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> With exact fields, 92.8% of households have a combination nobody else has. Generalising the date and the size brings that to almost none and costs the purpose nothing.</div>
+  </div>
+  <aside class="notes"><p>Answer: B. Option C is the belief this session exists to remove. Ask what the partner needs the table for; the answer (counting households both serve) is what decides which fields can be coarsened without loss.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-4-3" data-auto="lab" data-lab="4.3" data-label="Lab 4.3" data-n="30" data-session="3">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 4.3 · 25 min</div><h2>A pseudonym that holds</h2><p class="lead small">Hash national ID numbers plainly and re-link them with a list and by enumeration, replace them with a keyed hash, then attempt re-linkage through district, size and registration date and reduce it by generalising.</p><a class="nb" href="../labs/D4_3_replace_national_id.ipynb">D4_3_replace_national_id.ipynb</a></div><ul class="checklist"><li>A plain hash and a list attack <span class="min">6 min</span></li><li>Enumerate the id space <span class="min">5 min</span></li><li>A keyed hash <span class="min">6 min</span></li><li>Re-link through quasi-identifiers, then generalise <span class="min">8 min</span></li><li class="stretch">✱ Stretch: Change the key: what breaks, and what should</li></ul></div>
+  <aside class="notes"><p>AI-off for the first attempt. Every ID number is synthetic. Typical problems: hashing the integer instead of its text, so the hashes do not match; writing the key into the notebook or a file; counting unique combinations instead of the share of rows in them. Enumerating two million numbers takes a few seconds on a laptop CPU; GH_QUICK=1 tries 200,000. The lab starts from the reference cleaning of the register. No model is called.</p></aside>
+</section>
+
+<!-- ======================= SESSION 4 ======================= -->
+<section class="slide section" id="s4" data-auto="section" data-session="4" data-n="31">
+  <div class="kicker">Session 4</div>
+  <h1>A data-quality report</h1>
+  <ul class="bullets outcomes"><li>Rebuild a dataset from raw sources with one command</li><li>Draft a data-quality report from the build outputs</li><li>Classify outputs and choose a capstone question</li></ul>
+  <div class="sess-no">04</div>
+</section>
+
+<section class="slide" id="one-command" data-lo="LO6" data-n="32" data-session="4">
+  <div class="kicker">Rebuildable</div>
+  <h2>One command: raw files in, the dataset and its evidence out</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>1 · Read</b>the raw sources, exactly as they arrived</div>
+    <div class="arrow">→</div><div class="step c-cyan"><b>2 · Clean and join</b>each step counts its rows; rows without a household are set aside</div>
+    <div class="arrow">→</div><div class="step c-purple"><b>3 · Check</b>every rule runs on the result</div>
+    <div class="arrow">→</div><div class="step c-coral"><b>4 · Write</b>tables with pseudonyms, the join log, the rule results, the report</div>
+  </div>
+  <ul class="bullets small mt">
+    <li><code>uv run python build_dataset.py</code>: under a minute on a laptop for 40,000 registrations and 210,000 log rows</li>
+    <li>Nothing is edited by hand between the raw files and the outputs, so anybody can run it again</li>
+    <li>A rebuild is compared with the last one: the same rows, the same content</li>
+  </ul>
+  <aside class="notes"><p>The reference build is what the labs of Days 2 to 4 wrote, in one file of about 300 lines. Open it and scroll once: participants recognise their own functions. A notebook is where a step is worked out; the build is where it lives afterwards. In the lab, the fingerprint of the rebuilt table equals that of the reference table.</p></aside>
+</section>
+
+<section class="slide" id="report-parts" data-lo="LO6" data-n="33" data-session="4">
+  <div class="kicker">One page</div>
+  <h2>The quality report: six parts, read before any number is used</h2>
+  <table class="t small">
+    <tr><th>Part</th><th>Says</th><th>Comes from</th></tr>
+    <tr><td>1 · Headline</td><td>the estimate, its range, the standard</td><td>Day 3</td></tr>
+    <tr><td>2 · Question and population</td><td>who is counted, for which period</td><td>Lab 1.1</td></tr>
+    <tr><td>3 · Sources</td><td>owner, refresh date, classification</td><td>the provenance records</td></tr>
+    <tr><td>4 · Row counts per step</td><td>what went in, what was set aside and why</td><td>the join log</td></tr>
+    <tr><td>5 · Rules</td><td>how many ran, which failed</td><td>the rule results</td></tr>
+    <tr><td>6 · Limits</td><td>what the dataset cannot support</td><td>you</td></tr>
+  </table>
+  <aside class="notes"><p>The first five parts are assembled by a program. The sixth is the analyst's work and the part Sumayyah reads most closely. The structure follows the idea of a datasheet for a dataset, cut to one page for one question. Sources: Gebru and others, Datasheets for Datasets.</p></aside>
+</section>
+
+<section class="slide" id="no-typed-number" data-lo="LO6" data-n="34" data-session="4">
+  <div class="kicker">Lab 4.4, step 2</div>
+  <h2>No number in the report is typed by hand</h2>
+  <div class="cols cols-2">
+    <pre class="code" data-file="Lab 4.4"><code class="language-python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">headline</span>(<span class="hljs-params">facts</span>):
+    lo, hi = facts[<span class="hljs-string">&quot;range&quot;</span>]
+    <span class="hljs-keyword">return</span> (<span class="hljs-string">f&quot;an estimated &quot;</span>
+            <span class="hljs-string">f&quot;<span class="hljs-subst">{facts[<span class="hljs-string">&#x27;recommended&#x27;</span>]}</span> parcels &quot;</span>
+            <span class="hljs-string">f&quot;per eligible household per month &quot;</span>
+            <span class="hljs-string">f&quot;(plausible range <span class="hljs-subst">{lo}</span> to <span class="hljs-subst">{hi}</span>; &quot;</span>
+            <span class="hljs-string">f&quot;standard <span class="hljs-subst">{facts[<span class="hljs-string">&#x27;standard&#x27;</span>]}</span>)&quot;</span>)</code></pre>
+    <ul class="bullets small">
+      <li>The next rebuild changes the numbers. A typed number stays, and the report then describes a dataset that no longer exists</li>
+      <li>The lab checks it: every number in your headline must occur in the facts the build wrote</li>
+      <li>An AI-assistant may improve the wording after your draft exists. The numbers still come from the build</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>The AI-use rule for this lab: AI-assistant, after the participant's own draft, for wording only; the participant records what was asked and what was kept. A model that rewrites a sentence can also change 2.06 into 2.6. The check that compares the numbers of the text with the facts catches that.</p></aside>
+</section>
+
+<section class="slide" id="limits" data-lo="LO6" data-n="35" data-session="4">
+  <div class="kicker">Part 6</div>
+  <h2>Limits: what this dataset cannot support</h2>
+  <ul class="bullets">
+    <li>Household size is missing for <b>18.1%</b> of the 35,665 households, and more often for large ones</li>
+    <li>For D09, D17 and D24 the verdict against the standard depends on the assumption: <b>undecided</b></li>
+    <li>B12 sent no rows for 10 to 18 August: its districts look less served than they were</li>
+    <li>811 log rows could not be tied to a household; they are set aside, not counted</li>
+    <li>D29 and D30 have no row in the open table of 2022: coverage of need cannot be stated there</li>
+    <li>Sizes are reported by households and not verified</li>
+  </ul>
+  <aside class="notes"><p>Each limit is a sentence with a number and a consequence. Compare with "the data has some quality issues", which is true of every dataset and tells the reader nothing. Ask participants which limit changes what Sumayyah does on Monday; most say the three undecided districts, and that one goes first.</p></aside>
+</section>
+
+<section class="slide" id="what-may-leave" data-lo="LO2" data-n="36" data-session="4">
+  <div class="kicker">Lab 4.4, step 3</div>
+  <h2>Before a file is committed or attached, a program looks at it</h2>
+  <table class="t small">
+    <tr><th>Build output</th><th>Grain</th><th>Decision</th></tr>
+    <tr><td>join_log.csv, rule_results.csv, the report</td><td>aggregate</td><td>may leave</td></tr>
+    <tr><td>households.csv, handouts_q3.csv</td><td>household, pseudonymised</td><td>only under an agreement, generalised</td></tr>
+    <tr class="hl"><td>set_aside.csv</td><td>log row, keys as typed</td><td>stays inside</td></tr>
+  </table>
+  <ul class="bullets small mt-s">
+    <li>The set-aside rows keep each key exactly as the desk typed it, because somebody must repair it. That makes the file useful to the branch and unfit to travel</li>
+    <li>A scan for identifier patterns in every output is one more rule of the build</li>
+  </ul>
+  <aside class="notes"><p>The lab's scan searches each column for a household id, a ten-digit number starting with 1 and a mobile number, and finds them in one file only. In a capstone repository the set-aside rows appear as log id, branch and reason; the key as typed stays out. The classification of each output follows the provenance record of its sources (LO2).</p></aside>
+</section>
+
+<section class="slide" id="capstone-questions" data-lo="LO6" data-n="37" data-session="4">
+  <div class="kicker">The capstone</div>
+  <h2>A second city, the same four kinds of source, other faults</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>Question A</h4><p class="small mb0">Parcels per eligible household per month, by district, in the second quarter of 2026.</p></div>
+    <div class="card c-purple"><h4>Question B</h4><p class="small mb0">Kilograms handed out per household member, by branch, against kilograms received.</p></div>
+    <div class="card c-coral"><h4>Question C</h4><p class="small mb0">Share of eligible households that received no parcel in the quarter, by registration channel.</p></div>
+  </div>
+  <ul class="bullets small mt">
+    <li>You deliver a public repository that rebuilds with one command, and defend it in eight minutes</li>
+    <li>During the defence the assessor corrupts one input file; you show which rule fails and why</li>
+    <li>No raw personal field is committed, synthetic or not</li>
+  </ul>
+  <aside class="notes"><p>The brief is labs/capstone/README.md; the data is made by prepare_data.py --capstone with another seed, smaller volumes and its faults in other branches. Participants choose a question in the lab and may change it. The reference build may be reused as a starting point. What is assessed is what they understand, change and add: their own provenance records, the population of their question, the range of their estimate, and a suite that answers a corrupted input with a readable failure. AI assistance is allowed in full in the capstone, but no row of personal data, synthetic or real, goes to an external assistant.</p></aside>
+</section>
+
+<section class="slide" id="check-report" data-lo="LO6" data-n="38" data-session="4">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which sentence belongs in the report?</h2>
+  <div class="quiz" data-type="single" data-lo="LO6" data-id="check-report-q1">
+    <p class="lead">The build ran, every rule passed, and the estimate is 2.06 with a range of 2.02 to 2.07. Which sentence should open the limits section?</p>
+    <div class="opts">
+      <div class="opt" data-why="Reads passing rules as proof of truth, although rules test what a value may be" data-k="A">All rules passed, so the data is correct</div>
+      <div class="opt" data-why="Is true of every dataset and gives the reader nothing to act on" data-k="B">The data has some quality issues that should be kept in mind</div>
+      <div class="opt" data-ok data-k="C">Size is missing for 18.1% of households; three districts are undecided</div>
+      <div class="opt" data-why="Hides the assumption behind a precise figure and drops the range that was computed" data-k="D">The network delivers 2.060 parcels, above the standard</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> A limit names the fault, its size and what it does to the reader's decision. Here: for D09, D17 and D24 no verdict against the standard can be given.</div>
+  </div>
+  <aside class="notes"><p>Answer: C. Option A is the overclaim from Session 1 ("valid is not true"). Option B is the sentence most reports contain. Ask participants to rewrite B for one fault of their choice in under twenty words.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-4-4" data-auto="lab" data-lab="4.4" data-label="Lab 4.4" data-n="39" data-session="4">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 4.4 · 25 min</div><h2>The quality report</h2><p class="lead small">Run the reference build with one command, draft the quality report from its outputs and from the findings of the four days, decide which outputs may leave the analysis environment, and choose your capstone question.</p><a class="nb" href="../labs/D4_4_draft_quality_report.ipynb">D4_4_draft_quality_report.ipynb</a></div><ul class="checklist"><li>Rebuild from the raw sources with one command <span class="min">5 min</span></li><li>Draft the report from the build outputs <span class="min">10 min</span></li><li>What may leave the analysis environment <span class="min">5 min</span></li><li>Choose your capstone question <span class="min">5 min</span></li><li class="stretch">✱ Stretch: Corrupt one input file and rebuild</li></ul></div>
+  <aside class="notes"><p>AI-assistant allowed after the participant's own draft, for wording only. The build takes 20 to 40 seconds on a laptop CPU and runs twice at most (once in step 1, once in the stretch). Typical problems: typing numbers into the headline; limits without a number; marking the household tables as free to leave because they hold no name. Collect capstone_choice.json at the end to plan the presentation order. No model is called by the lab itself.</p></aside>
+</section>
+
+<!-- ======================= CLOSING ======================= -->
+<section class="slide" id="wrap-up" data-n="40" data-session="4">
+  <div class="kicker">Day 4 · wrap-up</div>
+  <h2>Three things to keep</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>Rules run every time</h4><p class="small mb0">Written from the dictionary, named by dimension, tested on a broken copy. Some faults show only between two fields or two sources.</p></div>
+    <div class="card c-purple"><h4>A key, then generalise</h4><p class="small mb0">A plain hash falls to a list. A keyed hash holds; exact dates and sizes still single households out.</p></div>
+    <div class="card c-coral"><h4>The report is built, the limits are written</h4><p class="small mb0">Numbers from the build. Limits from you: the fault, its size, what it does to the decision.</p></div>
+  </div>
+  <aside class="notes"><p>Go back over the four days in one sentence each: describe the sources before touching them; repair with rules and counts; say why a value is missing and how far the answer can move; make it rebuildable and safe to share. The capstone asks for all four on data nobody has cleaned for them.</p></aside>
+</section>
+
+<section class="slide dark" id="next" data-label="Capstone" data-n="41" data-session="4">
+  <div class="kicker">Next · Capstone</div>
+  <h2>Your repository, rebuilt live</h2>
+  <ul class="bullets">
+    <li>Choose question A, B or C and build from the raw files of the second city</li>
+    <li>One command; a provenance file; a rule suite; a README with row counts, rule results and the range of your estimate</li>
+    <li>Eight minutes of defence, four of questions, and one input file corrupted by the assessor</li>
+    <li>Keep every raw personal field out of the repository</li>
+  </ul>
+  <aside class="notes"><p>Hand out the brief (labs/capstone/README.md) and the rubric: provenance 15, joins and reconciliation 25, cleaning and validation 25, missing data and sensitivity 20, personal data and reproducibility 15. Tell participants to run their build from a fresh clone before they submit: a build that works only on its author's machine is the most common reason for a failed defence.</p></aside>
+</section>
+</div>
+<script type="application/json" id="academy-data">{"v":1,"engine":"1.0.0","build":{"at":"2026-11-15T11:22:42Z","version":"2027.1.0","commit":"87b98e4"},"course":{"id":"ds-202","code":"DS-202","title":"Data Acquisition, Preparation and Quality","track":"data-science","lang":"en","dir":"ltr","url":"https://sdaiaacademy.github.io/ds-202/","repo":"SDAIAAcademy/ds-202","home":"../index.html"},"deck":{"id":"day4","kind":"day","day":4,"label":"Day 4","title":"Validate and protect","prev":"day3.html","next":"capstone.html","md":"day4.md","alt":{}},"sessions":[{"n":1,"label":"Session 1","title":"Quality dimensions as rules","slide":"s1","outcomes":["Translate a data dictionary into column rules","Name the quality dimension of each rule","Run the suite on a build and read its failures"],"minutes":50,"lab":{"id":"4.1","title":"Rules for the joined table","minutes":25,"href":"../labs/D4_1_write_type_range.ipynb"}},{"n":2,"label":"Session 2","title":"Cross-field and cross-source checks","slide":"s2","outcomes":["Write rules across two fields","Write a rule across two sources","Produce a failure report a data owner can act on"],"minutes":50,"lab":{"id":"4.2","title":"Three rules across fields and sources","minutes":25,"href":"../labs/D4_2_add_three_consistency.ipynb"}},{"n":3,"label":"Session 3","title":"Minimise and pseudonymise","slide":"s3","outcomes":["Re-link a plain hash with a list and by enumeration","Replace identifiers with a keyed hash","Measure uniqueness on quasi-identifiers and reduce it by generalising"],"minutes":50,"lab":{"id":"4.3","title":"A pseudonym that holds","minutes":25,"href":"../labs/D4_3_replace_national_id.ipynb"}},{"n":4,"label":"Session 4","title":"A data-quality report","slide":"s4","outcomes":["Rebuild a dataset from raw sources with one command","Draft a data-quality report from the build outputs","Classify outputs and choose a capstone question"],"minutes":50,"lab":{"id":"4.4","title":"The quality report","minutes":25,"href":"../labs/D4_4_draft_quality_report.ipynb"}}],"slides":[{"id":"title","n":1,"title":"Validate and protect","kind":"title","session":0,"hash":"50695bcb","md":"#### [day4#title] Validate and protect\n\n*SDAIA Academy · Data Acquisition, Preparation and Quality*\n\nDay 4: Rules that run on every rebuild, identifiers that hold, and a report that says what the dataset is good for\n\nData Science Track · 4 teaching days + capstone day · 4 sessions · 4 labs · DS-202","notes":"Three days produced a dataset and an estimate with a range. Today makes both last: rules that run on every rebuild, identifiers that cannot be linked back, and one page that says what the dataset can and cannot support. Every lab starts from a supplied state: the joined table data/reference/joined_q3.csv.gz, the October batches, or the reference build. The capstone brief is handed out in the last session.","minutes":null,"lo":[]},{"id":"review-day-3","n":2,"title":"One number, or a number with a range","kind":"quiz","session":0,"hash":"0897e269","md":"#### [day4#review-day-3] One number, or a number with a range\n\n*Review of Day 3*\n\n**Question:** Complete cases give 1.985 parcels per eligible household per month; imputing within groups gives 2.060; the scenarios about the missing sizes run from 2.02 to 2.07. The standard is 2. What goes to Sumayyah?\n\n- A. 1.985: it uses only values that were recorded\n- B. 2.060: it is the best estimate, so it is the answer\n- C. 2.06, between 2.02 and 2.07, with the reason and the districts that stay below\n- D. 2.02: the mean of the two methods, to be fair to both","notes":"Answer: C. Seven districts are below the standard in every scenario and three change their verdict with the assumption. Today's last lab turns exactly this sentence into the headline of the quality report.","minutes":null,"lo":["LO5"]},{"id":"agenda","n":3,"title":"Validate and protect","kind":"content","session":0,"hash":"06788ce9","md":"#### [day4#agenda] Validate and protect\n\n*Today*\n\n- **Session 1 · Quality dimensions as rules**: Completeness, validity, uniqueness and type, written from the data dictionary\n- **Session 2 · Cross-field and cross-source checks**: Faults that show only between two fields or two sources, reported so a branch can act\n- **Session 3 · Minimise and pseudonymise**: A plain hash falls to a list; a keyed hash holds; quasi-identifiers still single people out\n- **Session 4 · A data-quality report**: Row counts, rule results, what is missing, how far the estimate moves, what may leave","notes":"","minutes":null,"lo":[]},{"id":"s1","n":4,"title":"Quality dimensions as rules","kind":"section","session":1,"hash":"fc3520ef","md":"#### [day4#s1] Quality dimensions as rules\n\n*Session 1*\n\n- Translate a data dictionary into column rules\n- Name the quality dimension of each rule\n- Run the suite on a build and read its failures","notes":"","minutes":null,"lo":["LO4"]},{"id":"repair-and-rule","n":5,"title":"A repair fixes this file. A rule protects every file after it","kind":"content","session":1,"hash":"eb877af8","md":"#### [day4#repair-and-rule] A repair fixes this file. A rule protects every file after it\n\n*Two different things*\n\n- Day 2 repaired what was found: encodings, keys, date layouts, units\n- The next extract arrives in three months, from the same 14 branches, with faults nobody has seen yet\n- A **rule** states what must hold. A program checks it on every rebuild and says which rows break it\n\n- **The evidence of LO4.** A rule suite that passes on the clean build and fails, readably, on a corrupted batch.","notes":"Ask who has opened a dataset, looked at df.describe() and called that validation. Looking is not a rule: it is not written down, it does not run next time, and it finds only what the person thought of on that day.","minutes":null,"lo":["LO4"]},{"id":"dimensions","n":6,"title":"Each dimension becomes a kind of rule","kind":"content","session":1,"hash":"dda0d381","md":"#### [day4#dimensions] Each dimension becomes a kind of rule\n\n*Quality dimensions*\n\n| Dimension | The question | A rule for the joined table |\n| --- | --- | --- |\n| **Type** | Is it the kind of value the column holds? | `handout_date` is written YYYY-MM-DD |\n| **Completeness** | Is a required value there? | `household_key` is never blank |\n| **Validity** | Is it a value the dictionary allows? | `parcels` between 1 and 3 |\n| **Uniqueness** | Does a key identify one row? | `log_id` never repeats |\n| **Consistency** | Do fields and sources agree? | weight is 9 to 15 kg per parcel |\n\nFrameworks name and count the dimensions differently. The names matter less than this: every rule in your suite says which one it tests.","notes":"Session 1 covers the first four, which need one column each. Consistency needs two columns or two sources and is Session 2. Timeliness, which many frameworks add, belongs to the provenance record of Day 1 (the refresh date), not to a row rule.","minutes":null,"lo":["LO4"]},{"id":"dictionary-to-rules","n":7,"title":"The data dictionary, written so that a program can check it","kind":"content","session":1,"hash":"11003afa","md":"#### [day4#dictionary-to-rules] The data dictionary, written so that a program can check it\n\n*Lab 4.1, steps 1 to 3*\n\n```python\n# file: Lab 4.1 · Pandera\nschema = pa.DataFrameSchema({\n  \"log_id\": pa.Column(str, unique=True),\n  \"parcels\": pa.Column(\n      int, pa.Check.in_range(1, 3)),\n  \"weight_kg\": pa.Column(\n      float, pa.Check.in_range(5, 50),\n      nullable=True),\n  \"handout_date\": pa.Column(\n      str, pa.Check.str_matches(ISO)),\n}, strict=True)\nschema.validate(df, lazy=True)\n```\n\n- \"Required: yes\" in the dictionary is `nullable=False`, the default: the completeness rule\n- `strict=True`: a missing or an extra column fails\n- `lazy=True`: every rule runs, and all failures come back together\n- Dates stay text with a pattern: a date in another layout fails; it is not guessed","notes":"FN-104 (Lab 4.4) declared a Pandera schema on a daily file and reported failures lazily; treat the syntax as known. New here: the rules are written from the data dictionary of a joined table, each is named by its dimension, and each is shown to fail on a copy broken on purpose. The lab uses Pandera because the rules are plain Python next to the data frame. Great Expectations does the same job with a larger apparatus (suites, checkpoints, rendered documentation) and is the usual choice when a team shares the rules; name it and move on. Sources: Pandera documentation; Great Expectations documentation.","minutes":null,"lo":["LO4"]},{"id":"readable-failure","n":8,"title":"A failure that reads like a sentence","kind":"content","session":1,"hash":"ecd598f4","md":"#### [day4#readable-failure] A failure that reads like a sentence\n\n*Lab 4.1, step 4*\n\n| Rule | Column | Rows | Examples |\n| --- | --- | --- | --- |\n| uniqueness: no value repeats | log_id | 2 | B01-0007639 |\n| completeness: no value is missing | household_key | 3 |  |\n| validity: parcels between 1 and 3 | parcels | 4 | 9 |\n| validity: district_id is one of the 30 districts | district_id | 2 | D99 |\n| type: handout_date is a date written YYYY-MM-DD | handout_date | 5 | 03/07/2026 |\n\nThe first 2,000 rows of the clean build, broken on purpose in five places. The same table, without the suite, raises no error anywhere.","notes":"Each rule is given a name: the dimension, then what must hold. Without the name the library reports the check in its own words, which the owner of the data cannot read. The repeated log_id counts two rows because both copies fail.","minutes":null,"lo":["LO4"]},{"id":"never-failed","n":9,"title":"A suite that has never failed has never been tested","kind":"content","session":1,"hash":"bd8a129c","md":"#### [day4#never-failed] A suite that has never failed has never been tested\n\n*Testing the test*\n\n- The suite passes on all 73,264 rows of the clean build. That proves little\n- A typing mistake in a pattern, or a range that is too wide, passes every build for ever\n- Break a copy on purpose, one fault per rule, and watch each rule fail\n- Decide in advance, per rule: does a failure **stop** the build, or **warn**?\n\n> **What goes wrong.** A suite is written after the cleaning, from the cleaned data, so that it passes. It then describes this file and protects nothing.","notes":"Stop or warn is the stretch of Lab 4.1. A repeated key or an unknown district corrupts every count: stop. An odd weight leaves the parcel count intact: warn, and count it in the log. The decision is the network's, and it is written down before the failure happens.","minutes":null,"lo":["LO4"]},{"id":"valid-not-true","n":10,"title":"Valid is not the same as true","kind":"content","session":1,"hash":"62ac0229","md":"#### [day4#valid-not-true] Valid is not the same as true\n\n*The limit of a rule*\n\n**0** rows of the clean build fail \"household_size between 1 and 20\"\n\n- Lab 3.4: the audit found recorded sizes that differ from the verified size, more often above than below\n- Every one of those sizes is a whole number between 1 and 20\n- A rule tests what a value **may be**. Whether it **is** so needs a second measurement","notes":"Keep this slide short: it prevents the most common overclaim of a quality report, \"the data passed validation\", read by a manager as \"the data is correct\". The report of Session 4 lists self-reported size under limits for this reason.","minutes":null,"lo":["LO4"]},{"id":"check-dimension","n":11,"title":"Which rule, and which dimension?","kind":"quiz","session":1,"hash":"bdfc7577","md":"#### [day4#check-dimension] Which rule, and which dimension?\n\n*Checkpoint*\n\n**Question:** In the joined table, one row is one handout, and a household has many handouts. A week of one branch is uploaded twice. Which rule catches it?\n\n- A. Uniqueness of `household_key`\n- B. Uniqueness of `log_id`\n- C. Completeness of `log_id`\n- D. Validity of `handout_date`","notes":"Answer: B. Ask for the grain before asking for the rule: participants who state \"one row per handout\" aloud do not pick A. Day 2 found exactly this fault: the week of 8 to 14 March at B02, 380 rows.","minutes":null,"lo":["LO4"]},{"id":"lab-4-1","n":12,"title":"Rules for the joined table","kind":"lab","session":1,"hash":"f39b0081","md":"#### [day4#lab-4-1] Rules for the joined table\n\nLab 4.1 · 25 min\n\nWrite type, range, uniqueness and completeness rules for the joined table from its data dictionary, run them on the clean build, and watch each fail on a copy you break.\n\n[D4_1_write_type_range.ipynb](https://sdaiaacademy.github.io/ds-202/labs/D4_1_write_type_range.ipynb)\n\n- [ ] Types and completeness from the dictionary (7 min)\n- [ ] Range and validity rules (6 min)\n- [ ] Uniqueness (4 min)\n- [ ] Run on the clean build and on a broken copy (8 min)\n- [ ] ✱ Stretch: Which rules stop the build and which only warn?","notes":"AI-off for the first attempt at each rule; an AI-tutor that only hints may explain Pandera syntax. Typical problems: int for a column that has blanks (use \"Int64\" and nullable=True); uniqueness put on household_key; a pattern without ^ and $, which then matches almost anything; forgetting to name a rule. The lab starts from G.joined_q3(), 73,264 rows. No model is called.","minutes":null,"lo":[]},{"id":"s2","n":13,"title":"Cross-field and cross-source checks","kind":"section","session":2,"hash":"93bfcdff","md":"#### [day4#s2] Cross-field and cross-source checks\n\n*Session 2*\n\n- Write rules across two fields\n- Write a rule across two sources\n- Produce a failure report a data owner can act on","notes":"","minutes":null,"lo":["LO4"]},{"id":"october-batch","n":14,"title":"A new batch arrives, and seven column rules fail","kind":"content","session":2,"hash":"a0811bb5","md":"#### [day4#october-batch] A new batch arrives, and seven column rules fail\n\n*Lab 4.2, step 1*\n\n| Rule that fails | Rows |\n| --- | --- |\n| validity: weight_kg between 5 and 50 | 278 |\n| completeness: household_key | 60 |\n| uniqueness: log_id | 50 |\n| validity: parcels between 1 and 3 | 40 |\n| validity: district_id | 20 |\n| type: handout_date | 15 |\n| validity: household_size | 12 |\n\n- The first week of October: 4,180 rows, built as the quarter was\n- Each line names what somebody can fix\n- Look again at the first line: 278 handouts above 50 kg. Is that all that is wrong with those rows?","notes":"The batch is supplied: data/raw/batches/joined_2026-10-w1_corrupted.csv, with a clean twin of 4,155 rows. Let participants answer the question on the slide before moving on. The 278 rows are all from one branch, which is the clue.","minutes":null,"lo":["LO4"]},{"id":"pounds-inside-range","n":15,"title":"B05 sent pounds. Most of its rows pass the range rule","kind":"content","session":2,"hash":"23bb8ae2","md":"#### [day4#pounds-inside-range] B05 sent pounds. Most of its rows pass the range rule\n\n*What a column rule cannot see*\n\n**278 · 377** rows of B05 caught by \"5 to 50 kg\", and rows of B05 that are wrong\n\n- A parcel weighs about 12 kg: about 26 in pounds\n- One parcel in pounds: 26, **inside** 5 to 50. Passes\n- Two or three parcels in pounds: 53 or 79. Fails\n- The value is fine on its own. It is wrong **for its number of parcels**","notes":"The median weight per parcel at B05 in this batch is 26.4, against about 12 at every other branch. Tightening the range to catch 26 would reject honest two-parcel handouts of 24 kg. No range on one column separates the two cases.","minutes":null,"lo":["LO4"]},{"id":"cross-field","n":16,"title":"Two rules across fields","kind":"content","session":2,"hash":"f510b96e","md":"#### [day4#cross-field] Two rules across fields\n\n*Lab 4.2, step 2*\n\n```python\n# file: Lab 4.2\ndef not_per_parcel(df):\n    ok = df.parcels.between(1, 3)\n    per = df.weight_kg / df.parcels.where(ok)\n    return df[per.notna()\n              & ~per.between(9, 15)]\n\ndef before_registration(df):\n    return df[date(df.handout_date)\n              \u003c date(df.registered_on)]\n```\n\n- 9 to 15 kg per parcel: all **377** rows of B05, and no row of any other branch\n- Handout on or after registration: **30** rows in 12 branches. A household cannot collect before it exists: a wrong key or a wrong date\n- Each rule skips rows that another rule already reports, so one fault gives one line","notes":"The functions return the failing rows, not True or False: the rows are what the branch needs. Rows whose parcels are outside 1 to 3 are left to the validity rule; otherwise 40 rows with parcels of 30 would appear under two rules and the report would count one fault twice.","minutes":null,"lo":["LO4"]},{"id":"cross-source","n":17,"title":"A branch cannot hand out more food than it received","kind":"content","session":2,"hash":"3b207045","md":"#### [day4#cross-source] A branch cannot hand out more food than it received\n\n*Lab 4.2, step 3*\n\n| Item | Value |\n| --- | --- |\n| B05 · received in the week | 9,574 kg |\n| B05 · handed out, as recorded | 20,005 kg |\n\n- The logs say what went out; the donations source says what came in. No single table holds both\n- To compare them: the same unit, the same week, one row per branch. A small pipeline of its own\n- It catches a whole class of faults that leave every row plausible","notes":"Every other branch handed out less than it received that week. The rule is coarse: stock carried over from earlier weeks could make an honest branch fail, so in production it would compare over a longer window or include opening stock. Say so: a cross-source rule encodes an assumption about the world, and the assumption belongs in the rule's description.","minutes":null,"lo":["LO4"]},{"id":"failure-report","n":18,"title":"A failure report says whose rows, and what to look at","kind":"content","session":2,"hash":"6db4a2c9","md":"#### [day4#failure-report] A failure report says whose rows, and what to look at\n\n*Lab 4.2, step 4*\n\n| Rule | Rows | Whose | What to look at |\n| --- | --- | --- | --- |\n| consistency: 9 to 15 kg per parcel | 377 | B05: 377 | median 26.4 per parcel: pounds entered as kilograms? |\n| consistency: handout on or after registration | 30 | 12 branches | the household id or the date of these handouts |\n| consistency across sources: handed out no more than received | 1 | B05 | handed 20,005 kg, received 9,574 kg |\n\n> **Ten lines in all.** Seven from the column rules, three from the rules you add. \"Validation failed\" helps nobody; a line that names the branch gets fixed.","notes":"Without the three new rules, a week of pounds would have entered every weight total, and 30 misattributed handouts every household count, with seven failures reported and a feeling that validation had done its job.","minutes":null,"lo":["LO4"]},{"id":"reject-or-quarantine","n":19,"title":"Reject the file, or set the rows aside?","kind":"content","session":2,"hash":"f3773a22","md":"#### [day4#reject-or-quarantine] Reject the file, or set the rows aside?\n\n*Recap of FN-104, as a rule of the build*\n\n- **Reject the file.** The fault is in how the file was made: a wrong unit, a wrong layout, a missing column. Every row of B05 is suspect. Send it back.\n- **Quarantine the rows.** The fault is in single rows: a blank key, a date before registration. Load the rest; set these aside with a reason and count them in the log.\n\nEither way the decision is made per rule, in advance, and the log shows it: rows in equal rows loaded plus rows set aside.","notes":"FN-104 (Lab 4.4) taught the choice on one daily file; do not teach it again, ask the room for the rule. What is new is that the decision is written per rule in the build of a joined table. This is the set-aside file of Day 2 again, now as policy. The third option, repairing silently inside the build, is the dangerous one: the reference build converts weights that are plainly in grams and records each change; ask the room whether a build should do that without telling anyone. It should tell: the change is in the log.","minutes":null,"lo":["LO4"]},{"id":"check-cross-field","n":20,"title":"Which rule finds it?","kind":"quiz","session":2,"hash":"60620947","md":"#### [day4#check-cross-field] Which rule finds it?\n\n*Checkpoint*\n\n**Question:** From 7 to 9 August a branch writes dates as month/day/year; the build reads that branch as day/month/year. Every date parses, and every one falls inside the quarter. Which rule is most likely to show the fault?\n\n- A. Type: the date matches the pattern of the file\n- B. Completeness: no date is missing\n- C. Validity: the date is inside the quarter\n- D. Consistency: rows per branch per day against that branch's usual pattern","notes":"Answer: D. Work one date through on the board: 08/07/2026 meant 7 August and is read as 8 July. Day 2 solved the layout for a whole file by looking for a part above 12; three days inside a file leave no such part, so no rule on one value can see the swap. A count of rows per branch per day is the rule that raises the question.","minutes":null,"lo":["LO4"]},{"id":"lab-4-2","n":21,"title":"Three rules across fields and sources","kind":"lab","session":2,"hash":"408fc39a","md":"#### [day4#lab-4-2] Three rules across fields and sources\n\nLab 4.2 · 25 min\n\nRun the column rules on a corrupted October batch, add two cross-field rules and one cross-source rule that catch what they miss, and write a failure report that says which branch must fix what.\n\n[D4_2_add_three_consistency.ipynb](https://sdaiaacademy.github.io/ds-202/labs/D4_2_add_three_consistency.ipynb)\n\n- [ ] Run the column rules on the corrupted batch (5 min)\n- [ ] Two rules across fields (8 min)\n- [ ] One rule across sources (7 min)\n- [ ] A failure report a branch can act on (5 min)\n- [ ] ✱ Stretch: Reject the batch or quarantine the rows?","notes":"AI-off for the first attempt at each rule. Typical problems: dividing by parcels where parcels is 30, so the rule double-counts another rule's rows; comparing dates as text when one side has another layout; joining donations at row level, which repeats the branch total on every handout. The lab starts from the two supplied batches and B.schema(). No model is called.","minutes":null,"lo":[]},{"id":"s3","n":22,"title":"Minimise and pseudonymise","kind":"section","session":3,"hash":"6ef4a426","md":"#### [day4#s3] Minimise and pseudonymise\n\n*Session 3*\n\n- Re-link a plain hash with a list and by enumeration\n- Replace identifiers with a keyed hash\n- Measure uniqueness on quasi-identifiers and reduce it by generalising","notes":"","minutes":null,"lo":["LO6"]},{"id":"minimise-first","n":23,"title":"The safest field is the one that never entered the dataset","kind":"content","session":3,"hash":"56e1ac25","md":"#### [day4#minimise-first] The safest field is the one that never entered the dataset\n\n*Before any technique*\n\n- Lab 1.1 listed the fields the question needs. A name, a phone number and an ID number are not among them\n- They were needed for **one step**: matching the 300 walk-in records of Day 2\n- After that step they are dropped, and the dataset keeps a key that says \"the same household\" and nothing else\n\n- **Minimise, then pseudonymise.** First ask whether the field is needed at all. Only for what remains: how to replace the identifier so that tables still join.","notes":"Under the Personal Data Protection Law, personal data is any data that can lead to identifying a person, directly or indirectly, and collection is limited to what the purpose needs. The purpose here was written down on Day 1: service coverage analysis for the quarter. Sources: Personal Data Protection Law.","minutes":null,"lo":["LO6"]},{"id":"pseudonymised-or-anonymised","n":24,"title":"Pseudonymised data is still personal data","kind":"content","session":3,"hash":"f33bdcc9","md":"#### [day4#pseudonymised-or-anonymised] Pseudonymised data is still personal data\n\n*Recap of FN-106*\n\n- **Pseudonymised.** Identifiers are replaced by codes. Linking back needs additional information, which is kept separately under its own controls. Somebody can still link back, so the data stays personal.\n- **Anonymised.** Nobody can link the data to a person any more, with any reasonable means. A much higher bar, and rarely reached by a table with one row per household.\n\nThe national guideline names generalisation and aggregation among the techniques: age bands in place of ages, a year in place of a date. Lab 4.3 uses both.","notes":"FN-106 (Session 3 of its first day) taught the two words, the keyed hash and quasi-identifiers on guardian and student records; keep this slide to two minutes. What is new here is measured: how fast a plain hash falls to enumeration, and how much generalisation it takes to bring re-linkage down on 37,333 households. The guideline defines pseudonymisation as transforming the primary identifiers into codes so that direct identification is not feasible without additional information, which is kept separately; it states that pseudonymised data is considered personal data. Sources: Personal Data Destruction, Anonymization and Pseudonymisation Guideline.","minutes":null,"lo":["LO6"]},{"id":"plain-hash-falls","n":25,"title":"\"A hash cannot be reversed.\" Nobody needs to reverse it","kind":"content","session":3,"hash":"446e86b2","md":"#### [day4#plain-hash-falls] \"A hash cannot be reversed.\" Nobody needs to reverse it\n\n*Lab 4.3, steps 1 and 2*\n\n**5,000 of 5,000** people on a known list re-identified in a table of plain SHA-256 hashes\n\n- The same input gives the same hash, for everyone\n- **List attack**: hash the ID numbers you hold; join\n- **Enumeration**: an ID number has ten digits. Hash every possible one\n- The 2,000,000 numbers of the course range take seconds on a laptop; all ten-digit numbers take hours","notes":"From the Lab 4.3 run: two million candidates hashed in 6 to 12 seconds on one core, depending on the laptop, 37,333 of 37,333 households recovered; at that rate ten thousand million numbers take 8 to 17 hours, less on several cores. The ID numbers are synthetic, drawn from a range chosen so that the attack fits in the lab. Adding a fixed text to every number before hashing does not help once the text is known.","minutes":null,"lo":["LO6"]},{"id":"keyed-hash","n":26,"title":"A keyed hash: without the key, neither attack starts","kind":"content","session":3,"hash":"8dd2c53d","md":"#### [day4#keyed-hash] A keyed hash: without the key, neither attack starts\n\n*Lab 4.3, step 3*\n\n```python\n# file: Lab 4.3 · HMAC\nimport hmac, hashlib, os\n\nkey = os.environ[\"GHILAL_KEY\"].encode()\n\ndef pseudonym(s: str) -> str:\n    return hmac.new(key, s.encode(),\n        hashlib.sha256).hexdigest()[:16]\n```\n\n- Stable and unique: the same household has the same pseudonym in every table, so joins still work\n- The key is the \"additional information\": kept separately, never committed, never sent\n- A list attack without the key: 0 of 5,000\n- A new key gives new pseudonyms: two recipients cannot join their tables to each other","notes":"HMAC is in the standard library; no package is needed. Where the key lives: an environment variable or a secrets store read at build time. The reference build falls back to a teaching key that is plainly labelled as not a secret, so that the course rebuilds without setup; a capstone repository must not do that. Sources: Python documentation, hmac; RFC 2104.","minutes":null,"lo":["LO6"]},{"id":"quasi-identifiers","n":27,"title":"The key holds, and ordinary fields still single households out","kind":"content","session":3,"hash":"c878a699","md":"#### [day4#quasi-identifiers] The key holds, and ordinary fields still single households out\n\n*Lab 4.3, step 4*\n\n| Item | Value |\n| --- | --- |\n| district, exact date, exact size | 92.8% |\n| district, year, size band | 0.0% |\n\nShare of the 37,333 households whose combination of fields occurs exactly once.\n\n- \"They live in D09, registered on 14 March 2024, seven of them\": a neighbour needs no key\n- A combination of ordinary fields that singles a person out is a **quasi-identifier**\n- Generalised, the smallest group has 4 households; the partner can still count shared households","notes":"Uniqueness is a simple measure and a pessimistic one: it assumes the attacker knows all three fields. It is still the right first number, because it costs one group-by. A smallest group of 4 is not a guarantee of anything; with a sensitive field in the table (income) even a group of 4 can reveal that all four are below the line. The table stays personal data and travels under an agreement.","minutes":null,"lo":["LO6"]},{"id":"what-travels","n":28,"title":"The classification of the source decides the conditions of sharing","kind":"content","session":3,"hash":"9c8570c9","md":"#### [day4#what-travels] The classification of the source decides the conditions of sharing\n\n*Who may receive what*\n\n- **Stays inside.** Raw sources. Rows with identifiers as typed. The key.\n- **Under an agreement.** Household-level tables, pseudonymised and generalised: to named people, for one purpose, for a stated time.\n- **May be published.** Aggregates by district that single nobody out, the code, the rules, the report.\n\nThe provenance records of Day 1 classified the register and the logs as Restricted. A table derived from them does not become Public by losing a column.","notes":"Ruqayyah Al-Marzouqi, the data protection officer, approves what leaves. The network applies the four national classification levels as its own policy; a charity is not a government entity, and this is a choice of the case, stated in the provenance records. Sources: Data Classification Policy; Data Sharing Policy.","minutes":null,"lo":["LO6"]},{"id":"check-pseudonym","n":29,"title":"What must change before the table is sent?","kind":"quiz","session":3,"hash":"0e0a7d67","md":"#### [day4#check-pseudonym] What must change before the table is sent?\n\n*Checkpoint*\n\n**Question:** A table for a partner holds, per household: a keyed-hash pseudonym, the district, the exact registration date and the household size. The key is stored safely. What is the remaining risk, and the remedy?\n\n- A. The pseudonym can be enumerated; use a longer hash\n- B. Date, district and size single households out; send the year and a size band\n- C. None: without names and ID numbers the table is anonymous\n- D. The pseudonym links tables; remove it and keep the other fields","notes":"Answer: B. Option C is the belief this session exists to remove. Ask what the partner needs the table for; the answer (counting households both serve) is what decides which fields can be coarsened without loss.","minutes":null,"lo":["LO6"]},{"id":"lab-4-3","n":30,"title":"A pseudonym that holds","kind":"lab","session":3,"hash":"1b308937","md":"#### [day4#lab-4-3] A pseudonym that holds\n\nLab 4.3 · 25 min\n\nHash national ID numbers plainly and re-link them with a list and by enumeration, replace them with a keyed hash, then attempt re-linkage through district, size and registration date and reduce it by generalising.\n\n[D4_3_replace_national_id.ipynb](https://sdaiaacademy.github.io/ds-202/labs/D4_3_replace_national_id.ipynb)\n\n- [ ] A plain hash and a list attack (6 min)\n- [ ] Enumerate the id space (5 min)\n- [ ] A keyed hash (6 min)\n- [ ] Re-link through quasi-identifiers, then generalise (8 min)\n- [ ] ✱ Stretch: Change the key: what breaks, and what should","notes":"AI-off for the first attempt. Every ID number is synthetic. Typical problems: hashing the integer instead of its text, so the hashes do not match; writing the key into the notebook or a file; counting unique combinations instead of the share of rows in them. Enumerating two million numbers takes a few seconds on a laptop CPU; GH_QUICK=1 tries 200,000. The lab starts from the reference cleaning of the register. No model is called.","minutes":null,"lo":[]},{"id":"s4","n":31,"title":"A data-quality report","kind":"section","session":4,"hash":"f8906c04","md":"#### [day4#s4] A data-quality report\n\n*Session 4*\n\n- Rebuild a dataset from raw sources with one command\n- Draft a data-quality report from the build outputs\n- Classify outputs and choose a capstone question","notes":"","minutes":null,"lo":["LO6","LO2"]},{"id":"one-command","n":32,"title":"One command: raw files in, the dataset and its evidence out","kind":"content","session":4,"hash":"f08ba929","md":"#### [day4#one-command] One command: raw files in, the dataset and its evidence out\n\n*Rebuildable*\n\n1. **1 · Read** the raw sources, exactly as they arrived\n2. **2 · Clean and join** each step counts its rows; rows without a household are set aside\n3. **3 · Check** every rule runs on the result\n4. **4 · Write** tables with pseudonyms, the join log, the rule results, the report\n\n- `uv run python build_dataset.py`: under a minute on a laptop for 40,000 registrations and 210,000 log rows\n- Nothing is edited by hand between the raw files and the outputs, so anybody can run it again\n- A rebuild is compared with the last one: the same rows, the same content","notes":"The reference build is what the labs of Days 2 to 4 wrote, in one file of about 300 lines. Open it and scroll once: participants recognise their own functions. A notebook is where a step is worked out; the build is where it lives afterwards. In the lab, the fingerprint of the rebuilt table equals that of the reference table.","minutes":null,"lo":["LO6"]},{"id":"report-parts","n":33,"title":"The quality report: six parts, read before any number is used","kind":"content","session":4,"hash":"7919137e","md":"#### [day4#report-parts] The quality report: six parts, read before any number is used\n\n*One page*\n\n| Part | Says | Comes from |\n| --- | --- | --- |\n| 1 · Headline | the estimate, its range, the standard | Day 3 |\n| 2 · Question and population | who is counted, for which period | Lab 1.1 |\n| 3 · Sources | owner, refresh date, classification | the provenance records |\n| 4 · Row counts per step | what went in, what was set aside and why | the join log |\n| 5 · Rules | how many ran, which failed | the rule results |\n| 6 · Limits | what the dataset cannot support | you |","notes":"The first five parts are assembled by a program. The sixth is the analyst's work and the part Sumayyah reads most closely. The structure follows the idea of a datasheet for a dataset, cut to one page for one question. Sources: Gebru and others, Datasheets for Datasets.","minutes":null,"lo":["LO6"]},{"id":"no-typed-number","n":34,"title":"No number in the report is typed by hand","kind":"content","session":4,"hash":"a670522e","md":"#### [day4#no-typed-number] No number in the report is typed by hand\n\n*Lab 4.4, step 2*\n\n```python\n# file: Lab 4.4\ndef headline(facts):\n    lo, hi = facts[\"range\"]\n    return (f\"an estimated \"\n            f\"{facts['recommended']} parcels \"\n            f\"per eligible household per month \"\n            f\"(plausible range {lo} to {hi}; \"\n            f\"standard {facts['standard']})\")\n```\n\n- The next rebuild changes the numbers. A typed number stays, and the report then describes a dataset that no longer exists\n- The lab checks it: every number in your headline must occur in the facts the build wrote\n- An AI-assistant may improve the wording after your draft exists. The numbers still come from the build","notes":"The AI-use rule for this lab: AI-assistant, after the participant's own draft, for wording only; the participant records what was asked and what was kept. A model that rewrites a sentence can also change 2.06 into 2.6. The check that compares the numbers of the text with the facts catches that.","minutes":null,"lo":["LO6"]},{"id":"limits","n":35,"title":"Limits: what this dataset cannot support","kind":"content","session":4,"hash":"7c48386f","md":"#### [day4#limits] Limits: what this dataset cannot support\n\n*Part 6*\n\n- Household size is missing for **18.1%** of the 35,665 households, and more often for large ones\n- For D09, D17 and D24 the verdict against the standard depends on the assumption: **undecided**\n- B12 sent no rows for 10 to 18 August: its districts look less served than they were\n- 811 log rows could not be tied to a household; they are set aside, not counted\n- D29 and D30 have no row in the open table of 2022: coverage of need cannot be stated there\n- Sizes are reported by households and not verified","notes":"Each limit is a sentence with a number and a consequence. Compare with \"the data has some quality issues\", which is true of every dataset and tells the reader nothing. Ask participants which limit changes what Sumayyah does on Monday; most say the three undecided districts, and that one goes first.","minutes":null,"lo":["LO6"]},{"id":"what-may-leave","n":36,"title":"Before a file is committed or attached, a program looks at it","kind":"content","session":4,"hash":"ee0aae69","md":"#### [day4#what-may-leave] Before a file is committed or attached, a program looks at it\n\n*Lab 4.4, step 3*\n\n| Build output | Grain | Decision |\n| --- | --- | --- |\n| join_log.csv, rule_results.csv, the report | aggregate | may leave |\n| households.csv, handouts_q3.csv | household, pseudonymised | only under an agreement, generalised |\n| set_aside.csv | log row, keys as typed | stays inside |\n\n- The set-aside rows keep each key exactly as the desk typed it, because somebody must repair it. That makes the file useful to the branch and unfit to travel\n- A scan for identifier patterns in every output is one more rule of the build","notes":"The lab's scan searches each column for a household id, a ten-digit number starting with 1 and a mobile number, and finds them in one file only. In a capstone repository the set-aside rows appear as log id, branch and reason; the key as typed stays out. The classification of each output follows the provenance record of its sources (LO2).","minutes":null,"lo":["LO2"]},{"id":"capstone-questions","n":37,"title":"A second city, the same four kinds of source, other faults","kind":"content","session":4,"hash":"274ffcca","md":"#### [day4#capstone-questions] A second city, the same four kinds of source, other faults\n\n*The capstone*\n\n- **Question A.** Parcels per eligible household per month, by district, in the second quarter of 2026.\n- **Question B.** Kilograms handed out per household member, by branch, against kilograms received.\n- **Question C.** Share of eligible households that received no parcel in the quarter, by registration channel.\n\n- You deliver a public repository that rebuilds with one command, and defend it in eight minutes\n- During the defence the assessor corrupts one input file; you show which rule fails and why\n- No raw personal field is committed, synthetic or not","notes":"The brief is labs/capstone/README.md; the data is made by prepare_data.py --capstone with another seed, smaller volumes and its faults in other branches. Participants choose a question in the lab and may change it. The reference build may be reused as a starting point. What is assessed is what they understand, change and add: their own provenance records, the population of their question, the range of their estimate, and a suite that answers a corrupted input with a readable failure. AI assistance is allowed in full in the capstone, but no row of personal data, synthetic or real, goes to an external assistant.","minutes":null,"lo":["LO6"]},{"id":"check-report","n":38,"title":"Which sentence belongs in the report?","kind":"quiz","session":4,"hash":"d8682ad4","md":"#### [day4#check-report] Which sentence belongs in the report?\n\n*Checkpoint*\n\n**Question:** The build ran, every rule passed, and the estimate is 2.06 with a range of 2.02 to 2.07. Which sentence should open the limits section?\n\n- A. All rules passed, so the data is correct\n- B. The data has some quality issues that should be kept in mind\n- C. Size is missing for 18.1% of households; three districts are undecided\n- D. The network delivers 2.060 parcels, above the standard","notes":"Answer: C. Option A is the overclaim from Session 1 (\"valid is not true\"). Option B is the sentence most reports contain. Ask participants to rewrite B for one fault of their choice in under twenty words.","minutes":null,"lo":["LO6"]},{"id":"lab-4-4","n":39,"title":"The quality report","kind":"lab","session":4,"hash":"aaf9a825","md":"#### [day4#lab-4-4] The quality report\n\nLab 4.4 · 25 min\n\nRun the reference build with one command, draft the quality report from its outputs and from the findings of the four days, decide which outputs may leave the analysis environment, and choose your capstone question.\n\n[D4_4_draft_quality_report.ipynb](https://sdaiaacademy.github.io/ds-202/labs/D4_4_draft_quality_report.ipynb)\n\n- [ ] Rebuild from the raw sources with one command (5 min)\n- [ ] Draft the report from the build outputs (10 min)\n- [ ] What may leave the analysis environment (5 min)\n- [ ] Choose your capstone question (5 min)\n- [ ] ✱ Stretch: Corrupt one input file and rebuild","notes":"AI-assistant allowed after the participant's own draft, for wording only. The build takes 20 to 40 seconds on a laptop CPU and runs twice at most (once in step 1, once in the stretch). Typical problems: typing numbers into the headline; limits without a number; marking the household tables as free to leave because they hold no name. Collect capstone_choice.json at the end to plan the presentation order. No model is called by the lab itself.","minutes":null,"lo":[]},{"id":"wrap-up","n":40,"title":"Three things to keep","kind":"content","session":4,"hash":"8de245e9","md":"#### [day4#wrap-up] Three things to keep\n\n*Day 4 · wrap-up*\n\n- **Rules run every time.** Written from the dictionary, named by dimension, tested on a broken copy. Some faults show only between two fields or two sources.\n- **A key, then generalise.** A plain hash falls to a list. A keyed hash holds; exact dates and sizes still single households out.\n- **The report is built, the limits are written.** Numbers from the build. Limits from you: the fault, its size, what it does to the decision.","notes":"Go back over the four days in one sentence each: describe the sources before touching them; repair with rules and counts; say why a value is missing and how far the answer can move; make it rebuildable and safe to share. The capstone asks for all four on data nobody has cleaned for them.","minutes":null,"lo":[]},{"id":"next","n":41,"title":"Your repository, rebuilt live","kind":"content","session":4,"hash":"fc7342f2","md":"#### [day4#next] Your repository, rebuilt live\n\n*Next · Capstone*\n\n- Choose question A, B or C and build from the raw files of the second city\n- One command; a provenance file; a rule suite; a README with row counts, rule results and the range of your estimate\n- Eight minutes of defence, four of questions, and one input file corrupted by the assessor\n- Keep every raw personal field out of the repository","notes":"Hand out the brief (labs/capstone/README.md) and the rubric: provenance 15, joins and reconciliation 25, cleaning and validation 25, missing data and sensitivity 20, personal data and reproducibility 15. Tell participants to run their build from a fresh clone before they submit: a build that works only on its author's machine is the most common reason for a failed defence.","minutes":null,"lo":[]}],"activities":[{"id":"review-day-3-q1","slide":"review-day-3","type":"single","prompt":"Complete cases give 1.985 parcels per eligible household per month; imputing within groups gives 2.060; the scenarios about the missing sizes run from 2.02 to 2.07. The standard is 2. What goes to Sumayyah?","options":[{"key":"A","text":"1.985: it uses only values that were recorded"},{"key":"B","text":"2.060: it is the best estimate, so it is the answer"},{"key":"C","text":"2.06, between 2.02 and 2.07, with the reason and the districts that stay below"},{"key":"D","text":"2.02: the mean of the two methods, to be fair to both"}],"correct":[2],"explanation":"The audit showed that blank sizes are large sizes, so complete cases are biased low. The range says how far the remaining assumption can move the figure.","misconceptions":["Treats dropping rows as the method that assumes nothing, although the dropped households are the larger ones","Reports the best single estimate and hides that it rests on an assumption about 18% of the households","","Averages methods as if each were an equally good measurement of the same thing"],"lo":["LO5"]},{"id":"check-dimension-q1","slide":"check-dimension","type":"single","prompt":"In the joined table, one row is one handout, and a household has many handouts. A week of one branch is uploaded twice. Which rule catches it?","options":[{"key":"A","text":"Uniqueness of household_key"},{"key":"B","text":"Uniqueness of log_id"},{"key":"C","text":"Completeness of log_id"},{"key":"D","text":"Validity of handout_date"}],"correct":[1],"explanation":"Uniqueness belongs to the key of the grain. The grain here is the handout, so its key, log_id, must never repeat.","misconceptions":["Puts uniqueness on a column that repeats by design: every household with two handouts would fail","","Looks for blanks, although a row uploaded twice is complete in every field","Checks each value alone; a repeated row has the same valid values as the first copy"],"lo":["LO4"]},{"id":"check-cross-field-q1","slide":"check-cross-field","type":"single","prompt":"From 7 to 9 August a branch writes dates as month/day/year; the build reads that branch as day/month/year. Every date parses, and every one falls inside the quarter. Which rule is most likely to show the fault?","options":[{"key":"A","text":"Type: the date matches the pattern of the file"},{"key":"B","text":"Completeness: no date is missing"},{"key":"C","text":"Validity: the date is inside the quarter"},{"key":"D","text":"Consistency: rows per branch per day against that branch's usual pattern"}],"correct":[3],"explanation":"Each swapped date is a possible date. The fault shows only in a relation: the branch has no rows on 7 and 9 August, and about twice its usual rows on 8 July and 8 September.","misconceptions":["Tests the layout of the text; a swapped day and month has the same layout","Looks for blanks, although every date is present","Checks each date alone against the quarter; every swapped date is inside it",""],"lo":["LO4"]},{"id":"check-pseudonym-q1","slide":"check-pseudonym","type":"single","prompt":"A table for a partner holds, per household: a keyed-hash pseudonym, the district, the exact registration date and the household size. The key is stored safely. What is the remaining risk, and the remedy?","options":[{"key":"A","text":"The pseudonym can be enumerated; use a longer hash"},{"key":"B","text":"Date, district and size single households out; send the year and a size band"},{"key":"C","text":"None: without names and ID numbers the table is anonymous"},{"key":"D","text":"The pseudonym links tables; remove it and keep the other fields"}],"correct":[1],"explanation":"With exact fields, 92.8% of households have a combination nobody else has. Generalising the date and the size brings that to almost none and costs the purpose nothing.","misconceptions":["Believes a keyed hash can be broken like a plain one; without the key no candidate can be tested","","Takes the absence of names and numbers for anonymity, and ignores what the other fields reveal together","Removes the one field the partner needs to count shared households, and leaves the identifying ones"],"lo":["LO6"]},{"id":"check-report-q1","slide":"check-report","type":"single","prompt":"The build ran, every rule passed, and the estimate is 2.06 with a range of 2.02 to 2.07. Which sentence should open the limits section?","options":[{"key":"A","text":"All rules passed, so the data is correct"},{"key":"B","text":"The data has some quality issues that should be kept in mind"},{"key":"C","text":"Size is missing for 18.1% of households; three districts are undecided"},{"key":"D","text":"The network delivers 2.060 parcels, above the standard"}],"correct":[2],"explanation":"A limit names the fault, its size and what it does to the reader's decision. Here: for D09, D17 and D24 no verdict against the standard can be given.","misconceptions":["Reads passing rules as proof of truth, although rules test what a value may be","Is true of every dataset and gives the reader nothing to act on","","Hides the assumption behind a precise figure and drops the range that was computed"],"lo":["LO6"]}],"ai":{"context":{"course":"../context/course.md","courseJs":"../context/course.js","day":"day4.md","llms":"../llms.txt"},"tasks":[],"tools":[]},"bridge":{"allowedOrigins":[]},"features":{},"strings":{}}</script>
+<script src="../_engine/academy.js"></script>
+</body>
+</html>

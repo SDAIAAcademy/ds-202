@@ -1,0 +1,1570 @@
+{
+  "v": 1,
+  "engine": "1.0.0",
+  "build": {
+    "at": "2026-11-15T11:22:42Z",
+    "version": "2027.1.0",
+    "commit": "87b98e4"
+  },
+  "lang": "en",
+  "dir": "ltr",
+  "slides": [
+    {
+      "deck": "day1",
+      "id": "title",
+      "n": 1,
+      "session": 0,
+      "title": "Find and document the sources",
+      "text": "SDAIA Academy · Data Acquisition, Preparation and Quality Find and document the sources Day 1: The question, the four sources, their provenance and who they leave out Data Science Track4 teaching days + capstone day4 sessions · 4 labsDS-202",
+      "href": "../slides/day1.html#title"
+    },
+    {
+      "deck": "day1",
+      "id": "agenda",
+      "n": 2,
+      "session": 0,
+      "title": "Find and document the sources",
+      "text": "Today Find and document the sources Session 1 · Start from the question, not the files The question fixes the unit, the population and the period; the variables follow Session 2 · Files, APIs and databases Files, an API and a database each fail differently: count what arrived against what was sent Session 3 · Provenance and sharing basis A record per source: origin, owner, coverage, sharing basis, refresh date and limits Session 4 · Coverage and sampling frames A register lists who registered, not who is in need; an outside frame shows the gap",
+      "href": "../slides/day1.html#agenda"
+    },
+    {
+      "deck": "day1",
+      "id": "s1",
+      "n": 3,
+      "session": 1,
+      "title": "Start from the question, not the files",
+      "text": "Session 1 Start from the question, not the files Take a question apart into unit, population, period and groups List the fields a question needs, with a source for each Name the fields left out and the gaps no source fills 01",
+      "href": "../slides/day1.html#s1"
+    },
+    {
+      "deck": "day1",
+      "id": "the-request",
+      "n": 4,
+      "session": 1,
+      "title": "Ghilal Food Bank Network asks one question of four sources",
+      "text": "The case Ghilal Food Bank Network asks one question of four sources \"In the third quarter of 2026, how many parcels did an eligible household receive per month in each district, and which districts are below our standard of two?\" The register 40,000 registrations with personal data. Widad Al-Ghunaim. Branch logs 210,000 handout rows in 14 files. Hazem Al-Sulaim. Donations API Every delivery of food to a branch. Talal Al-Wabil. Open district table Population and households, 2022. The municipality.",
+      "href": "../slides/day1.html#the-request"
+    },
+    {
+      "deck": "day1",
+      "id": "four-parts",
+      "n": 5,
+      "session": 1,
+      "title": "A question fixes four things, and each one removes a way to be wrong",
+      "text": "Before any file A question fixes four things, and each one removes a way to be wrong Part In this question If you leave it open Unit a household you count handouts, and a household served twice counts twice Population active, eligible, registered before 1 July 2026 September registrations get one month and look under-served Period 1 July to 30 September 2026 each branch reports its own \"last quarter\" Groups the district of the household you group by branch, and a branch is not a district",
+      "href": "../slides/day1.html#four-parts"
+    },
+    {
+      "deck": "day1",
+      "id": "eligibility-rule",
+      "n": 6,
+      "session": 1,
+      "title": "Eligibility is income per member, so household size decides who is counted",
+      "text": "The rule of the network Eligibility is income per member, so household size decides who is counted Eligible: an active household whose monthly income per member is at most 1,000 SAR Income 6,000 SAR with 5 members: 1,200 per member, not eligible The same income with 7 members: 857 per member, eligible A household with no recorded size cannot be classified at all Why this matters on Day 3 Household size is blank for 18% of the population of the question. The denominator of the headline depends on a field that is often missing.",
+      "href": "../slides/day1.html#eligibility-rule"
+    },
+    {
+      "deck": "day1",
+      "id": "variables-first",
+      "n": 7,
+      "session": 1,
+      "title": "From the answer to variables, from variables to fields, and only then to files",
+      "text": "Work backwards From the answer to variables, from variables to fields, and only then to files 1 · The answer parcels per eligible household per month, by district → 2 · Variables parcels, date, eligibility, district, a link between the two → 3 · Fields one source field for each variable → 4 · Files request only those fields What goes wrong. Starting from the files: every column looks useful, all of them are taken, and the question is bent to fit what happened to be there.",
+      "href": "../slides/day1.html#variables-first"
+    },
+    {
+      "deck": "day1",
+      "id": "nine-fields",
+      "n": 8,
+      "session": 1,
+      "title": "The answer needs 9 of the 34 fields",
+      "text": "Lab 1.1, step 2 The answer needs 9 of the 34 fields Role Field Source numerator parcels, handout_date branch logs link household_id logs and register population status, registered_on register eligibility household_size, monthly_income_sar register groups district_id register 9 of 34 fields in the four sources that the headline needs Two more, from the open table, are justified by the coverage check of Session 4.",
+      "href": "../slides/day1.html#nine-fields"
+    },
+    {
+      "deck": "day1",
+      "id": "not-taken",
+      "n": 9,
+      "session": 1,
+      "title": "What the purpose does not need is not taken",
+      "text": "Minimisation, at the first step What the purpose does not need is not taken Field Why it stays behind national_id household_id already links the sources head_name no step of the answer uses a name phone nobody is contacted collected_by does not change a count of parcels note free text can hold anything The law, in one line. The Personal Data Protection Law limits the content of personal data to the minimum necessary for the purpose. The cheapest moment to apply it is before the extract is requested.",
+      "href": "../slides/day1.html#not-taken"
+    },
+    {
+      "deck": "day1",
+      "id": "gaps",
+      "n": 10,
+      "session": 1,
+      "title": "Three things the question needs are in no source",
+      "text": "Lab 1.1, step 4 Three things the question needs are in no source Households that never registered The register lists who came. Session 4 measures how many did not. Verified household sizes Sizes are reported by the household. An audit verified 600 of them. A frame for D29 and D30 Two districts established after the open table was made. Write gaps down on Day 1. A gap named before the analysis is a limit. A gap found by a reader afterwards is an error.",
+      "href": "../slides/day1.html#gaps"
+    },
+    {
+      "deck": "day1",
+      "id": "check-question",
+      "n": 11,
+      "session": 1,
+      "title": "Which field do you ask for?",
+      "text": "Checkpoint Which field do you ask for? Widad offers to add any register field to your extract. The headline is parcels per eligible household per month, by district. Which one do you ask her to include? household_size, because eligibility is income per member national_id, to be sure of linking the right household phone, in case a household must be called to confirm every field, since unused columns can be dropped later",
+      "href": "../slides/day1.html#check-question"
+    },
+    {
+      "deck": "day1",
+      "id": "lab-1-1",
+      "n": 12,
+      "session": 1,
+      "title": "The question before the files",
+      "text": "Lab 1.1 · 25 min The question before the files Take the question of the programmes director apart, list the variables it needs with one source field for each, write down the fields you will not take and the gaps no source fills. D1_1_list_variables_question.ipynb Take the question apart 5 min The fields the question needs 10 min The fields you will not take 5 min What no source provides 5 min ✱ Stretch: A second question, and what it adds",
+      "href": "../slides/day1.html#lab-1-1"
+    },
+    {
+      "deck": "day1",
+      "id": "s2",
+      "n": 13,
+      "session": 2,
+      "title": "Files, APIs and databases",
+      "text": "Session 2 Files, APIs and databases Load files as text whatever their encoding Page through an API and reconcile with its total Query a register in SQL and build a source inventory 02",
+      "href": "../slides/day1.html#s2"
+    },
+    {
+      "deck": "day1",
+      "id": "three-doors",
+      "n": 14,
+      "session": 2,
+      "title": "Files, an API and a database fail in three different ways",
+      "text": "How data arrive Files, an API and a database fail in three different ways Files Nothing describes them. Encoding, date layout and units are in nobody's head but the sender's. A file can come twice or not at all. An API Data come in pages, the service can be busy, and records change while you read. It usually states a total. A database Types and keys are declared, but only the ones somebody declared. Your query decides what you see. One habit covers all three: before reading a value, count what arrived against what the source says it sent.",
+      "href": "../slides/day1.html#three-doors"
+    },
+    {
+      "deck": "day1",
+      "id": "text-first",
+      "n": 15,
+      "session": 2,
+      "title": "Load every column as text first; decide types later, in steps you can count",
+      "text": "Recap of FN-104, one step further Load every column as text first; decide types later, in steps you can count B01 reads as UTF-8. B03 fails at its first Arabic name: it is in Windows-1256 B08 opens, but begins with three extra bytes, EF BB BF: a byte order mark that a spreadsheet wrote A loader that guesses types reads 03/07/2026 as March or as July, and does not say which As text, nothing is lost: 14 files, 210,000 rows, every repair still ahead and countable What goes wrong. The mark becomes part of the first column name, and log_id is \"not found\" in one file of fourteen.",
+      "href": "../slides/day1.html#text-first"
+    },
+    {
+      "deck": "day1",
+      "id": "paging",
+      "n": 16,
+      "session": 2,
+      "title": "Follow next until it is null, and expect a busy answer",
+      "text": "Reading an API Follow next until it is null, and expect a busy answer records, url = [], \"/v1/donations?page=1&per_page=200\" while url: page = G.get_json(base + url) # retries a 503 records += page[\"data\"] total, url = page[\"total\"], page[\"next\"] The address of the next page comes from the answer; do not compute it 503 means \"busy, ask again\": wait, retry, give up after a few tries Keep the total the service reports: it is its claim about itself",
+      "href": "../slides/day1.html#paging"
+    },
+    {
+      "deck": "day1",
+      "id": "api-total",
+      "n": 17,
+      "session": 2,
+      "title": "The API sent 12 records more than its own total",
+      "text": "Measured in Lab 1.2 The API sent 12 records more than its own total 5,137 · 5,125 records received, and the total the API reports Donations kept arriving while the 26 pages were read Four pages begin with records the page before ended with 12 donation ids arrive twice; distinct ids are exactly 5,125 The inventory records the distinct count and the 12 that were dropped",
+      "href": "../slides/day1.html#api-total"
+    },
+    {
+      "deck": "day1",
+      "id": "register-sql",
+      "n": 18,
+      "session": 2,
+      "title": "40,000 rows describe 39,820 households",
+      "text": "The register, in SQL 40,000 rows describe 39,820 households SELECT count(*), count(DISTINCT household_id), min(registered_on), max(registered_on) FROM registrations; 180 household ids that are in the register twice Not an error, yet A household that registers again at another branch gets a second row. It becomes an error in the first join that assumes one row per id.",
+      "href": "../slides/day1.html#register-sql"
+    },
+    {
+      "deck": "day1",
+      "id": "inventory",
+      "n": 19,
+      "session": 2,
+      "title": "Three sources reconcile; the largest has nothing to reconcile against",
+      "text": "The source inventory Three sources reconcile; the largest has nothing to reconcile against Source Arrives as Rows The source says Agrees register database extract 40,000 40,000 registrations yes branch logs 14 files 210,000 nothing unknown donations API, 26 pages 5,125 total = 5,125 yes open district table one file 28 28 districts of 2022 yes What goes wrong. A week uploaded twice and a week never uploaded both pass this table. The logs hold one of each.",
+      "href": "../slides/day1.html#inventory"
+    },
+    {
+      "deck": "day1",
+      "id": "check-total",
+      "n": 20,
+      "session": 2,
+      "title": "Your count and the count of the source disagree",
+      "text": "Checkpoint Your count and the count of the source disagree You paged through an API and hold 5,137 records. The API reports a total of 5,125. What goes into the source inventory? 5,137: it is what actually arrived 5,125: the API knows its own data 5,125 distinct ids, and a line that 12 repeats were dropped Either: twelve records cannot change the analysis",
+      "href": "../slides/day1.html#check-total"
+    },
+    {
+      "deck": "day1",
+      "id": "lab-1-2",
+      "n": 21,
+      "session": 2,
+      "title": "Three ways in",
+      "text": "Lab 1.2 · 25 min Three ways in Load the 14 branch log files whatever their encoding, page through the donations API until it ends and reconcile with its total, query the register in SQL, and write a source inventory. D1_2_load_logs_page.ipynb Load the 14 log files, whatever their encoding 7 min Page through the donations API and reconcile with its total 8 min Query the register in SQL 6 min The source inventory 4 min ✱ Stretch: Does a smaller page size change what arrives?",
+      "href": "../slides/day1.html#lab-1-2"
+    },
+    {
+      "deck": "day1",
+      "id": "s3",
+      "n": 22,
+      "session": 3,
+      "title": "Provenance and sharing basis",
+      "text": "Session 3 Provenance and sharing basis Write a provenance record with its six fields and a classification level State the sharing basis and its purpose Pass and apply a reviewer checklist 03",
+      "href": "../slides/day1.html#s3"
+    },
+    {
+      "deck": "day1",
+      "id": "why-provenance",
+      "n": 23,
+      "session": 3,
+      "title": "Somebody will ask where a number came from, and you will not be in the room",
+      "text": "A year from now Somebody will ask where a number came from, and you will not be in the room Which extract was this, and from which day? Who can say what a column means? Were we allowed to use it for this? What is it known not to cover? A provenance record One short record per source, kept in the repository beside the code, changed in the same commit as the extract it describes.",
+      "href": "../slides/day1.html#why-provenance"
+    },
+    {
+      "deck": "day1",
+      "id": "six-fields",
+      "n": 24,
+      "session": 3,
+      "title": "Six fields, and what a reviewer needs to read in each",
+      "text": "The record Six fields, and what a reviewer needs to read in each Field A reviewer needs origin the system, and how the extract was made owner the person to ask, by role coverage which units, which period, and who is not in it sharing basis the consent, agreement or approval, and its purpose refresh date the day your copy was taken limits what the data cannot be trusted for The labs add a seventh key, the classification level of the source.",
+      "href": "../slides/day1.html#six-fields"
+    },
+    {
+      "deck": "day1",
+      "id": "sharing-basis",
+      "n": 25,
+      "session": 3,
+      "title": "Holding an extract is not permission to use it for the next question",
+      "text": "On what basis Holding an extract is not permission to use it for the next question The register extract came under approval DS-2026-041, for service coverage analysis, Q3 2026 The approval names a purpose, the people who may see the data, and that identified records go no further A new question next year is a new request to the data protection officer In the Data Sharing Policy Among its principles: sharing serves a legitimate purpose, and access is authorised on a need-to-know and least-privilege basis.",
+      "href": "../slides/day1.html#sharing-basis"
+    },
+    {
+      "deck": "day1",
+      "id": "classification",
+      "n": 26,
+      "session": 3,
+      "title": "Three of the four sources are Restricted; one is Public",
+      "text": "The seventh key Three of the four sources are Restricted; one is Public Source Level Because register Restricted personal data of beneficiaries branch logs Restricted household ids and names of collectors donations API Restricted internal operations, no donor names open district table Public published under an open licence The national policy has four levels: Top Secret, Secret, Restricted and Public. Anything joined to a Restricted source is at least Restricted.",
+      "href": "../slides/day1.html#classification"
+    },
+    {
+      "deck": "day1",
+      "id": "three-dates",
+      "n": 27,
+      "session": 3,
+      "title": "The open table has three dates, and only one is the refresh date",
+      "text": "Open data has provenance too The open table has three dates, and only one is the refresh date 2022 The year the rows describe. It belongs in coverage. 15 March 2023 The day it was published. It identifies the release, in origin. 2 October 2026 The day our copy was downloaded: the refresh date. And the gap between them is a limit. A table about 2022 used in 2026 describes a city that has since grown, unevenly.",
+      "href": "../slides/day1.html#three-dates"
+    },
+    {
+      "deck": "day1",
+      "id": "weak-record",
+      "n": 28,
+      "session": 3,
+      "title": "A record written in a hurry fails eight checks",
+      "text": "Lab 1.3, step 3 A record written in a hurry fails eight checks The draft origin: \"files\" · owner: \"Hazem\" · coverage: \"this year\" · sharing basis: \"internal\" · refresh date: \"October\" · limits: \"messy\" · classification: \"Internal\" Repaired from the source note One row per handout, 1 January to 30 September 2026, all 14 branches. Copy of 2026-10-03. Four limits, among them: a week can be uploaded twice or be missing, and no file says so. \"Internal\" is not one of the four levels. \"This year\" will be false in January.",
+      "href": "../slides/day1.html#weak-record"
+    },
+    {
+      "deck": "day1",
+      "id": "limits-feed-later",
+      "n": 29,
+      "session": 3,
+      "title": "A limit written on Day 1 is an explanation on Day 3",
+      "text": "Why limits earn their place A limit written on Day 1 is an explanation on Day 3 \"The online form and the call script offer sizes 1 to 6 only\": why sizes are missing for large households \"No size field on the paper form of B03 and B11 before March 2025\": why they are missing at two branches \"Sizes are reported, not verified\": why an audit was needed \"A week can be missing, and no file says so\": why a district can look under-served",
+      "href": "../slides/day1.html#limits-feed-later"
+    },
+    {
+      "deck": "day1",
+      "id": "check-provenance",
+      "n": 30,
+      "session": 3,
+      "title": "Which coverage line passes a reviewer?",
+      "text": "Checkpoint Which coverage line passes a reviewer? You are writing the coverage field of the register record. Which line lets a stranger decide what the data can answer? All households registered with the network Registrations 2021-01-03 to 2026-09-28; households that never registered are absent 40,000 rows, 11 columns, 4.4 MB Extract taken on 2026-10-04 from the register",
+      "href": "../slides/day1.html#check-provenance"
+    },
+    {
+      "deck": "day1",
+      "id": "lab-1-3",
+      "n": 31,
+      "session": 3,
+      "title": "Two provenance records",
+      "text": "Lab 1.3 · 25 min Two provenance records Write the provenance records of the register and of the open district table from their source notes, repair a weak record with the reviewer checklist, and assemble the provenance file of the project. D1_3_write_provenance_records.ipynb The record of the register 9 min The record of the open district table 7 min Run the checklist and repair a weak record 5 min Assemble provenance.json 4 min ✱ Stretch: A record for the audit file",
+      "href": "../slides/day1.html#lab-1-3"
+    },
+    {
+      "deck": "day1",
+      "id": "s4",
+      "n": 32,
+      "session": 4,
+      "title": "Coverage and sampling frames",
+      "text": "Session 4 Coverage and sampling frames Compare a register with an outside frame by district Account for rows that match on one side only Flag under-covered districts and word the caveat 04",
+      "href": "../slides/day1.html#s4"
+    },
+    {
+      "deck": "day1",
+      "id": "frame-vs-register",
+      "n": 33,
+      "session": 4,
+      "title": "The question is about households in need; the register lists households that came",
+      "text": "Three populations The question is about households in need; the register lists households that came In need every low-income household of the city. Nobody has this list. → The frame a 2022 survey estimate of low-income households, by district → The register households that registered, by district Coverage is the register divided by the frame. It says how much of the population of interest the data can speak for.",
+      "href": "../slides/day1.html#frame-vs-register"
+    },
+    {
+      "deck": "day1",
+      "id": "outer-join",
+      "n": 34,
+      "session": 4,
+      "title": "A join against an outside list has three outcomes; an inner join shows one",
+      "text": "Lab 1.4, step 2 A join against an outside list has three outcomes; an inner join shows one In both · 28 Districts with a registered count and a frame. Register only · 2 D29 and D30: 2,523 registered households, no row in the frame. Frame only · 0 No district of the frame is without registrations. With an inner join the table has 28 tidy rows, and 2,523 households leave the analysis without a message.",
+      "href": "../slides/day1.html#outer-join"
+    },
+    {
+      "deck": "day1",
+      "id": "coverage-numbers",
+      "n": 35,
+      "session": 4,
+      "title": "In four districts the register reaches about a third of the households in need",
+      "text": "Measured in Lab 1.4 In four districts the register reaches about a third of the households in need D07 Al-Mahjar 0.31 D22 Al-Jabal 0.34 D26 Wadi Al-Sidr 0.34 D15 Al-Sahil 0.36 23 other districts 0.71 to 0.90 D03 Al-Waha 1.18",
+      "href": "../slides/day1.html#coverage-numbers"
+    },
+    {
+      "deck": "day1",
+      "id": "over-100",
+      "n": 36,
+      "session": 4,
+      "title": "Coverage of 118% says the frame is old, not that the register is wrong",
+      "text": "A ratio above 1 Coverage of 118% says the frame is old, not that the register is wrong D03: 1,113 registered households against an estimate of 940 The frame describes 2022; the district has grown since The estimate is from a survey, with no published margin of error \"Low income\" in the survey is not the eligibility rule of the network What goes wrong. Reading the ratio as a fact about the register: \"178 fabricated households\". The denominator is the uncertain part.",
+      "href": "../slides/day1.html#over-100"
+    },
+    {
+      "deck": "day1",
+      "id": "missing-units",
+      "n": 37,
+      "session": 4,
+      "title": "Under-coverage is whole households missing, and not at random",
+      "text": "A first kind of missing data Under-coverage is whole households missing, and not at random Missing values: the household is there, a field is blank. Day 3, Sessions 1 to 3 Missing units: the household is not in the data at all Households far from a branch register less; they are also the ones served least The headline is therefore too kind to exactly the districts it is meant to find No repair, only a report No imputation of a field brings back a household that was never listed. The coverage table goes beside the headline.",
+      "href": "../slides/day1.html#missing-units"
+    },
+    {
+      "deck": "day1",
+      "id": "coverage-note",
+      "n": 38,
+      "session": 4,
+      "title": "Three sentences go under the headline",
+      "text": "Lab 1.4, step 4 Three sentences go under the headline The figure describes registered households only; in D07, D15, D22 and D26 fewer than half of the estimated low-income households are registered For D29 and D30 the share of households in need that are registered is unknown: the frame has no row The frame is a 2022 survey estimate; coverage ratios are approximate And two that must not. \"Low coverage means low need.\" \"Coverage above 100% shows fabricated households.\"",
+      "href": "../slides/day1.html#coverage-note"
+    },
+    {
+      "deck": "day1",
+      "id": "check-coverage",
+      "n": 39,
+      "session": 4,
+      "title": "A district that looks well served",
+      "text": "Checkpoint A district that looks well served District D22 shows a healthy number of parcels per registered household, and its coverage is 0.34. What may the report say about D22? D22 is well served and needs no attention Its true figure is the reported one multiplied by 0.34 Nothing: with such coverage the district must be dropped Its registered households are served; most households in need are not registered",
+      "href": "../slides/day1.html#check-coverage"
+    },
+    {
+      "deck": "day1",
+      "id": "lab-1-4",
+      "n": 40,
+      "session": 4,
+      "title": "Who is not in the register",
+      "text": "Lab 1.4 · 25 min Who is not in the register Count registered households per district in SQL, join them to the open table with a full outer join, compute coverage ratios, flag the under-covered districts and choose the sentences that go under the headline. D1_4_compare_registrations_open.ipynb Registered households per district, in SQL 5 min Join to the open table and find what does not match 7 min Coverage ratios and flags 8 min The coverage note 5 min ✱ Stretch: A second frame: all households",
+      "href": "../slides/day1.html#lab-1-4"
+    },
+    {
+      "deck": "day1",
+      "id": "wrap-up",
+      "n": 41,
+      "session": 4,
+      "title": "Three things to keep",
+      "text": "Day 1 · wrap-up Three things to keep The question chooses the fields Unit, population, period, groups. Nine fields of 34; five identifying fields stay behind. Count before you read What arrived against what the source says: 5,125 of 5,125, 40,000 rows for 39,820 households, and logs that say nothing. Write down what a source cannot do Six fields per source, and a coverage table that keeps four districts from looking well served.",
+      "href": "../slides/day1.html#wrap-up"
+    },
+    {
+      "deck": "day1",
+      "id": "next",
+      "n": 42,
+      "session": 4,
+      "title": "Join and clean: every repair counted",
+      "text": "Next · Day 2 Join and clean: every repair counted One register file in three states of encoding, and names that must match 210,000 log rows joined to the register without losing or adding a row 300 walk-in records with no key at all Three date layouts and two weight units that no file declares",
+      "href": "../slides/day1.html#next"
+    },
+    {
+      "deck": "day2",
+      "id": "title",
+      "n": 1,
+      "session": 0,
+      "title": "Join and clean",
+      "text": "SDAIA Academy · Data Acquisition, Preparation and Quality Join and clean Day 2: Bytes, keys, people without keys, dates and units, each repair counted Data Science Track4 teaching days + capstone day4 sessions · 4 labsDS-202",
+      "href": "../slides/day2.html#title"
+    },
+    {
+      "deck": "day2",
+      "id": "review-day-1",
+      "n": 2,
+      "session": 0,
+      "title": "A count that nobody can check",
+      "text": "Review of Day 1 A count that nobody can check The inventory of Day 1 shows 210,000 log rows from 14 files, and the logs state no total of their own. What does that line of the inventory allow you to say? The logs are complete: 210,000 rows arrived 210,000 rows arrived; whether any are missing or doubled is unknown The logs are wrong: a round number is suspicious The logs cannot be used until the branches state totals",
+      "href": "../slides/day2.html#review-day-1"
+    },
+    {
+      "deck": "day2",
+      "id": "agenda",
+      "n": 3,
+      "session": 0,
+      "title": "Join and clean",
+      "text": "Today Join and clean Session 1 · Encodings and Arabic text One file, several encodings: decide line by line, repair, and match on a normalised key Session 2 · Keys and cardinality Repair keys by rule, test the cardinality, and make the row counts add up Session 3 · Matching without a clean key Block, score and choose a threshold on labelled pairs: a false match costs most Session 4 · Types, units and dates Layout and unit belong to the source, not the value: decide per branch, convert, log",
+      "href": "../slides/day2.html#agenda"
+    },
+    {
+      "deck": "day2",
+      "id": "s1",
+      "n": 4,
+      "session": 1,
+      "title": "Encodings and Arabic text",
+      "text": "Session 1 Encodings and Arabic text Decode a file line by line and count each encoding Repair names that were decoded twice Normalise Arabic letters and digits into a key and log every repair 01",
+      "href": "../slides/day2.html#s1"
+    },
+    {
+      "deck": "day2",
+      "id": "three-states",
+      "n": 5,
+      "session": 1,
+      "title": "A line of the register is in one of three states, and no encoding reads them all",
+      "text": "One file, appended from 14 exports A line of the register is in one of three states, and no encoding reads them all State What you see Lines UTF-8, correct ماجد محمد باوزير most Windows-1256 bytes (B03, B11) fails as UTF-8 5,458 UTF-8 that was decoded twice (B06) ط¨ظ†ط¯ط± …: valid UTF-8, wrong letters 2,732 names What goes wrong. Reading the whole file as Windows-1256 raises no error: every byte is a letter in that code page. The 34,542 UTF-8 lines become nonsense, quietly.",
+      "href": "../slides/day2.html#three-states"
+    },
+    {
+      "deck": "day2",
+      "id": "line-by-line",
+      "n": 6,
+      "session": 1,
+      "title": "Decide per line: valid UTF-8 is UTF-8; what is not is the legacy code page",
+      "text": "The decision rule Decide per line: valid UTF-8 is UTF-8; what is not is the legacy code page def decode(b: bytes): try: return b.decode(\"utf-8\"), \"utf-8\" except UnicodeDecodeError: return b.decode(\"cp1256\"), \"cp1256\" Arabic in Windows-1256 is almost never valid UTF-8, so the test is safe in this direction Return the encoding with the text and count it The count has a shape: all 5,458 lines are from two branches. A scatter over all branches would mean the rule is wrong",
+      "href": "../slides/day2.html#line-by-line"
+    },
+    {
+      "deck": "day2",
+      "id": "decoded-twice",
+      "n": 7,
+      "session": 1,
+      "title": "Undo the wrong step, and prove the rule leaves correct text alone",
+      "text": "The state that raises no error anywhere Undo the wrong step, and prove the rule leaves correct text alone 1 · Typed بندر stored as UTF-8 bytes → 2 · Misread the branch system read the bytes as Windows-1256 and saved the result → 3 · Repair s.encode(\"cp1256\").decode(\"utf-8\") Correct Arabic does not survive that round trip: the decode fails and the function returns the text unchanged So the function is safe on all 40,000 names, and changes 2,732, every one at B06",
+      "href": "../slides/day2.html#decoded-twice"
+    },
+    {
+      "deck": "day2",
+      "id": "letters-and-keys",
+      "n": 8,
+      "session": 1,
+      "title": "A key is a normalised copy for matching; the stored name is never replaced",
+      "text": "After the bytes, the letters A key is a normalised copy for matching; the stored name is never replaced Rule Example drop marks and the stretch mark مُحمّد → محمد one alef; ى → ي; ة → ه أحمد → احمد join عبد to the next word عبد الله → عبدالله one space between words trailing and double spaces go 24,355 distinct Arabic names as typed are 21,252 distinct keys: about one \"different\" name in eight was a spelling variant.",
+      "href": "../slides/day2.html#letters-and-keys"
+    },
+    {
+      "deck": "day2",
+      "id": "digits-hide",
+      "n": 9,
+      "session": 1,
+      "title": "An ID number typed in Arabic-Indic digits is a different string",
+      "text": "Digits are text too An ID number typed in Arabic-Indic digits is a different string 39,851 → 39,820 distinct national ids, before and after the digit rule One branch typed 2,784 ID numbers as ١٠٩٠… 31 households registered there and again elsewhere: one person, two strings A count of distinct people, or a join on the id, was wrong with no error Normalise digits in every key before you compare it with anything",
+      "href": "../slides/day2.html#digits-hide"
+    },
+    {
+      "deck": "day2",
+      "id": "repair-log",
+      "n": 10,
+      "session": 1,
+      "title": "A repair that is not counted cannot be checked, repeated or reversed",
+      "text": "The habit of the day A repair that is not counted cannot be checked, repeated or reversed A rule Written as code, applied to every row, never by hand to a few. A count One line per rule in a log: how many rows it changed, and where. The original Kept beside the repaired value, so a reviewer can disagree. The same three in every lab today: a repair log, a join log, a threshold table, a change log.",
+      "href": "../slides/day2.html#repair-log"
+    },
+    {
+      "deck": "day2",
+      "id": "check-encoding",
+      "n": 11,
+      "session": 1,
+      "title": "Which loader do you trust?",
+      "text": "Checkpoint Which loader do you trust? A file was appended from several systems. Four loaders are proposed. Which one do you run? Read it all as Windows-1256: it raises no error Read it as UTF-8 and replace undecodable bytes with a mark Let a detection library pick the encoding of the file Decode line by line, UTF-8 first, and count the lines of each encoding",
+      "href": "../slides/day2.html#check-encoding"
+    },
+    {
+      "deck": "day2",
+      "id": "lab-2-1",
+      "n": 12,
+      "session": 1,
+      "title": "One file, three encodings",
+      "text": "Lab 2.1 · 25 min One file, three encodings Decode the register extract line by line, repair the names that were decoded twice, normalise Arabic letters and digits into matching keys, and write the repair log that shows what the digits were hiding. D2_1_repair_mixed_encodings.ipynb Decode the extract line by line and count 6 min Repair the names that were decoded twice 6 min Normalise letters and digits into keys 8 min The repair log, and what the digits were hiding 5 min ✱ Stretch: Names in Latin letters: case and hyphens",
+      "href": "../slides/day2.html#lab-2-1"
+    },
+    {
+      "deck": "day2",
+      "id": "s2",
+      "n": 13,
+      "session": 2,
+      "title": "Keys and cardinality",
+      "text": "Session 2 Keys and cardinality Repair mistyped keys by stated rules Test many-to-one before joining Reconcile rows in with rows out plus rows set aside 02",
+      "href": "../slides/day2.html#s2"
+    },
+    {
+      "deck": "day2",
+      "id": "three-silent-failures",
+      "n": 14,
+      "session": 2,
+      "title": "A join can lose rows, add rows, and report neither",
+      "text": "Many handouts, one household A join can lose rows, add rows, and report neither Lost A key typed by hand does not match. In an inner join the handout disappears. Added A household that is in the register twice gets every handout twice. Unnoticed The result is a table of plausible size. Nothing compares it with what went in. The remedy has three parts, in this order: repair keys by rule, test the cardinality, count rows at every step.",
+      "href": "../slides/day2.html#three-silent-failures"
+    },
+    {
+      "deck": "day2",
+      "id": "key-repair",
+      "n": 15,
+      "session": 2,
+      "title": "A repair is safe when it cannot change which household is meant",
+      "text": "Lab 2.2, step 1 A repair is safe when it cannot change which household is meant As typed Rule Safe because h482913 upper-case case carries no information in this id H482913 strip spaces nor do spaces H-482913 remove the hyphen nor a separator H48O913 letter O to digit 0 after the H only digits are possible Never a repair: replacing an id by \"the most similar one in the register\". That picks a household, and it can pick the wrong one.",
+      "href": "../slides/day2.html#key-repair"
+    },
+    {
+      "deck": "day2",
+      "id": "cardinality-test",
+      "n": 16,
+      "session": 2,
+      "title": "Without the test, 209,620 rows went in and 210,585 came out",
+      "text": "Lab 2.2, step 2 Without the test, 209,620 rows went in and 210,585 came out logs.merge(reg, on=\"household_id\", how=\"left\", validate=\"many_to_one\") # MergeError: Merge keys are not unique # in right dataset A left join never loses a left row; it adds one for every extra match on the right 180 household ids are in the register twice: +965 rows, every one a handout counted double validate turns the assumption \"one row per household\" into a test that stops the join",
+      "href": "../slides/day2.html#cardinality-test"
+    },
+    {
+      "deck": "day2",
+      "id": "set-aside",
+      "n": 17,
+      "session": 2,
+      "title": "Rows without a household are set aside with a reason, not deleted",
+      "text": "What cannot be joined Rows without a household are set aside with a reason, not deleted Reason Rows key not in the register 421 blank key 311 set aside 732 They are handouts that happened: deleting them is an undercount with no trace The file goes to the owner of the logs; a corrected key enters the next build Unknown keys are spread over every branch: well-formed typing errors",
+      "href": "../slides/day2.html#set-aside"
+    },
+    {
+      "deck": "day2",
+      "id": "join-log",
+      "n": 18,
+      "session": 2,
+      "title": "The join log: every row that came in is on one of its lines",
+      "text": "The evidence of LO3 The join log: every row that came in is on one of its lines Step Rows Note log rows read 210,000 14 branch files exact copies dropped 209,620 380 rows: a week of B02 uploaded twice keys repaired 209,620 2,446 keys by four rules set aside 732 421 unknown, 311 blank joined to a household 208,888 many to one, tested 210,000 = 380 copies + 732 set aside + 208,888 joined.",
+      "href": "../slides/day2.html#join-log"
+    },
+    {
+      "deck": "day2",
+      "id": "check-join",
+      "n": 19,
+      "session": 2,
+      "title": "More rows out than in",
+      "text": "Checkpoint More rows out than in A left join of 209,620 log rows to the register returns 210,585 rows and no error. What is the first thing you check? Whether household_id is unique in the register How many log keys have no match in the register Whether a branch file was loaded twice Nothing: drop duplicate rows from the result",
+      "href": "../slides/day2.html#check-join"
+    },
+    {
+      "deck": "day2",
+      "id": "lab-2-2",
+      "n": 20,
+      "session": 2,
+      "title": "A join that loses nothing",
+      "text": "Lab 2.2 · 25 min A join that loses nothing Repair the household ids of the logs, test the join against the register for one-to-many breaks, join, and write a join log in which rows in equal rows out plus rows set aside, each with a reason. D2_2_join_logs_registrations.ipynb Repair the keys and name what cannot be repaired 8 min Test the cardinality before joining 5 min Join and reconcile 7 min The join log and the set-aside file 5 min ✱ Stretch: Handouts dated before the registration",
+      "href": "../slides/day2.html#lab-2-2"
+    },
+    {
+      "deck": "day2",
+      "id": "s3",
+      "n": 21,
+      "session": 3,
+      "title": "Matching without a clean key",
+      "text": "Session 3 Matching without a clean key Block and score candidate pairs Measure false matches and missed matches on labelled pairs Choose a threshold and state its cost 03",
+      "href": "../slides/day2.html#s3"
+    },
+    {
+      "deck": "day2",
+      "id": "no-key",
+      "n": 22,
+      "session": 3,
+      "title": "300 handouts were written on paper, with a name and no id",
+      "text": "The problem 300 handouts were written on paper, with a name and no id A satellite point of B04 and B05, during Ramadan A name, a district ticked on the form, a phone for seven in ten 4,937 active households of the two branches to search Staff labelled 848 candidate pairs by hand: 255 true, 593 not Two errors, two prices Missed match: a handout stays uncounted, and you can see it. False match: one family is credited with another's parcels, and it looks like a success.",
+      "href": "../slides/day2.html#no-key"
+    },
+    {
+      "deck": "day2",
+      "id": "block-score-decide",
+      "n": 23,
+      "session": 3,
+      "title": "Block, score, decide",
+      "text": "Three steps Block, score, decide 1 · Block compare only pairs that agree on a reliable field: the district → 2 · Score how alike are the two name keys, from 0 to 100 → 3 · Decide accept, reject, or send to a person Blocking: 311,703 candidate pairs instead of 1,481,100, and all 255 true pairs survive it A true pair that disagrees on the blocking field is never compared: check that on the labelled pairs",
+      "href": "../slides/day2.html#block-score-decide"
+    },
+    {
+      "deck": "day2",
+      "id": "threshold-trade",
+      "n": 24,
+      "session": 3,
+      "title": "A higher threshold buys fewer false matches with more missed ones",
+      "text": "Measured on the 848 labelled pairs A higher threshold buys fewer false matches with more missed ones Rule Accepted False False-match rate Missed of 255 name score ≥ 70 309 86 27.8% 32 name score ≥ 85 149 11 7.4% 117 name score ≥ 95 117 4 3.4% 142 No threshold gives both. Even at 95, four accepted pairs are the wrong family, and more than half of the true pairs are missed.",
+      "href": "../slides/day2.html#threshold-trade"
+    },
+    {
+      "deck": "day2",
+      "id": "second-field",
+      "n": 25,
+      "session": 3,
+      "title": "A second field breaks the trade",
+      "text": "Lab 2.3, step 4 A second field breaks the trade 172 · 0 pairs accepted and false matches, when names are alike and phones agree on nine of ten digits Two fields that agree by accident are rare; one field that agrees by accident is common 83 true pairs are not accepted: mostly walk-ins who gave no phone They go to a review queue for a person, not through a lower threshold",
+      "href": "../slides/day2.html#second-field"
+    },
+    {
+      "deck": "day2",
+      "id": "three-outcomes",
+      "n": 26,
+      "session": 3,
+      "title": "Accept, reject, or ask a person",
+      "text": "The decision has three outcomes Accept, reject, or ask a person Accept automatically The rule that showed no false match on labelled pairs. 172 of 300 walk-ins. Review Likely names without a phone, or several candidates. A person decides, and the decision is recorded. Leave unmatched 45 walk-ins are new households. An unmatched record is an honest result. Report it like a join: 300 records in, so many matched by rule, so many by review, so many unmatched.",
+      "href": "../slides/day2.html#three-outcomes"
+    },
+    {
+      "deck": "day2",
+      "id": "check-threshold",
+      "n": 27,
+      "session": 3,
+      "title": "Which rule goes into the build?",
+      "text": "Checkpoint Which rule goes into the build? A false match credits one family with another's parcels. On labelled pairs: name ≥ 70 accepts 309 with 86 false; name ≥ 95 accepts 117 with 4 false; name and phone accepts 172 with 0 false. Which do you automate? Name ≥ 70: it finds the most matches Name ≥ 95: 3.4% false is good enough Name and phone, with the rest sent to review None: match all 300 by hand",
+      "href": "../slides/day2.html#check-threshold"
+    },
+    {
+      "deck": "day2",
+      "id": "lab-2-3",
+      "n": 28,
+      "session": 3,
+      "title": "300 records without a key",
+      "text": "Lab 2.3 · 25 min 300 records without a key Match 300 walk-in records to the register of two branches by normalised name, measure false and missed matches on staff-labelled pairs at three thresholds, add the phone as a second field, and choose the rule to run. D2_3_match_300_records.ipynb Normalise and block 5 min Score the candidate pairs 6 min False matches at three thresholds 7 min Add the phone, measure again, choose 7 min ✱ Stretch: The review queue",
+      "href": "../slides/day2.html#lab-2-3"
+    },
+    {
+      "deck": "day2",
+      "id": "s4",
+      "n": 29,
+      "session": 4,
+      "title": "Types, units and dates",
+      "text": "Session 4 Types, units and dates Decide a date layout per source from evidence Bring weights in two units to one, and catch mislabelled ones Write a change log with a count per rule 04",
+      "href": "../slides/day2.html#s4"
+    },
+    {
+      "deck": "day2",
+      "id": "value-has-no-evidence",
+      "n": 30,
+      "session": 4,
+      "title": "03/07/2026 is 3 July at one branch and 7 March at another",
+      "text": "The same string, two days 03/07/2026 is 3 July at one branch and 7 March at another 8 branches write 2026-07-03 4 branches write day first: 03/07/2026 2 branches, on donated software, write month first: 07/03/2026 No file says which 36,002 of 91,403 slash dates in which both parts are 12 or less: the value alone cannot be read",
+      "href": "../slides/day2.html#value-has-no-evidence"
+    },
+    {
+      "deck": "day2",
+      "id": "layout-per-source",
+      "n": 31,
+      "session": 4,
+      "title": "A layout belongs to the source: one unambiguous date settles the whole file",
+      "text": "Where the evidence is A layout belongs to the source: one unambiguous date settles the whole file 1 · Group by branch a branch uses one layout → 2 · Look for a part above 12 if the first part ever exceeds 12 it is the day → 3 · Parse strictly with that one format; a value that does not fit is an error And then test the result. Every branch has handouts in every month. A branch read with the wrong layout would have none after day 12.",
+      "href": "../slides/day2.html#layout-per-source"
+    },
+    {
+      "deck": "day2",
+      "id": "guessing-cost",
+      "n": 32,
+      "session": 4,
+      "title": "Guessing day first for a month-first branch loses 61% and corrupts 36%",
+      "text": "The stretch of Lab 2.4 Guessing day first for a month-first branch loses 61% and corrupts 36% lost: no such date 11,625 wrong, silently 6,960 right by luck 620 The 19,205 handouts of B05, parsed day first with unreadable values turned into \"no date\". The 6,960 are the dangerous ones: a real-looking date, in the wrong month.",
+      "href": "../slides/day2.html#guessing-cost"
+    },
+    {
+      "deck": "day2",
+      "id": "units-evidence",
+      "n": 33,
+      "session": 4,
+      "title": "The weight per parcel shows which unit a number is in",
+      "text": "Lab 2.4, step 3 The weight per parcel shows which unit a number is in Branch, unit as labelled Median per parcel Reading B01, kg 12.0 kilograms: the packing standard B05, lb 26.4 pounds, labelled as pounds B13, kg (1,312 rows) 26.4 pounds labelled as kilograms B09, kg (150 rows) above 9,000 grams typed into a kilogram field Between 15 and 19.8 per parcel there is no value at all: the two clouds do not touch, so a rule can separate them.",
+      "href": "../slides/day2.html#units-evidence"
+    },
+    {
+      "deck": "day2",
+      "id": "blanks-stay",
+      "n": 34,
+      "session": 4,
+      "title": "734 blank weights stay blank",
+      "text": "What cleaning must not do 734 blank weights stay blank All at B09, 4 to 17 May: the scale was away for repair A blank is not zero and is not 12 kg per parcel Filling it is a decision about missing data, with consequences for every average of weight The change log says \"left missing\", with the count Tomorrow Day 3 asks why a value is missing before deciding what to do about it. This one has a known cause and a recorded date range.",
+      "href": "../slides/day2.html#blanks-stay"
+    },
+    {
+      "deck": "day2",
+      "id": "change-log",
+      "n": 35,
+      "session": 4,
+      "title": "The change log names every rule, its rows and its branches",
+      "text": "Lab 2.4, step 4 The change log names every rule, its rows and its branches Change Rows Branches dates read as ISO 118,217 8 branches dates read day first 52,731 B03, B08, B10, B11 dates read month first 38,672 B05, B13 pounds to kilograms 37,360 B05, B13 pounds labelled kg 1,312 B13 grams to kilograms 150 B09 weight missing, left missing 734 B09",
+      "href": "../slides/day2.html#change-log"
+    },
+    {
+      "deck": "day2",
+      "id": "check-date",
+      "n": 36,
+      "session": 4,
+      "title": "A date that could be two days",
+      "text": "Checkpoint A date that could be two days A branch file holds 05/06/2026 and, further down, 09/27/2026. How do you read the first date? 5 June: day first is the convention here 6 May: the file holds a second part above 12, so the month comes first It cannot be known: set it aside as ambiguous Either: let the date parser infer it",
+      "href": "../slides/day2.html#check-date"
+    },
+    {
+      "deck": "day2",
+      "id": "lab-2-4",
+      "n": 37,
+      "session": 4,
+      "title": "One calendar, one unit",
+      "text": "Lab 2.4 · 25 min One calendar, one unit Find the date layout of each branch from its own rows, parse every date with it, bring pounds, grams and mislabelled weights to kilograms, and write the change log. D2_4_standardise_three_date.ipynb Find the date layout of each branch 7 min Parse every date with the layout of its branch 5 min Bring every weight to kilograms 8 min The change log 5 min ✱ Stretch: What guessing value by value would have done",
+      "href": "../slides/day2.html#lab-2-4"
+    },
+    {
+      "deck": "day2",
+      "id": "wrap-up",
+      "n": 38,
+      "session": 4,
+      "title": "Three things to keep",
+      "text": "Day 2 · wrap-up Three things to keep No error is not correct The wrong encoding, the wrong date order and a doubled household all run without a message. Rows in = rows out + rows set aside 210,000 = 380 + 732 + 208,888. Each line has a reason. Evidence lives in the source The layout, the unit and the encoding are decided per file or per line, and measured before they are trusted.",
+      "href": "../slides/day2.html#wrap-up"
+    },
+    {
+      "deck": "day2",
+      "id": "next",
+      "n": 39,
+      "session": 4,
+      "title": "Missing data and measurement: how far can the headline move?",
+      "text": "Next · Day 3 Missing data and measurement: how far can the headline move? Household size is blank for 18% of the population of the question Three reasons for a blank, and what each does to the estimate Three estimates of one number, then a range you can defend Sizes that are recorded, and wrong",
+      "href": "../slides/day2.html#next"
+    },
+    {
+      "deck": "day3",
+      "id": "title",
+      "n": 1,
+      "session": 0,
+      "title": "Missing data and measurement",
+      "text": "SDAIA Academy · Data Acquisition, Preparation and Quality Missing data and measurement Day 3: Why values are missing, what each remedy assumes, and how far the headline can move Data Science Track4 teaching days + capstone day4 sessions · 4 labsDS-202",
+      "href": "../slides/day3.html#title"
+    },
+    {
+      "deck": "day3",
+      "id": "review-day-2",
+      "n": 2,
+      "session": 0,
+      "title": "Rows that could not be joined",
+      "text": "Review of Day 2 Rows that could not be joined After key repair, 732 log rows have no household: 421 carry an id that is not in the register and 311 are blank. What happens to them? They drop out in the join; no action is needed Each gets the most similar id in the register They go to a set-aside file with a reason, and the join log counts them They stay in the joined table with blank household fields",
+      "href": "../slides/day3.html#review-day-2"
+    },
+    {
+      "deck": "day3",
+      "id": "agenda",
+      "n": 3,
+      "session": 0,
+      "title": "Missing data and measurement",
+      "text": "Today Missing data and measurement Session 1 · Why data go missing Three mechanisms of missingness, the evidence for each, and the bias each causes Session 2 · Imputation and its cost Complete cases, one value, or similar households: three assumptions, three answers Session 3 · Sensitivity ranges Logical bounds first, then a range under assumptions you can defend Session 4 · Measurement error and proxies Random error, one-directional error, and what a proxy really measures",
+      "href": "../slides/day3.html#agenda"
+    },
+    {
+      "deck": "day3",
+      "id": "s1",
+      "n": 4,
+      "session": 1,
+      "title": "Why data go missing",
+      "text": "Session 1 Why data go missing Tabulate missingness against observed fields Tell the three mechanisms apart with evidence Give the direction of bias each one causes 01",
+      "href": "../slides/day3.html#s1"
+    },
+    {
+      "deck": "day3",
+      "id": "why-before-what",
+      "n": 5,
+      "session": 1,
+      "title": "Ask why a value is missing before deciding what to do about it",
+      "text": "The first question Ask why a value is missing before deciding what to do about it Household size is blank for 18.1% of the 35,665 households of the question Without a size, a household cannot be classified as eligible or not Dropping them, filling them, or reporting a range: each is right under one reason for the blank and wrong under another Where reasons come from From the people who produced the data, the source note, and data from outside. Rarely from the column itself.",
+      "href": "../slides/day3.html#why-before-what"
+    },
+    {
+      "deck": "day3",
+      "id": "three-mechanisms",
+      "n": 6,
+      "session": 1,
+      "title": "A blank can depend on nothing, on what you see, or on the value itself",
+      "text": "Three mechanisms A blank can depend on nothing, on what you see, or on the value itself Mechanism The blank depends on Dropping the rows MCAR · completely at random nothing loses precision, adds no bias MAR · at random given what is recorded fields you can see: a branch, a date biased, unless you work within those fields MNAR · not at random the missing value itself biased, and the recorded data cannot show by how much The names are Rubin's (1976). They describe the relation between a blank and the data, not a property of a column: one column can hold all three.",
+      "href": "../slides/day3.html#three-mechanisms"
+    },
+    {
+      "deck": "day3",
+      "id": "two-patterns",
+      "n": 7,
+      "session": 1,
+      "title": "One column, two patterns: a paper form and a list that stops at 6",
+      "text": "Measured in Lab 3.1 One column, two patterns: a paper form and a list that stops at 6 Group Size missing registered at a branch 8.2% registered by phone 35.7% registered online 34.4% B03, at the desk, before March 2025 43.4% B03, at the desk, from March 2025 4.1% The source note of Day 1 holds both reasons: the old paper form of B03 and B11 had no size field; the online form and the call script offer sizes 1 to 6 A missing rate that differs between groups rules out MCAR. It does not tell MAR from MNAR",
+      "href": "../slides/day3.html#two-patterns"
+    },
+    {
+      "deck": "day3",
+      "id": "audit-evidence",
+      "n": 8,
+      "session": 1,
+      "title": "The audit shows what the register cannot: blank sizes are large sizes",
+      "text": "Data from outside The audit shows what the register cannot: blank sizes are large sizes 7.2 · 5.3 verified members on average: households with a blank size, and households with a recorded one 600 home visits in September 2026; the size was verified Of the households with a blank size, 68% have 7 members or more; of the others, 25% The value itself decided whether it was recorded: MNAR No table of the register alone could have shown this",
+      "href": "../slides/day3.html#audit-evidence"
+    },
+    {
+      "deck": "day3",
+      "id": "rows-not-cells",
+      "n": 9,
+      "session": 1,
+      "title": "B12 sent no rows for nine days of August",
+      "text": "Missing data is not only blank cells B12 sent no rows for nine days of August 10 to 18 August 2026: not one log row from B12, and rows on every other day of nine months No blank cell marks it. You find it only by counting rows per branch per day The households of its districts show fewer parcels than they received There is no field to impute: the remedy is to ask Hazem for the file, or to report the gap A blank with a known cause 734 weights at B09 are blank from 4 to 17 May: the scale was away. Cause and dates are recorded, so it is MAR. Parcels were counted as usual.",
+      "href": "../slides/day3.html#rows-not-cells"
+    },
+    {
+      "deck": "day3",
+      "id": "six-scenarios",
+      "n": 10,
+      "session": 1,
+      "title": "Six gaps: the mechanism, and where it pushes a number",
+      "text": "Lab 3.1, step 4 · the evidence of LO1 Six gaps: the mechanism, and where it pushes a number Gap Mechanism A statistic from the recorded data phone blank, about 3% everywhere MCAR mean size: unbiased size blank on the old form of B03, B11 MAR eligible households there: too low size blank for large households MNAR mean size: too low weight blank at B09 in May MAR kilograms of B09 in May: too low nine days of B12 without rows MAR parcels in its districts: too low donor type null for anonymous individuals MNAR share of retailers: too high",
+      "href": "../slides/day3.html#six-scenarios"
+    },
+    {
+      "deck": "day3",
+      "id": "check-mechanism",
+      "n": 11,
+      "session": 1,
+      "title": "Name the mechanism",
+      "text": "Checkpoint Name the mechanism An online form offers household sizes 1 to 6; larger households leave the field blank. You compute the mean household size from the recorded values. Which line is right? MAR, since it depends on the channel; the mean is unbiased MNAR, since the value decides; the mean is too low MCAR, since a form is not a person; the mean is unbiased MNAR, since the value decides; the mean is too high",
+      "href": "../slides/day3.html#check-mechanism"
+    },
+    {
+      "deck": "day3",
+      "id": "lab-3-1",
+      "n": 12,
+      "session": 1,
+      "title": "Six gaps, six mechanisms",
+      "text": "Lab 3.1 · 25 min Six gaps, six mechanisms Tabulate where household sizes are missing, read the audit of home visits, inspect three more gaps in the logs and the API, then classify the six patterns by mechanism and give the direction of bias for each. D3_1_classify_six_missingness.ipynb Where household sizes are missing 7 min What the audit shows 5 min Three gaps in the logs and the API 6 min Classify the six and give the direction of bias 7 min ✱ Stretch: Why no test on the observed data can rule out the third mechanism",
+      "href": "../slides/day3.html#lab-3-1"
+    },
+    {
+      "deck": "day3",
+      "id": "s2",
+      "n": 13,
+      "session": 2,
+      "title": "Imputation and its cost",
+      "text": "Session 2 Imputation and its cost Compute a complete-case estimate and say what it assumes Impute a single value and a value within groups Compare the estimates overall and by district 02",
+      "href": "../slides/day3.html#s2"
+    },
+    {
+      "deck": "day3",
+      "id": "no-neutral-option",
+      "n": 14,
+      "session": 2,
+      "title": "Every way of handling a blank is an assumption about the households behind it",
+      "text": "There is no neutral option Every way of handling a blank is an assumption about the households behind it Complete cases Drop the rows. Assumes the dropped households are like the kept ones. One value for all Fill with the median. Assumes every blank household is typical. A value from similar households Fill from a group. Assumes that within the group, blank and recorded households are alike. Lab 3.2 computes the headline all three ways, on the same 35,665 households.",
+      "href": "../slides/day3.html#no-neutral-option"
+    },
+    {
+      "deck": "day3",
+      "id": "complete-case",
+      "n": 15,
+      "session": 2,
+      "title": "Complete cases: 1.985, from the households that were easy to record",
+      "text": "Lab 3.2, step 1 Complete cases: 1.985, from the households that were easy to record 29,204 households take part; 6,461 do not The 6,461 are larger, more often eligible, and receive 2 or 3 parcels per visit Remove them, and the average of the eligible households that remain is too low 1.985 is below the standard of 2: the network \"fails\" What goes wrong. The code runs, no value was changed, and the result is reported as \"the data\". The assumption was never written down.",
+      "href": "../slides/day3.html#complete-case"
+    },
+    {
+      "deck": "day3",
+      "id": "median-cost",
+      "n": 16,
+      "session": 2,
+      "title": "The median gives every blank household five members",
+      "text": "Lab 3.2, step 2 The median gives every blank household five members Estimate: 2.003. Everybody is classified; nobody is dropped But most blank households have 7 members or more Income 6,000 SAR, 7 members in reality: 857 per member, eligible. With the imputed 5: 1,200, \"not eligible\" Their parcels leave the numerator with them And the spread shrinks 6,461 households at exactly one size: the distribution of sizes gets a spike that was never there.",
+      "href": "../slides/day3.html#median-cost"
+    },
+    {
+      "deck": "day3",
+      "id": "within-groups",
+      "n": 17,
+      "session": 2,
+      "title": "Use a recorded field that carries information about the missing one",
+      "text": "Lab 3.2, step 3 Use a recorded field that carries information about the missing one Usual parcels per handout Households Median recorded size never collected 6,162 4 1 7,571 3 2 12,574 6 3 2,897 10 The desk hands out 1, 2 or 3 parcels by the family card: the log knows something the register lost Each blank gets the median of its group: 3,218 households get 6, and 1,694 get 10 Estimate: 2.060",
+      "href": "../slides/day3.html#within-groups"
+    },
+    {
+      "deck": "day3",
+      "id": "three-estimates",
+      "n": 18,
+      "session": 2,
+      "title": "Three methods, three answers, and a different list of districts each time",
+      "text": "The comparison table of LO5 Three methods, three answers, and a different list of districts each time Method Estimate Districts below the standard of 2 complete case 1.985 13 median imputed 2.003 11 imputed within groups 2.060 7 Six districts change side. D04, D08, D09, D12, D17 and D24 are below the standard by one method and above it by another. A director who acts on the first table sends help to the wrong places.",
+      "href": "../slides/day3.html#three-estimates"
+    },
+    {
+      "deck": "day3",
+      "id": "synthetic-reveal",
+      "n": 19,
+      "session": 2,
+      "title": "With no size missing, the estimate would have been 2.062",
+      "text": "What only synthetic data can show With no size missing, the estimate would have been 2.062 complete case −0.077 median imputed −0.059 imputed within groups −0.002 Distance from the value that complete data would have given. The generator knows the size every household would have reported; in real work this cell does not exist.",
+      "href": "../slides/day3.html#synthetic-reveal"
+    },
+    {
+      "deck": "day3",
+      "id": "check-imputation",
+      "n": 20,
+      "session": 2,
+      "title": "Which estimate do you put first?",
+      "text": "Checkpoint Which estimate do you put first? Sizes are blank mostly for large households, and branches hand out more parcels per visit to large households. Three estimates are on your desk. Which one do you present first, and why? Complete case: it changes no value Median: simple and easy to explain The mean of the three, to be fair to each Within groups: it uses a recorded field related to the size",
+      "href": "../slides/day3.html#check-imputation"
+    },
+    {
+      "deck": "day3",
+      "id": "lab-3-2",
+      "n": 21,
+      "session": 2,
+      "title": "Three estimates of one number",
+      "text": "Lab 3.2 · 25 min Three estimates of one number Estimate parcels per eligible household with complete cases, with the median size and with the median of similar households, and compare the three overall and by district. D3_2_estimate_parcels_per.ipynb The complete-case estimate 5 min Impute the median 5 min Impute within groups 8 min The comparison table, overall and by district 7 min ✱ Stretch: Draw a donor at random, twenty times",
+      "href": "../slides/day3.html#lab-3-2"
+    },
+    {
+      "deck": "day3",
+      "id": "s3",
+      "n": 22,
+      "session": 3,
+      "title": "Sensitivity ranges",
+      "text": "Session 3 Sensitivity ranges Compute the logical bounds of an estimate Build a plausible range by shifting the imputed values Recommend one estimate with its range and its reason 03",
+      "href": "../slides/day3.html#s3"
+    },
+    {
+      "deck": "day3",
+      "id": "answerable-question",
+      "n": 23,
+      "session": 3,
+      "title": "\"Which estimate is right?\" cannot be answered. \"How far can it move?\" can",
+      "text": "Change the question \"Which estimate is right?\" cannot be answered. \"How far can it move?\" can 1 · Logical bounds assume nothing about the blank households → 2 · A plausible range assumptions you can defend, stated → 3 · A recommendation one estimate, its range, its reason A sensitivity analysis varies what you assumed and reports what happens to the conclusion. It does not make the missing data less missing.",
+      "href": "../slides/day3.html#answerable-question"
+    },
+    {
+      "deck": "day3",
+      "id": "logical-bounds",
+      "n": 24,
+      "session": 3,
+      "title": "Whatever the 6,461 households are, the estimate lies between 1.775 and 2.133",
+      "text": "Lab 3.3, step 1 Whatever the 6,461 households are, the estimate lies between 1.775 and 2.133 Each blank household is eligible or not; you do not know which Lowest: exactly those that collected few parcels are eligible Highest: exactly those that collected many are eligible No assumption about sizes can leave this interval Honest, and too wide The bounds straddle the standard of 2. They take \"every blank household that collected nothing is eligible\" as seriously as anything else.",
+      "href": "../slides/day3.html#logical-bounds"
+    },
+    {
+      "deck": "day3",
+      "id": "plausible-range",
+      "n": 25,
+      "session": 3,
+      "title": "Shift the imputed sizes: the estimate stays between 2.02 and 2.07",
+      "text": "Lab 3.3, step 2 Shift the imputed sizes: the estimate stays between 2.02 and 2.07 Scenario for the blank households Estimate imputed size − 1 2.073 imputed within groups 2.060 imputed size + 1 2.039 imputed size + 2 2.020 phone and online blanks are at least 7 2.040 Recorded sizes never change. Only the guess is varied, by amounts the audit makes believable: blank households were about two members larger.",
+      "href": "../slides/day3.html#plausible-range"
+    },
+    {
+      "deck": "day3",
+      "id": "district-verdicts",
+      "n": 26,
+      "session": 3,
+      "title": "Seven districts are below the standard under every scenario; three depend on it",
+      "text": "Lab 3.3, step 3 Seven districts are below the standard under every scenario; three depend on it Below · 7 D07, D15, D22, D26 at 1.3 to 1.5. D11 and D19 near 1.75. D23 at 1.96 to 1.99. Depends · 3 D09, D17, D24: between 1.98 and 2.02. Reported as \"cannot be classified with these data\". At or above · 20 Above the standard whichever scenario is taken. Three verdicts, not two. \"Depends on the assumption\" is a finding. It tells the director where one more audit would change a decision.",
+      "href": "../slides/day3.html#district-verdicts"
+    },
+    {
+      "deck": "day3",
+      "id": "what-range-misses",
+      "n": 27,
+      "session": 3,
+      "title": "D23 is \"below\" under every assumption about sizes, and is not below",
+      "text": "The limit of a sensitivity range D23 is \"below\" under every assumption about sizes, and is not below D23 and D24 are served by branch B12 B12 sent no rows for 10 to 18 August: handouts happened and are in no file The range varied household sizes. It never varied the missing rows The generator's own count puts D23 at 2.25 parcels per eligible household What goes wrong. A range covers the assumption you varied and nothing else. \"Robust to missing sizes\" is not \"robust\".",
+      "href": "../slides/day3.html#what-range-misses"
+    },
+    {
+      "deck": "day3",
+      "id": "recommendation",
+      "n": 28,
+      "session": 3,
+      "title": "A recommendation has four parts",
+      "text": "Lab 3.3, step 4 A recommendation has four parts The paragraph About 2.06 parcels per eligible household per month (2.02 to 2.07 under different assumptions about the 18% of households with no recorded size). Seven districts are below the standard under every assumption; for three the answer depends on it. We recommend filling blank sizes from similar households, because blank sizes are mostly large households. An estimate , not a list of three Its range , and what was varied What holds across the range , and what does not The reason for the method, in terms the director can check",
+      "href": "../slides/day3.html#recommendation"
+    },
+    {
+      "deck": "day3",
+      "id": "check-range",
+      "n": 29,
+      "session": 3,
+      "title": "What do you report for the district?",
+      "text": "Checkpoint What do you report for the district? District D17 comes out at 1.98 under one scenario for the blank sizes and at 2.01 under another. The standard is 2. What does the report say about D17? It cannot be classified with these data; both values are shown Below the standard: 1.98 is the safe figure At the standard: the midpoint is 2.0 It is left out until sizes are complete",
+      "href": "../slides/day3.html#check-range"
+    },
+    {
+      "deck": "day3",
+      "id": "lab-3-3",
+      "n": 30,
+      "session": 3,
+      "title": "How far could it move?",
+      "text": "Lab 3.3 · 25 min How far could it move? Bound the estimate under best-case and worst-case assumptions about the households with no size, narrow it to a plausible range by shifting the imputed sizes, see which districts change side of the standard, and recommend an estimate. D3_3_bound_estimate_under.ipynb The logical bounds 7 min A plausible range: shift the imputed sizes 8 min Which districts change side of the standard 5 min Recommend an estimate, with its reason 5 min ✱ Stretch: The tipping point of one district",
+      "href": "../slides/day3.html#lab-3-3"
+    },
+    {
+      "deck": "day3",
+      "id": "s4",
+      "n": 31,
+      "session": 4,
+      "title": "Measurement error and proxies",
+      "text": "Session 4 Measurement error and proxies Measure reporting error against an audit Simulate random and one-directional error Say what a proxy measures and what it does not 04",
+      "href": "../slides/day3.html#s4"
+    },
+    {
+      "deck": "day3",
+      "id": "recorded-and-wrong",
+      "n": 32,
+      "session": 4,
+      "title": "A value can be present, valid, and wrong",
+      "text": "The other half of data quality A value can be present, valid, and wrong Household size is reported by the household at registration and is not verified It passes every rule: an integer between 1 and 20 No validation suite can see that 7 should have been 5 Only a second measurement can: here, 289 audited households with a recorded size Two kinds of error Random: up as often as down, for anybody. Systematic: in one direction, or for one kind of household.",
+      "href": "../slides/day3.html#recorded-and-wrong"
+    },
+    {
+      "deck": "day3",
+      "id": "audit-error",
+      "n": 33,
+      "session": 4,
+      "title": "92% of recorded sizes are exact, and the mean error is almost zero",
+      "text": "Measured in Lab 3.4 92% of recorded sizes are exact, and the mean error is almost zero Recorded − verified Households −1 18 0 266 +1 2 +2 3 Mean error −0.035 members: a reviewer would call the column reliable 18 households under-report by one: a birth or a returning member not yet registered 5 over-report. Look at who they are before looking at how many",
+      "href": "../slides/day3.html#audit-error"
+    },
+    {
+      "deck": "day3",
+      "id": "error-at-threshold",
+      "n": 34,
+      "session": 4,
+      "title": "All five over-reporters are just above the eligibility line",
+      "text": "Where the error sits All five over-reporters are just above the eligibility line Reported Verified Income, SAR Per verified member 7 5 5,250 1,050 9 8 8,150 1,019 4 3 3,100 1,033 4 2 2,450 1,225 9 7 8,400 1,200 With the verified size none is eligible; with the reported size all five are. A small error, placed exactly where the rule decides.",
+      "href": "../slides/day3.html#error-at-threshold"
+    },
+    {
+      "deck": "day3",
+      "id": "two-simulations",
+      "n": 35,
+      "session": 4,
+      "title": "Random error in 8% of sizes moves the headline less than over-reporting in 2.6%",
+      "text": "Lab 3.4, steps 2 and 3 Random error in 8% of sizes moves the headline less than over-reporting in 2.6% random ±1, 8.0% of households −0.006 over-report, 1.4% −0.028 over-report, 2.6% −0.055 over-report, 5.2% −0.107 Shift of the headline from 2.060, averaged over 200 simulated registers. Over-reporters enter the denominator as eligible and collect almost nothing: the desk hands out by the family card.",
+      "href": "../slides/day3.html#two-simulations"
+    },
+    {
+      "deck": "day3",
+      "id": "measurement-reveal",
+      "n": 36,
+      "session": 4,
+      "title": "The recorded sizes already contain the error: the headline is about 0.07 too low",
+      "text": "What only synthetic data can show The recorded sizes already contain the error: the headline is about 0.07 too low 2.062 → 2.131 the estimate with every size as reported, and with every size as it truly is The direction was predictable from the audit; the size needed the simulation Missing sizes cost up to 0.077; mis-reported sizes cost 0.069 Only the first had a column of blanks to warn you",
+      "href": "../slides/day3.html#measurement-reveal"
+    },
+    {
+      "deck": "day3",
+      "id": "proxies",
+      "n": 37,
+      "session": 4,
+      "title": "A proxy measures what it measures, not what you wish it measured",
+      "text": "Proxies A proxy measures what it measures, not what you wish it measured Parcels per handout are set by the desk from the family card: a proxy for the verified size band It disagrees with the recorded size for 1.5% of households that collected: a list for review It is silent about households that never collected 323 households are eligible by the register and never collected in nine months What goes wrong. Defining \"eligible\" as \"collected regularly\". Every eligible household that was not served leaves the denominator, and every district looks well served.",
+      "href": "../slides/day3.html#proxies"
+    },
+    {
+      "deck": "day3",
+      "id": "check-direction",
+      "n": 38,
+      "session": 4,
+      "title": "Which way does the headline move?",
+      "text": "Checkpoint Which way does the headline move? A few households just above the income line report one or two members more than they have, and so count as eligible. Branch desks hand out parcels by the family card. What happens to \"parcels per eligible household\"? Nothing measurable: the errors are too few It rises: larger households receive more parcels It falls: they enter the denominator and collect almost nothing It cannot be said without verifying every household",
+      "href": "../slides/day3.html#check-direction"
+    },
+    {
+      "deck": "day3",
+      "id": "lab-3-4",
+      "n": 39,
+      "session": 4,
+      "title": "When the answer itself is wrong",
+      "text": "Lab 3.4 · 25 min When the answer itself is wrong Measure the reporting error of household size in the audit, simulate random error and over-reporting near the eligibility line, and measure the shift of the headline under each. D3_4_simulate_self_report.ipynb Measure the reporting error in the audit 6 min Simulate random error 7 min Simulate over-reporting near the line 7 min The shift table and a proxy 5 min ✱ Stretch: How large an audit to see a 2% error rate?",
+      "href": "../slides/day3.html#lab-3-4"
+    },
+    {
+      "deck": "day3",
+      "id": "wrap-up",
+      "n": 40,
+      "session": 4,
+      "title": "Three things to keep",
+      "text": "Day 3 · wrap-up Three things to keep Why, before what The reason for a blank comes from the source note and from outside data, and it decides which remedy is honest. An estimate, a range, a reason 2.06, between 2.02 and 2.07; seven districts below under every assumption, three undecided. A range covers what you varied Not the nine days of B12, and not sizes that were recorded wrong.",
+      "href": "../slides/day3.html#wrap-up"
+    },
+    {
+      "deck": "day3",
+      "id": "next",
+      "n": 41,
+      "session": 4,
+      "title": "Validate and protect, then choose your capstone question",
+      "text": "Next · Day 4 Validate and protect, then choose your capstone question Rules that run on every rebuild, and a batch that breaks them ID numbers replaced by a keyed hash, and an attempt to link them back The quality report, written from the outputs of one command Three capstone questions on a second extract with other faults",
+      "href": "../slides/day3.html#next"
+    },
+    {
+      "deck": "day4",
+      "id": "title",
+      "n": 1,
+      "session": 0,
+      "title": "Validate and protect",
+      "text": "SDAIA Academy · Data Acquisition, Preparation and Quality Validate and protect Day 4: Rules that run on every rebuild, identifiers that hold, and a report that says what the dataset is good for Data Science Track4 teaching days + capstone day4 sessions · 4 labsDS-202",
+      "href": "../slides/day4.html#title"
+    },
+    {
+      "deck": "day4",
+      "id": "review-day-3",
+      "n": 2,
+      "session": 0,
+      "title": "One number, or a number with a range",
+      "text": "Review of Day 3 One number, or a number with a range Complete cases give 1.985 parcels per eligible household per month; imputing within groups gives 2.060; the scenarios about the missing sizes run from 2.02 to 2.07. The standard is 2. What goes to Sumayyah? 1.985: it uses only values that were recorded 2.060: it is the best estimate, so it is the answer 2.06, between 2.02 and 2.07, with the reason and the districts that stay below 2.02: the mean of the two methods, to be fair to both",
+      "href": "../slides/day4.html#review-day-3"
+    },
+    {
+      "deck": "day4",
+      "id": "agenda",
+      "n": 3,
+      "session": 0,
+      "title": "Validate and protect",
+      "text": "Today Validate and protect Session 1 · Quality dimensions as rules Completeness, validity, uniqueness and type, written from the data dictionary Session 2 · Cross-field and cross-source checks Faults that show only between two fields or two sources, reported so a branch can act Session 3 · Minimise and pseudonymise A plain hash falls to a list; a keyed hash holds; quasi-identifiers still single people out Session 4 · A data-quality report Row counts, rule results, what is missing, how far the estimate moves, what may leave",
+      "href": "../slides/day4.html#agenda"
+    },
+    {
+      "deck": "day4",
+      "id": "s1",
+      "n": 4,
+      "session": 1,
+      "title": "Quality dimensions as rules",
+      "text": "Session 1 Quality dimensions as rules Translate a data dictionary into column rules Name the quality dimension of each rule Run the suite on a build and read its failures 01",
+      "href": "../slides/day4.html#s1"
+    },
+    {
+      "deck": "day4",
+      "id": "repair-and-rule",
+      "n": 5,
+      "session": 1,
+      "title": "A repair fixes this file. A rule protects every file after it",
+      "text": "Two different things A repair fixes this file. A rule protects every file after it Day 2 repaired what was found: encodings, keys, date layouts, units The next extract arrives in three months, from the same 14 branches, with faults nobody has seen yet A rule states what must hold. A program checks it on every rebuild and says which rows break it The evidence of LO4 A rule suite that passes on the clean build and fails, readably, on a corrupted batch.",
+      "href": "../slides/day4.html#repair-and-rule"
+    },
+    {
+      "deck": "day4",
+      "id": "dimensions",
+      "n": 6,
+      "session": 1,
+      "title": "Each dimension becomes a kind of rule",
+      "text": "Quality dimensions Each dimension becomes a kind of rule Dimension The question A rule for the joined table Type Is it the kind of value the column holds? handout_date is written YYYY-MM-DD Completeness Is a required value there? household_key is never blank Validity Is it a value the dictionary allows? parcels between 1 and 3 Uniqueness Does a key identify one row? log_id never repeats Consistency Do fields and sources agree? weight is 9 to 15 kg per parcel Frameworks name and count the dimensions differently. The names matter less than this: every rule in your suite says which one it tests.",
+      "href": "../slides/day4.html#dimensions"
+    },
+    {
+      "deck": "day4",
+      "id": "dictionary-to-rules",
+      "n": 7,
+      "session": 1,
+      "title": "The data dictionary, written so that a program can check it",
+      "text": "Lab 4.1, steps 1 to 3 The data dictionary, written so that a program can check it schema = pa.DataFrameSchema({ \"log_id\": pa.Column(str, unique=True), \"parcels\": pa.Column( int, pa.Check.in_range(1, 3)), \"weight_kg\": pa.Column( float, pa.Check.in_range(5, 50), nullable=True), \"handout_date\": pa.Column( str, pa.Check.str_matches(ISO)), }, strict=True) schema.validate(df, lazy=True) \"Required: yes\" in the dictionary is nullable=False, the default: the completeness rule strict=True: a missing or an extra column fails lazy=True: every rule runs, and all failures come back together Dates stay text with a pattern: a date in another layout fails; it is not guessed",
+      "href": "../slides/day4.html#dictionary-to-rules"
+    },
+    {
+      "deck": "day4",
+      "id": "readable-failure",
+      "n": 8,
+      "session": 1,
+      "title": "A failure that reads like a sentence",
+      "text": "Lab 4.1, step 4 A failure that reads like a sentence Rule Column Rows Examples uniqueness: no value repeats log_id 2 B01-0007639 completeness: no value is missing household_key 3 validity: parcels between 1 and 3 parcels 4 9 validity: district_id is one of the 30 districts district_id 2 D99 type: handout_date is a date written YYYY-MM-DD handout_date 5 03/07/2026 The first 2,000 rows of the clean build, broken on purpose in five places. The same table, without the suite, raises no error anywhere.",
+      "href": "../slides/day4.html#readable-failure"
+    },
+    {
+      "deck": "day4",
+      "id": "never-failed",
+      "n": 9,
+      "session": 1,
+      "title": "A suite that has never failed has never been tested",
+      "text": "Testing the test A suite that has never failed has never been tested The suite passes on all 73,264 rows of the clean build. That proves little A typing mistake in a pattern, or a range that is too wide, passes every build for ever Break a copy on purpose, one fault per rule, and watch each rule fail Decide in advance, per rule: does a failure stop the build, or warn? What goes wrong. A suite is written after the cleaning, from the cleaned data, so that it passes. It then describes this file and protects nothing.",
+      "href": "../slides/day4.html#never-failed"
+    },
+    {
+      "deck": "day4",
+      "id": "valid-not-true",
+      "n": 10,
+      "session": 1,
+      "title": "Valid is not the same as true",
+      "text": "The limit of a rule Valid is not the same as true 0 rows of the clean build fail \"household_size between 1 and 20\" Lab 3.4: the audit found recorded sizes that differ from the verified size, more often above than below Every one of those sizes is a whole number between 1 and 20 A rule tests what a value may be. Whether it is so needs a second measurement",
+      "href": "../slides/day4.html#valid-not-true"
+    },
+    {
+      "deck": "day4",
+      "id": "check-dimension",
+      "n": 11,
+      "session": 1,
+      "title": "Which rule, and which dimension?",
+      "text": "Checkpoint Which rule, and which dimension? In the joined table, one row is one handout, and a household has many handouts. A week of one branch is uploaded twice. Which rule catches it? Uniqueness of household_key Uniqueness of log_id Completeness of log_id Validity of handout_date",
+      "href": "../slides/day4.html#check-dimension"
+    },
+    {
+      "deck": "day4",
+      "id": "lab-4-1",
+      "n": 12,
+      "session": 1,
+      "title": "Rules for the joined table",
+      "text": "Lab 4.1 · 25 min Rules for the joined table Write type, range, uniqueness and completeness rules for the joined table from its data dictionary, run them on the clean build, and watch each fail on a copy you break. D4_1_write_type_range.ipynb Types and completeness from the dictionary 7 min Range and validity rules 6 min Uniqueness 4 min Run on the clean build and on a broken copy 8 min ✱ Stretch: Which rules stop the build and which only warn?",
+      "href": "../slides/day4.html#lab-4-1"
+    },
+    {
+      "deck": "day4",
+      "id": "s2",
+      "n": 13,
+      "session": 2,
+      "title": "Cross-field and cross-source checks",
+      "text": "Session 2 Cross-field and cross-source checks Write rules across two fields Write a rule across two sources Produce a failure report a data owner can act on 02",
+      "href": "../slides/day4.html#s2"
+    },
+    {
+      "deck": "day4",
+      "id": "october-batch",
+      "n": 14,
+      "session": 2,
+      "title": "A new batch arrives, and seven column rules fail",
+      "text": "Lab 4.2, step 1 A new batch arrives, and seven column rules fail Rule that fails Rows validity: weight_kg between 5 and 50 278 completeness: household_key 60 uniqueness: log_id 50 validity: parcels between 1 and 3 40 validity: district_id 20 type: handout_date 15 validity: household_size 12 The first week of October: 4,180 rows, built as the quarter was Each line names what somebody can fix Look again at the first line: 278 handouts above 50 kg. Is that all that is wrong with those rows?",
+      "href": "../slides/day4.html#october-batch"
+    },
+    {
+      "deck": "day4",
+      "id": "pounds-inside-range",
+      "n": 15,
+      "session": 2,
+      "title": "B05 sent pounds. Most of its rows pass the range rule",
+      "text": "What a column rule cannot see B05 sent pounds. Most of its rows pass the range rule 278 · 377 rows of B05 caught by \"5 to 50 kg\", and rows of B05 that are wrong A parcel weighs about 12 kg: about 26 in pounds One parcel in pounds: 26, inside 5 to 50. Passes Two or three parcels in pounds: 53 or 79. Fails The value is fine on its own. It is wrong for its number of parcels",
+      "href": "../slides/day4.html#pounds-inside-range"
+    },
+    {
+      "deck": "day4",
+      "id": "cross-field",
+      "n": 16,
+      "session": 2,
+      "title": "Two rules across fields",
+      "text": "Lab 4.2, step 2 Two rules across fields def not_per_parcel(df): ok = df.parcels.between(1, 3) per = df.weight_kg / df.parcels.where(ok) return df[per.notna() & ~per.between(9, 15)] def before_registration(df): return df[date(df.handout_date) < date(df.registered_on)] 9 to 15 kg per parcel: all 377 rows of B05, and no row of any other branch Handout on or after registration: 30 rows in 12 branches. A household cannot collect before it exists: a wrong key or a wrong date Each rule skips rows that another rule already reports, so one fault gives one line",
+      "href": "../slides/day4.html#cross-field"
+    },
+    {
+      "deck": "day4",
+      "id": "cross-source",
+      "n": 17,
+      "session": 2,
+      "title": "A branch cannot hand out more food than it received",
+      "text": "Lab 4.2, step 3 A branch cannot hand out more food than it received B05 · received in the week 9,574 kg B05 · handed out, as recorded 20,005 kg The logs say what went out; the donations source says what came in. No single table holds both To compare them: the same unit, the same week, one row per branch. A small pipeline of its own It catches a whole class of faults that leave every row plausible",
+      "href": "../slides/day4.html#cross-source"
+    },
+    {
+      "deck": "day4",
+      "id": "failure-report",
+      "n": 18,
+      "session": 2,
+      "title": "A failure report says whose rows, and what to look at",
+      "text": "Lab 4.2, step 4 A failure report says whose rows, and what to look at Rule Rows Whose What to look at consistency: 9 to 15 kg per parcel 377 B05: 377 median 26.4 per parcel: pounds entered as kilograms? consistency: handout on or after registration 30 12 branches the household id or the date of these handouts consistency across sources: handed out no more than received 1 B05 handed 20,005 kg, received 9,574 kg Ten lines in all. Seven from the column rules, three from the rules you add. \"Validation failed\" helps nobody; a line that names the branch gets fixed.",
+      "href": "../slides/day4.html#failure-report"
+    },
+    {
+      "deck": "day4",
+      "id": "reject-or-quarantine",
+      "n": 19,
+      "session": 2,
+      "title": "Reject the file, or set the rows aside?",
+      "text": "Recap of FN-104, as a rule of the build Reject the file, or set the rows aside? Reject the file The fault is in how the file was made: a wrong unit, a wrong layout, a missing column. Every row of B05 is suspect. Send it back. Quarantine the rows The fault is in single rows: a blank key, a date before registration. Load the rest; set these aside with a reason and count them in the log. Either way the decision is made per rule, in advance, and the log shows it: rows in equal rows loaded plus rows set aside.",
+      "href": "../slides/day4.html#reject-or-quarantine"
+    },
+    {
+      "deck": "day4",
+      "id": "check-cross-field",
+      "n": 20,
+      "session": 2,
+      "title": "Which rule finds it?",
+      "text": "Checkpoint Which rule finds it? From 7 to 9 August a branch writes dates as month/day/year; the build reads that branch as day/month/year. Every date parses, and every one falls inside the quarter. Which rule is most likely to show the fault? Type: the date matches the pattern of the file Completeness: no date is missing Validity: the date is inside the quarter Consistency: rows per branch per day against that branch's usual pattern",
+      "href": "../slides/day4.html#check-cross-field"
+    },
+    {
+      "deck": "day4",
+      "id": "lab-4-2",
+      "n": 21,
+      "session": 2,
+      "title": "Three rules across fields and sources",
+      "text": "Lab 4.2 · 25 min Three rules across fields and sources Run the column rules on a corrupted October batch, add two cross-field rules and one cross-source rule that catch what they miss, and write a failure report that says which branch must fix what. D4_2_add_three_consistency.ipynb Run the column rules on the corrupted batch 5 min Two rules across fields 8 min One rule across sources 7 min A failure report a branch can act on 5 min ✱ Stretch: Reject the batch or quarantine the rows?",
+      "href": "../slides/day4.html#lab-4-2"
+    },
+    {
+      "deck": "day4",
+      "id": "s3",
+      "n": 22,
+      "session": 3,
+      "title": "Minimise and pseudonymise",
+      "text": "Session 3 Minimise and pseudonymise Re-link a plain hash with a list and by enumeration Replace identifiers with a keyed hash Measure uniqueness on quasi-identifiers and reduce it by generalising 03",
+      "href": "../slides/day4.html#s3"
+    },
+    {
+      "deck": "day4",
+      "id": "minimise-first",
+      "n": 23,
+      "session": 3,
+      "title": "The safest field is the one that never entered the dataset",
+      "text": "Before any technique The safest field is the one that never entered the dataset Lab 1.1 listed the fields the question needs. A name, a phone number and an ID number are not among them They were needed for one step: matching the 300 walk-in records of Day 2 After that step they are dropped, and the dataset keeps a key that says \"the same household\" and nothing else Minimise, then pseudonymise First ask whether the field is needed at all. Only for what remains: how to replace the identifier so that tables still join.",
+      "href": "../slides/day4.html#minimise-first"
+    },
+    {
+      "deck": "day4",
+      "id": "pseudonymised-or-anonymised",
+      "n": 24,
+      "session": 3,
+      "title": "Pseudonymised data is still personal data",
+      "text": "Recap of FN-106 Pseudonymised data is still personal data Pseudonymised Identifiers are replaced by codes. Linking back needs additional information, which is kept separately under its own controls. Somebody can still link back, so the data stays personal. Anonymised Nobody can link the data to a person any more, with any reasonable means. A much higher bar, and rarely reached by a table with one row per household. The national guideline names generalisation and aggregation among the techniques: age bands in place of ages, a year in place of a date. Lab 4.3 uses both.",
+      "href": "../slides/day4.html#pseudonymised-or-anonymised"
+    },
+    {
+      "deck": "day4",
+      "id": "plain-hash-falls",
+      "n": 25,
+      "session": 3,
+      "title": "\"A hash cannot be reversed.\" Nobody needs to reverse it",
+      "text": "Lab 4.3, steps 1 and 2 \"A hash cannot be reversed.\" Nobody needs to reverse it 5,000 of 5,000 people on a known list re-identified in a table of plain SHA-256 hashes The same input gives the same hash, for everyone List attack : hash the ID numbers you hold; join Enumeration : an ID number has ten digits. Hash every possible one The 2,000,000 numbers of the course range take seconds on a laptop; all ten-digit numbers take hours",
+      "href": "../slides/day4.html#plain-hash-falls"
+    },
+    {
+      "deck": "day4",
+      "id": "keyed-hash",
+      "n": 26,
+      "session": 3,
+      "title": "A keyed hash: without the key, neither attack starts",
+      "text": "Lab 4.3, step 3 A keyed hash: without the key, neither attack starts import hmac, hashlib, os key = os.environ[\"GHILAL_KEY\"].encode() def pseudonym(s: str) -> str: return hmac.new(key, s.encode(), hashlib.sha256).hexdigest()[:16] Stable and unique: the same household has the same pseudonym in every table, so joins still work The key is the \"additional information\": kept separately, never committed, never sent A list attack without the key: 0 of 5,000 A new key gives new pseudonyms: two recipients cannot join their tables to each other",
+      "href": "../slides/day4.html#keyed-hash"
+    },
+    {
+      "deck": "day4",
+      "id": "quasi-identifiers",
+      "n": 27,
+      "session": 3,
+      "title": "The key holds, and ordinary fields still single households out",
+      "text": "Lab 4.3, step 4 The key holds, and ordinary fields still single households out district, exact date, exact size 92.8% district, year, size band 0.0% Share of the 37,333 households whose combination of fields occurs exactly once. \"They live in D09, registered on 14 March 2024, seven of them\": a neighbour needs no key A combination of ordinary fields that singles a person out is a quasi-identifier Generalised, the smallest group has 4 households; the partner can still count shared households",
+      "href": "../slides/day4.html#quasi-identifiers"
+    },
+    {
+      "deck": "day4",
+      "id": "what-travels",
+      "n": 28,
+      "session": 3,
+      "title": "The classification of the source decides the conditions of sharing",
+      "text": "Who may receive what The classification of the source decides the conditions of sharing Stays inside Raw sources. Rows with identifiers as typed. The key. Under an agreement Household-level tables, pseudonymised and generalised: to named people, for one purpose, for a stated time. May be published Aggregates by district that single nobody out, the code, the rules, the report. The provenance records of Day 1 classified the register and the logs as Restricted. A table derived from them does not become Public by losing a column.",
+      "href": "../slides/day4.html#what-travels"
+    },
+    {
+      "deck": "day4",
+      "id": "check-pseudonym",
+      "n": 29,
+      "session": 3,
+      "title": "What must change before the table is sent?",
+      "text": "Checkpoint What must change before the table is sent? A table for a partner holds, per household: a keyed-hash pseudonym, the district, the exact registration date and the household size. The key is stored safely. What is the remaining risk, and the remedy? The pseudonym can be enumerated; use a longer hash Date, district and size single households out; send the year and a size band None: without names and ID numbers the table is anonymous The pseudonym links tables; remove it and keep the other fields",
+      "href": "../slides/day4.html#check-pseudonym"
+    },
+    {
+      "deck": "day4",
+      "id": "lab-4-3",
+      "n": 30,
+      "session": 3,
+      "title": "A pseudonym that holds",
+      "text": "Lab 4.3 · 25 min A pseudonym that holds Hash national ID numbers plainly and re-link them with a list and by enumeration, replace them with a keyed hash, then attempt re-linkage through district, size and registration date and reduce it by generalising. D4_3_replace_national_id.ipynb A plain hash and a list attack 6 min Enumerate the id space 5 min A keyed hash 6 min Re-link through quasi-identifiers, then generalise 8 min ✱ Stretch: Change the key: what breaks, and what should",
+      "href": "../slides/day4.html#lab-4-3"
+    },
+    {
+      "deck": "day4",
+      "id": "s4",
+      "n": 31,
+      "session": 4,
+      "title": "A data-quality report",
+      "text": "Session 4 A data-quality report Rebuild a dataset from raw sources with one command Draft a data-quality report from the build outputs Classify outputs and choose a capstone question 04",
+      "href": "../slides/day4.html#s4"
+    },
+    {
+      "deck": "day4",
+      "id": "one-command",
+      "n": 32,
+      "session": 4,
+      "title": "One command: raw files in, the dataset and its evidence out",
+      "text": "Rebuildable One command: raw files in, the dataset and its evidence out 1 · Read the raw sources, exactly as they arrived → 2 · Clean and join each step counts its rows; rows without a household are set aside → 3 · Check every rule runs on the result → 4 · Write tables with pseudonyms, the join log, the rule results, the report uv run python build_dataset.py: under a minute on a laptop for 40,000 registrations and 210,000 log rows Nothing is edited by hand between the raw files and the outputs, so anybody can run it again A rebuild is compared with the last one: the same rows, the same content",
+      "href": "../slides/day4.html#one-command"
+    },
+    {
+      "deck": "day4",
+      "id": "report-parts",
+      "n": 33,
+      "session": 4,
+      "title": "The quality report: six parts, read before any number is used",
+      "text": "One page The quality report: six parts, read before any number is used Part Says Comes from 1 · Headline the estimate, its range, the standard Day 3 2 · Question and population who is counted, for which period Lab 1.1 3 · Sources owner, refresh date, classification the provenance records 4 · Row counts per step what went in, what was set aside and why the join log 5 · Rules how many ran, which failed the rule results 6 · Limits what the dataset cannot support you",
+      "href": "../slides/day4.html#report-parts"
+    },
+    {
+      "deck": "day4",
+      "id": "no-typed-number",
+      "n": 34,
+      "session": 4,
+      "title": "No number in the report is typed by hand",
+      "text": "Lab 4.4, step 2 No number in the report is typed by hand def headline(facts): lo, hi = facts[\"range\"] return (f\"an estimated \" f\"{facts['recommended']} parcels \" f\"per eligible household per month \" f\"(plausible range {lo} to {hi}; \" f\"standard {facts['standard']})\") The next rebuild changes the numbers. A typed number stays, and the report then describes a dataset that no longer exists The lab checks it: every number in your headline must occur in the facts the build wrote An AI-assistant may improve the wording after your draft exists. The numbers still come from the build",
+      "href": "../slides/day4.html#no-typed-number"
+    },
+    {
+      "deck": "day4",
+      "id": "limits",
+      "n": 35,
+      "session": 4,
+      "title": "Limits: what this dataset cannot support",
+      "text": "Part 6 Limits: what this dataset cannot support Household size is missing for 18.1% of the 35,665 households, and more often for large ones For D09, D17 and D24 the verdict against the standard depends on the assumption: undecided B12 sent no rows for 10 to 18 August: its districts look less served than they were 811 log rows could not be tied to a household; they are set aside, not counted D29 and D30 have no row in the open table of 2022: coverage of need cannot be stated there Sizes are reported by households and not verified",
+      "href": "../slides/day4.html#limits"
+    },
+    {
+      "deck": "day4",
+      "id": "what-may-leave",
+      "n": 36,
+      "session": 4,
+      "title": "Before a file is committed or attached, a program looks at it",
+      "text": "Lab 4.4, step 3 Before a file is committed or attached, a program looks at it Build output Grain Decision join_log.csv, rule_results.csv, the report aggregate may leave households.csv, handouts_q3.csv household, pseudonymised only under an agreement, generalised set_aside.csv log row, keys as typed stays inside The set-aside rows keep each key exactly as the desk typed it, because somebody must repair it. That makes the file useful to the branch and unfit to travel A scan for identifier patterns in every output is one more rule of the build",
+      "href": "../slides/day4.html#what-may-leave"
+    },
+    {
+      "deck": "day4",
+      "id": "capstone-questions",
+      "n": 37,
+      "session": 4,
+      "title": "A second city, the same four kinds of source, other faults",
+      "text": "The capstone A second city, the same four kinds of source, other faults Question A Parcels per eligible household per month, by district, in the second quarter of 2026. Question B Kilograms handed out per household member, by branch, against kilograms received. Question C Share of eligible households that received no parcel in the quarter, by registration channel. You deliver a public repository that rebuilds with one command, and defend it in eight minutes During the defence the assessor corrupts one input file; you show which rule fails and why No raw personal field is committed, synthetic or not",
+      "href": "../slides/day4.html#capstone-questions"
+    },
+    {
+      "deck": "day4",
+      "id": "check-report",
+      "n": 38,
+      "session": 4,
+      "title": "Which sentence belongs in the report?",
+      "text": "Checkpoint Which sentence belongs in the report? The build ran, every rule passed, and the estimate is 2.06 with a range of 2.02 to 2.07. Which sentence should open the limits section? All rules passed, so the data is correct The data has some quality issues that should be kept in mind Size is missing for 18.1% of households; three districts are undecided The network delivers 2.060 parcels, above the standard",
+      "href": "../slides/day4.html#check-report"
+    },
+    {
+      "deck": "day4",
+      "id": "lab-4-4",
+      "n": 39,
+      "session": 4,
+      "title": "The quality report",
+      "text": "Lab 4.4 · 25 min The quality report Run the reference build with one command, draft the quality report from its outputs and from the findings of the four days, decide which outputs may leave the analysis environment, and choose your capstone question. D4_4_draft_quality_report.ipynb Rebuild from the raw sources with one command 5 min Draft the report from the build outputs 10 min What may leave the analysis environment 5 min Choose your capstone question 5 min ✱ Stretch: Corrupt one input file and rebuild",
+      "href": "../slides/day4.html#lab-4-4"
+    },
+    {
+      "deck": "day4",
+      "id": "wrap-up",
+      "n": 40,
+      "session": 4,
+      "title": "Three things to keep",
+      "text": "Day 4 · wrap-up Three things to keep Rules run every time Written from the dictionary, named by dimension, tested on a broken copy. Some faults show only between two fields or two sources. A key, then generalise A plain hash falls to a list. A keyed hash holds; exact dates and sizes still single households out. The report is built, the limits are written Numbers from the build. Limits from you: the fault, its size, what it does to the decision.",
+      "href": "../slides/day4.html#wrap-up"
+    },
+    {
+      "deck": "day4",
+      "id": "next",
+      "n": 41,
+      "session": 4,
+      "title": "Your repository, rebuilt live",
+      "text": "Next · Capstone Your repository, rebuilt live Choose question A, B or C and build from the raw files of the second city One command; a provenance file; a rule suite; a README with row counts, rule results and the range of your estimate Eight minutes of defence, four of questions, and one input file corrupted by the assessor Keep every raw personal field out of the repository",
+      "href": "../slides/day4.html#next"
+    },
+    {
+      "deck": "capstone",
+      "id": "title",
+      "n": 1,
+      "session": 0,
+      "title": "Capstone project presentations",
+      "text": "SDAIA Academy · Data Acquisition, Preparation and Quality Capstone project presentations Capstone: Each participant rebuilds a dataset from raw files, live, and defends it: eight minutes, then four minutes of questions Data Science Track4 teaching days + capstone day8 min talk and demo · 4 min Q&ADS-202",
+      "href": "../slides/capstone.html#title"
+    },
+    {
+      "deck": "capstone",
+      "id": "agenda",
+      "n": 2,
+      "session": 0,
+      "title": "How the presentations run",
+      "text": "Capstone How the presentations run Expectations and final prep the rubric, a rebuild from a fresh clone, then the first defences Defences eight minutes each with a live rebuild and one corrupted input, then four minutes of questions Exit check, review and closing the supervised check, the trainer's review, the follow-up task",
+      "href": "../slides/capstone.html#agenda"
+    },
+    {
+      "deck": "capstone",
+      "id": "rubric",
+      "n": 3,
+      "session": 0,
+      "title": "The rubric",
+      "text": "How presentations are scored The rubric Provenance 15% Joins and reconciliation 25% Cleaning and validation 25% Missing data and sensitivity 20% Personal data and reproducibility 15% Every claim has a count. Rows in, rows out, rows set aside; rules run, rules failed; an estimate with its range.",
+      "href": "../slides/capstone.html#rubric"
+    },
+    {
+      "deck": "capstone",
+      "id": "format",
+      "n": 4,
+      "session": 0,
+      "title": "Eight minutes of defence, then four minutes of questions",
+      "text": "Format Eight minutes of defence, then four minutes of questions 1 · The question Which question, which population, which sources. One minute, no slides needed. 2 · The rebuild One command on the raw files. Then the assessor corrupts one input file: rebuild, and show which rule fails and why. 3 · The answer and its limits The estimate with its range, and the one limit that matters most to the person who asked. Peer feedback. After each defence, everyone writes one strength, one question and one suggestion.",
+      "href": "../slides/capstone.html#format"
+    },
+    {
+      "deck": "capstone",
+      "id": "running-order",
+      "n": 5,
+      "session": 0,
+      "title": "Who presents when",
+      "text": "Running order Who presents when # Presenter Question 1 2 3 4 5 6 7 8",
+      "href": "../slides/capstone.html#running-order"
+    },
+    {
+      "deck": "capstone",
+      "id": "final-prep",
+      "n": 6,
+      "session": 0,
+      "title": "Final prep · 20 minutes",
+      "text": "Before the first presentation Final prep · 20 minutes Clone your repository into a new folder, run your one command there, and search the clone for a raw personal field.",
+      "href": "../slides/capstone.html#final-prep"
+    },
+    {
+      "deck": "capstone",
+      "id": "now-presenting",
+      "n": 7,
+      "session": 0,
+      "title": "Defence and rebuild",
+      "text": "Now presenting Defence and rebuild Questions",
+      "href": "../slides/capstone.html#now-presenting"
+    },
+    {
+      "deck": "capstone",
+      "id": "review",
+      "n": 8,
+      "session": 0,
+      "title": "What the presentations showed",
+      "text": "Trainer review What the presentations showed Strongest patterns What several projects got right. Common gaps What most projects would fix next. One surprise Something nobody expected.",
+      "href": "../slides/capstone.html#review"
+    },
+    {
+      "deck": "capstone",
+      "id": "what-next",
+      "n": 9,
+      "session": 0,
+      "title": "Keep going",
+      "text": "After the course Keep going The follow-up task: a provenance file and a rule suite for one dataset from your work, or one open dataset. The brief is labs/follow_up.md Your repository stays yours: keep it rebuildable, and add the rule for the fault the assessor found today Next in the Data Science stream: the other DS-200 courses prepare for the same DS Assistant badge; your trainer has the current schedule",
+      "href": "../slides/capstone.html#what-next"
+    },
+    {
+      "deck": "capstone",
+      "id": "thanks",
+      "n": 10,
+      "session": 0,
+      "title": "Thank you",
+      "text": "SDAIA Academy Thank you Data Acquisition, Preparation and Quality",
+      "href": "../slides/capstone.html#thanks"
+    }
+  ]
+}

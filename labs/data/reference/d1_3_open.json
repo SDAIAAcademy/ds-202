@@ -1,0 +1,13 @@
+{
+ "origin": "Open Data Portal of Madinat Al-Sidr Municipality, dataset Population and households by district, 2022",
+ "owner": "The statistics office of the municipality (publisher); our copy is kept by the analyst",
+ "coverage": "28 districts as they were in 2022; D29 and D30, established in 2024, are absent",
+ "sharing_basis": "Open licence of the portal: free reuse with attribution to the publisher",
+ "refresh_date": "2026-10-02",
+ "limits": [
+  "describes 2022; the city has grown since, unevenly",
+  "low_income_households_est is a survey estimate with no published margin of error",
+  "low income in the survey is not the eligibility rule of the network"
+ ],
+ "classification": "Public"
+}

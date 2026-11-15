@@ -1,0 +1,13 @@
+{
+ "scenarios": {
+  "delta -1": 2.073,
+  "delta +0": 2.06,
+  "delta +1": 2.039,
+  "delta +2": 2.02,
+  "floor7": 2.04
+ },
+ "plausible": [
+  2.02,
+  2.073
+ ]
+}

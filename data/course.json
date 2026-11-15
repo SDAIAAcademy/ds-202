@@ -1,0 +1,993 @@
+{
+  "v": 1,
+  "engine": "1.0.0",
+  "build": {
+    "at": "2026-11-15T11:22:42Z",
+    "version": "2027.1.0",
+    "commit": "87b98e4"
+  },
+  "lang": "en",
+  "dir": "ltr",
+  "langs": [
+    "en"
+  ],
+  "alt": {},
+  "course": {
+    "id": "ds-202",
+    "code": "DS-202",
+    "version": "2027.1.0",
+    "title": "Data Acquisition, Preparation and Quality",
+    "tagline": "Turn four raw sources into an analysis dataset that rebuilds with one command, with its provenance, its rules and an honest account of what is missing",
+    "description": "Participants assemble an analysis dataset for a fictional food bank network from four sources: registrations with personal data, branch logs, a donations API and open population data. They record provenance, join with key and cardinality checks, clean Arabic and English text, dates and units, write validation rules that rerun on every build, and measure how missing data and measurement error move a headline estimate. Personal data are minimised and pseudonymised, and the dataset rebuilds from raw sources with one command.",
+    "track": "data-science",
+    "track_name": "Data Science Track",
+    "level": 200,
+    "badge": {
+      "name": "Data Science",
+      "level": "Assistant"
+    },
+    "audience": "Practitioners. Graduates and early-career analysts who have completed the FN courses or passed the placement test, and analysts moving into data science.",
+    "prerequisites": [
+      "FN-101 Python for Data and AI Work",
+      "FN-104 SQL and Data Wrangling",
+      "FN-106 Responsible Data and AI Practice in the Kingdom",
+      "Writes SQL joins and group-by queries without assistance",
+      "Setup: a laptop CPU with uv, or Google Colab. No key, account or model is needed. Run 00_setup_check and the two-hour pre-work notebook before Day 1; see labs/README.md."
+    ],
+    "url": "https://sdaiaacademy.github.io/ds-202/",
+    "repo": "SDAIAAcademy/ds-202",
+    "home": "../index.html",
+    "format": "intensive",
+    "format_note": "Intensive: 4 teaching days of four sessions and a capstone day, with guided pre-work and a tracked follow-up task",
+    "shape": "4 teaching days + capstone day",
+    "hours": {
+      "instruction": 6,
+      "lab": 7,
+      "guided_self_study": 6,
+      "assessment": 1,
+      "capstone": 6,
+      "total": 26
+    },
+    "unit": "day",
+    "outcomes": [
+      {
+        "id": "LO1",
+        "text": "Describe missing-data mechanisms and kinds of measurement error and the bias each can introduce, given six scenarios from the case",
+        "level": "Awareness",
+        "evidence": "mechanism and bias direction for each, at least five of six correct"
+      },
+      {
+        "id": "LO2",
+        "text": "Prepare a provenance record per source covering origin, owner, coverage, sharing basis, refresh date and limits, given the four sources and their documentation",
+        "level": "Applied",
+        "evidence": "a provenance file that passes a reviewer's checklist"
+      },
+      {
+        "id": "LO3",
+        "text": "Implement joins with key checks, cardinality tests and reconciliation counts so that no row is silently lost or duplicated, given tables with seeded duplicate, missing and mistyped keys",
+        "level": "Applied",
+        "evidence": "a join log of row counts per step and set-aside rows with reasons"
+      },
+      {
+        "id": "LO4",
+        "text": "Configure validation rules for types, ranges, uniqueness, completeness and cross-field consistency that run on every rebuild, given the joined table and its data dictionary",
+        "level": "Applied",
+        "evidence": "a rule suite that passes on the clean build and fails readably on a corrupted batch"
+      },
+      {
+        "id": "LO5",
+        "text": "Analyse how complete-case analysis, imputation and a sensitivity range change a headline estimate, given parcels per eligible household by district, with 18% of household sizes missing",
+        "level": "Applied",
+        "evidence": "a comparison table and a recommended estimate with its reason"
+      },
+      {
+        "id": "LO6",
+        "text": "Build a rebuildable analysis dataset from raw sources with personal data minimised and pseudonymised, given a question set by the food bank and the four raw sources",
+        "level": "Performance",
+        "evidence": "a repository that rebuilds with one command, with provenance, rules and quality report, defended live"
+      }
+    ],
+    "case_study": {
+      "name": "Ghilal Food Bank Network",
+      "summary": "Ghilal Food Bank Network (شبكة غِلال لبنوك الطعام) is a fictional network of 14 branches serving the 30 districts of a fictional city, Madinat Al-Sidr. Its programmes director asks how many parcels an eligible household received per month in each district in the third quarter of 2026; participants assemble the answer from 40,000 registrations with personal data, 210,000 branch log rows, a local donations API and an open district population table. All data is synthetic and generated with a fixed seed, with planted encoding faults, duplicate and mistyped keys, gaps, unit errors and missing household sizes that each lab finds."
+    },
+    "days": [
+      {
+        "id": "day1",
+        "kind": "day",
+        "n": 1,
+        "number": 1,
+        "label": "Day 1",
+        "title": "Find and document the sources",
+        "subtitle": "The question, the four sources, their provenance and who they leave out",
+        "shape": "4 sessions · 4 labs",
+        "deck": "../slides/day1.html",
+        "md": "../slides/day1.md",
+        "url": "https://sdaiaacademy.github.io/ds-202/slides/day1.html",
+        "sessions": [
+          {
+            "n": 1,
+            "label": "Session 1",
+            "title": "Start from the question, not the files",
+            "summary": "The question fixes the unit, the population and the period; the variables follow",
+            "outcomes": [
+              "Take a question apart into unit, population, period and groups",
+              "List the fields a question needs, with a source for each",
+              "Name the fields left out and the gaps no source fills"
+            ],
+            "lo": [
+              "LO2",
+              "LO6"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "1.1",
+              "title": "The question before the files",
+              "summary": "Take the question of the programmes director apart, list the variables it needs with one source field for each, write down the fields you will not take and the gaps no source fills.",
+              "minutes": 25,
+              "href": "../labs/D1_1_list_variables_question.ipynb",
+              "steps": [
+                {
+                  "text": "Take the question apart",
+                  "minutes": 5
+                },
+                {
+                  "text": "The fields the question needs",
+                  "minutes": 10
+                },
+                {
+                  "text": "The fields you will not take",
+                  "minutes": 5
+                },
+                {
+                  "text": "What no source provides",
+                  "minutes": 5
+                }
+              ],
+              "stretch": "A second question, and what it adds"
+            }
+          },
+          {
+            "n": 2,
+            "label": "Session 2",
+            "title": "Files, APIs and databases",
+            "summary": "Files, an API and a database each fail differently: count what arrived against what was sent",
+            "outcomes": [
+              "Load files as text whatever their encoding",
+              "Page through an API and reconcile with its total",
+              "Query a register in SQL and build a source inventory"
+            ],
+            "lo": [
+              "LO6",
+              "LO3"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "1.2",
+              "title": "Three ways in",
+              "summary": "Load the 14 branch log files whatever their encoding, page through the donations API until it ends and reconcile with its total, query the register in SQL, and write a source inventory.",
+              "minutes": 25,
+              "href": "../labs/D1_2_load_logs_page.ipynb",
+              "steps": [
+                {
+                  "text": "Load the 14 log files, whatever their encoding",
+                  "minutes": 7
+                },
+                {
+                  "text": "Page through the donations API and reconcile with its total",
+                  "minutes": 8
+                },
+                {
+                  "text": "Query the register in SQL",
+                  "minutes": 6
+                },
+                {
+                  "text": "The source inventory",
+                  "minutes": 4
+                }
+              ],
+              "stretch": "Does a smaller page size change what arrives?"
+            }
+          },
+          {
+            "n": 3,
+            "label": "Session 3",
+            "title": "Provenance and sharing basis",
+            "summary": "A record per source: origin, owner, coverage, sharing basis, refresh date and limits",
+            "outcomes": [
+              "Write a provenance record with its six fields and a classification level",
+              "State the sharing basis and its purpose",
+              "Pass and apply a reviewer checklist"
+            ],
+            "lo": [
+              "LO2"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "1.3",
+              "title": "Two provenance records",
+              "summary": "Write the provenance records of the register and of the open district table from their source notes, repair a weak record with the reviewer checklist, and assemble the provenance file of the project.",
+              "minutes": 25,
+              "href": "../labs/D1_3_write_provenance_records.ipynb",
+              "steps": [
+                {
+                  "text": "The record of the register",
+                  "minutes": 9
+                },
+                {
+                  "text": "The record of the open district table",
+                  "minutes": 7
+                },
+                {
+                  "text": "Run the checklist and repair a weak record",
+                  "minutes": 5
+                },
+                {
+                  "text": "Assemble provenance.json",
+                  "minutes": 4
+                }
+              ],
+              "stretch": "A record for the audit file"
+            }
+          },
+          {
+            "n": 4,
+            "label": "Session 4",
+            "title": "Coverage and sampling frames",
+            "summary": "A register lists who registered, not who is in need; an outside frame shows the gap",
+            "outcomes": [
+              "Compare a register with an outside frame by district",
+              "Account for rows that match on one side only",
+              "Flag under-covered districts and word the caveat"
+            ],
+            "lo": [
+              "LO1",
+              "LO2"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "1.4",
+              "title": "Who is not in the register",
+              "summary": "Count registered households per district in SQL, join them to the open table with a full outer join, compute coverage ratios, flag the under-covered districts and choose the sentences that go under the headline.",
+              "minutes": 25,
+              "href": "../labs/D1_4_compare_registrations_open.ipynb",
+              "steps": [
+                {
+                  "text": "Registered households per district, in SQL",
+                  "minutes": 5
+                },
+                {
+                  "text": "Join to the open table and find what does not match",
+                  "minutes": 7
+                },
+                {
+                  "text": "Coverage ratios and flags",
+                  "minutes": 8
+                },
+                {
+                  "text": "The coverage note",
+                  "minutes": 5
+                }
+              ],
+              "stretch": "A second frame: all households"
+            }
+          }
+        ]
+      },
+      {
+        "id": "day2",
+        "kind": "day",
+        "n": 2,
+        "number": 2,
+        "label": "Day 2",
+        "title": "Join and clean",
+        "subtitle": "Bytes, keys, people without keys, dates and units, each repair counted",
+        "shape": "4 sessions · 4 labs",
+        "deck": "../slides/day2.html",
+        "md": "../slides/day2.md",
+        "url": "https://sdaiaacademy.github.io/ds-202/slides/day2.html",
+        "sessions": [
+          {
+            "n": 1,
+            "label": "Session 1",
+            "title": "Encodings and Arabic text",
+            "summary": "One file, several encodings: decide line by line, repair, and match on a normalised key",
+            "outcomes": [
+              "Decode a file line by line and count each encoding",
+              "Repair names that were decoded twice",
+              "Normalise Arabic letters and digits into a key and log every repair"
+            ],
+            "lo": [
+              "LO6"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "2.1",
+              "title": "One file, three encodings",
+              "summary": "Decode the register extract line by line, repair the names that were decoded twice, normalise Arabic letters and digits into matching keys, and write the repair log that shows what the digits were hiding.",
+              "minutes": 25,
+              "href": "../labs/D2_1_repair_mixed_encodings.ipynb",
+              "steps": [
+                {
+                  "text": "Decode the extract line by line and count",
+                  "minutes": 6
+                },
+                {
+                  "text": "Repair the names that were decoded twice",
+                  "minutes": 6
+                },
+                {
+                  "text": "Normalise letters and digits into keys",
+                  "minutes": 8
+                },
+                {
+                  "text": "The repair log, and what the digits were hiding",
+                  "minutes": 5
+                }
+              ],
+              "stretch": "Names in Latin letters: case and hyphens"
+            }
+          },
+          {
+            "n": 2,
+            "label": "Session 2",
+            "title": "Keys and cardinality",
+            "summary": "Repair keys by rule, test the cardinality, and make the row counts add up",
+            "outcomes": [
+              "Repair mistyped keys by stated rules",
+              "Test many-to-one before joining",
+              "Reconcile rows in with rows out plus rows set aside"
+            ],
+            "lo": [
+              "LO3"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "2.2",
+              "title": "A join that loses nothing",
+              "summary": "Repair the household ids of the logs, test the join against the register for one-to-many breaks, join, and write a join log in which rows in equal rows out plus rows set aside, each with a reason.",
+              "minutes": 25,
+              "href": "../labs/D2_2_join_logs_registrations.ipynb",
+              "steps": [
+                {
+                  "text": "Repair the keys and name what cannot be repaired",
+                  "minutes": 8
+                },
+                {
+                  "text": "Test the cardinality before joining",
+                  "minutes": 5
+                },
+                {
+                  "text": "Join and reconcile",
+                  "minutes": 7
+                },
+                {
+                  "text": "The join log and the set-aside file",
+                  "minutes": 5
+                }
+              ],
+              "stretch": "Handouts dated before the registration"
+            }
+          },
+          {
+            "n": 3,
+            "label": "Session 3",
+            "title": "Matching without a clean key",
+            "summary": "Block, score and choose a threshold on labelled pairs: a false match costs most",
+            "outcomes": [
+              "Block and score candidate pairs",
+              "Measure false matches and missed matches on labelled pairs",
+              "Choose a threshold and state its cost"
+            ],
+            "lo": [
+              "LO3"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "2.3",
+              "title": "300 records without a key",
+              "summary": "Match 300 walk-in records to the register of two branches by normalised name, measure false and missed matches on staff-labelled pairs at three thresholds, add the phone as a second field, and choose the rule to run.",
+              "minutes": 25,
+              "href": "../labs/D2_3_match_300_records.ipynb",
+              "steps": [
+                {
+                  "text": "Normalise and block",
+                  "minutes": 5
+                },
+                {
+                  "text": "Score the candidate pairs",
+                  "minutes": 6
+                },
+                {
+                  "text": "False matches at three thresholds",
+                  "minutes": 7
+                },
+                {
+                  "text": "Add the phone, measure again, choose",
+                  "minutes": 7
+                }
+              ],
+              "stretch": "The review queue"
+            }
+          },
+          {
+            "n": 4,
+            "label": "Session 4",
+            "title": "Types, units and dates",
+            "summary": "Layout and unit belong to the source, not the value: decide per branch, convert, log",
+            "outcomes": [
+              "Decide a date layout per source from evidence",
+              "Bring weights in two units to one, and catch mislabelled ones",
+              "Write a change log with a count per rule"
+            ],
+            "lo": [
+              "LO6"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "2.4",
+              "title": "One calendar, one unit",
+              "summary": "Find the date layout of each branch from its own rows, parse every date with it, bring pounds, grams and mislabelled weights to kilograms, and write the change log.",
+              "minutes": 25,
+              "href": "../labs/D2_4_standardise_three_date.ipynb",
+              "steps": [
+                {
+                  "text": "Find the date layout of each branch",
+                  "minutes": 7
+                },
+                {
+                  "text": "Parse every date with the layout of its branch",
+                  "minutes": 5
+                },
+                {
+                  "text": "Bring every weight to kilograms",
+                  "minutes": 8
+                },
+                {
+                  "text": "The change log",
+                  "minutes": 5
+                }
+              ],
+              "stretch": "What guessing value by value would have done"
+            }
+          }
+        ]
+      },
+      {
+        "id": "day3",
+        "kind": "day",
+        "n": 3,
+        "number": 3,
+        "label": "Day 3",
+        "title": "Missing data and measurement",
+        "subtitle": "Why values are missing, what each remedy assumes, and how far the headline can move",
+        "shape": "4 sessions · 4 labs",
+        "deck": "../slides/day3.html",
+        "md": "../slides/day3.md",
+        "url": "https://sdaiaacademy.github.io/ds-202/slides/day3.html",
+        "sessions": [
+          {
+            "n": 1,
+            "label": "Session 1",
+            "title": "Why data go missing",
+            "summary": "Three mechanisms of missingness, the evidence for each, and the bias each causes",
+            "outcomes": [
+              "Tabulate missingness against observed fields",
+              "Tell the three mechanisms apart with evidence",
+              "Give the direction of bias each one causes"
+            ],
+            "lo": [
+              "LO1"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "3.1",
+              "title": "Six gaps, six mechanisms",
+              "summary": "Tabulate where household sizes are missing, read the audit of home visits, inspect three more gaps in the logs and the API, then classify the six patterns by mechanism and give the direction of bias for each.",
+              "minutes": 25,
+              "href": "../labs/D3_1_classify_six_missingness.ipynb",
+              "steps": [
+                {
+                  "text": "Where household sizes are missing",
+                  "minutes": 7
+                },
+                {
+                  "text": "What the audit shows",
+                  "minutes": 5
+                },
+                {
+                  "text": "Three gaps in the logs and the API",
+                  "minutes": 6
+                },
+                {
+                  "text": "Classify the six and give the direction of bias",
+                  "minutes": 7
+                }
+              ],
+              "stretch": "Why no test on the observed data can rule out the third mechanism"
+            }
+          },
+          {
+            "n": 2,
+            "label": "Session 2",
+            "title": "Imputation and its cost",
+            "summary": "Complete cases, one value, or similar households: three assumptions, three answers",
+            "outcomes": [
+              "Compute a complete-case estimate and say what it assumes",
+              "Impute a single value and a value within groups",
+              "Compare the estimates overall and by district"
+            ],
+            "lo": [
+              "LO5"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "3.2",
+              "title": "Three estimates of one number",
+              "summary": "Estimate parcels per eligible household with complete cases, with the median size and with the median of similar households, and compare the three overall and by district.",
+              "minutes": 25,
+              "href": "../labs/D3_2_estimate_parcels_per.ipynb",
+              "steps": [
+                {
+                  "text": "The complete-case estimate",
+                  "minutes": 5
+                },
+                {
+                  "text": "Impute the median",
+                  "minutes": 5
+                },
+                {
+                  "text": "Impute within groups",
+                  "minutes": 8
+                },
+                {
+                  "text": "The comparison table, overall and by district",
+                  "minutes": 7
+                }
+              ],
+              "stretch": "Draw a donor at random, twenty times"
+            }
+          },
+          {
+            "n": 3,
+            "label": "Session 3",
+            "title": "Sensitivity ranges",
+            "summary": "Logical bounds first, then a range under assumptions you can defend",
+            "outcomes": [
+              "Compute the logical bounds of an estimate",
+              "Build a plausible range by shifting the imputed values",
+              "Recommend one estimate with its range and its reason"
+            ],
+            "lo": [
+              "LO5"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "3.3",
+              "title": "How far could it move?",
+              "summary": "Bound the estimate under best-case and worst-case assumptions about the households with no size, narrow it to a plausible range by shifting the imputed sizes, see which districts change side of the standard, and recommend an estimate.",
+              "minutes": 25,
+              "href": "../labs/D3_3_bound_estimate_under.ipynb",
+              "steps": [
+                {
+                  "text": "The logical bounds",
+                  "minutes": 7
+                },
+                {
+                  "text": "A plausible range: shift the imputed sizes",
+                  "minutes": 8
+                },
+                {
+                  "text": "Which districts change side of the standard",
+                  "minutes": 5
+                },
+                {
+                  "text": "Recommend an estimate, with its reason",
+                  "minutes": 5
+                }
+              ],
+              "stretch": "The tipping point of one district"
+            }
+          },
+          {
+            "n": 4,
+            "label": "Session 4",
+            "title": "Measurement error and proxies",
+            "summary": "Random error, one-directional error, and what a proxy really measures",
+            "outcomes": [
+              "Measure reporting error against an audit",
+              "Simulate random and one-directional error",
+              "Say what a proxy measures and what it does not"
+            ],
+            "lo": [
+              "LO1"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "3.4",
+              "title": "When the answer itself is wrong",
+              "summary": "Measure the reporting error of household size in the audit, simulate random error and over-reporting near the eligibility line, and measure the shift of the headline under each.",
+              "minutes": 25,
+              "href": "../labs/D3_4_simulate_self_report.ipynb",
+              "steps": [
+                {
+                  "text": "Measure the reporting error in the audit",
+                  "minutes": 6
+                },
+                {
+                  "text": "Simulate random error",
+                  "minutes": 7
+                },
+                {
+                  "text": "Simulate over-reporting near the line",
+                  "minutes": 7
+                },
+                {
+                  "text": "The shift table and a proxy",
+                  "minutes": 5
+                }
+              ],
+              "stretch": "How large an audit to see a 2% error rate?"
+            }
+          }
+        ]
+      },
+      {
+        "id": "day4",
+        "kind": "day",
+        "n": 4,
+        "number": 4,
+        "label": "Day 4",
+        "title": "Validate and protect",
+        "subtitle": "Rules that run on every rebuild, identifiers that hold, and a report that says what the dataset is good for",
+        "shape": "4 sessions · 4 labs",
+        "deck": "../slides/day4.html",
+        "md": "../slides/day4.md",
+        "url": "https://sdaiaacademy.github.io/ds-202/slides/day4.html",
+        "sessions": [
+          {
+            "n": 1,
+            "label": "Session 1",
+            "title": "Quality dimensions as rules",
+            "summary": "Completeness, validity, uniqueness and type, written from the data dictionary",
+            "outcomes": [
+              "Translate a data dictionary into column rules",
+              "Name the quality dimension of each rule",
+              "Run the suite on a build and read its failures"
+            ],
+            "lo": [
+              "LO4"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "4.1",
+              "title": "Rules for the joined table",
+              "summary": "Write type, range, uniqueness and completeness rules for the joined table from its data dictionary, run them on the clean build, and watch each fail on a copy you break.",
+              "minutes": 25,
+              "href": "../labs/D4_1_write_type_range.ipynb",
+              "steps": [
+                {
+                  "text": "Types and completeness from the dictionary",
+                  "minutes": 7
+                },
+                {
+                  "text": "Range and validity rules",
+                  "minutes": 6
+                },
+                {
+                  "text": "Uniqueness",
+                  "minutes": 4
+                },
+                {
+                  "text": "Run on the clean build and on a broken copy",
+                  "minutes": 8
+                }
+              ],
+              "stretch": "Which rules stop the build and which only warn?"
+            }
+          },
+          {
+            "n": 2,
+            "label": "Session 2",
+            "title": "Cross-field and cross-source checks",
+            "summary": "Faults that show only between two fields or two sources, reported so a branch can act",
+            "outcomes": [
+              "Write rules across two fields",
+              "Write a rule across two sources",
+              "Produce a failure report a data owner can act on"
+            ],
+            "lo": [
+              "LO4"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "4.2",
+              "title": "Three rules across fields and sources",
+              "summary": "Run the column rules on a corrupted October batch, add two cross-field rules and one cross-source rule that catch what they miss, and write a failure report that says which branch must fix what.",
+              "minutes": 25,
+              "href": "../labs/D4_2_add_three_consistency.ipynb",
+              "steps": [
+                {
+                  "text": "Run the column rules on the corrupted batch",
+                  "minutes": 5
+                },
+                {
+                  "text": "Two rules across fields",
+                  "minutes": 8
+                },
+                {
+                  "text": "One rule across sources",
+                  "minutes": 7
+                },
+                {
+                  "text": "A failure report a branch can act on",
+                  "minutes": 5
+                }
+              ],
+              "stretch": "Reject the batch or quarantine the rows?"
+            }
+          },
+          {
+            "n": 3,
+            "label": "Session 3",
+            "title": "Minimise and pseudonymise",
+            "summary": "A plain hash falls to a list; a keyed hash holds; quasi-identifiers still single people out",
+            "outcomes": [
+              "Re-link a plain hash with a list and by enumeration",
+              "Replace identifiers with a keyed hash",
+              "Measure uniqueness on quasi-identifiers and reduce it by generalising"
+            ],
+            "lo": [
+              "LO6"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "4.3",
+              "title": "A pseudonym that holds",
+              "summary": "Hash national ID numbers plainly and re-link them with a list and by enumeration, replace them with a keyed hash, then attempt re-linkage through district, size and registration date and reduce it by generalising.",
+              "minutes": 25,
+              "href": "../labs/D4_3_replace_national_id.ipynb",
+              "steps": [
+                {
+                  "text": "A plain hash and a list attack",
+                  "minutes": 6
+                },
+                {
+                  "text": "Enumerate the id space",
+                  "minutes": 5
+                },
+                {
+                  "text": "A keyed hash",
+                  "minutes": 6
+                },
+                {
+                  "text": "Re-link through quasi-identifiers, then generalise",
+                  "minutes": 8
+                }
+              ],
+              "stretch": "Change the key: what breaks, and what should"
+            }
+          },
+          {
+            "n": 4,
+            "label": "Session 4",
+            "title": "A data-quality report",
+            "summary": "Row counts, rule results, what is missing, how far the estimate moves, what may leave",
+            "outcomes": [
+              "Rebuild a dataset from raw sources with one command",
+              "Draft a data-quality report from the build outputs",
+              "Classify outputs and choose a capstone question"
+            ],
+            "lo": [
+              "LO6",
+              "LO2"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "4.4",
+              "title": "The quality report",
+              "summary": "Run the reference build with one command, draft the quality report from its outputs and from the findings of the four days, decide which outputs may leave the analysis environment, and choose your capstone question.",
+              "minutes": 25,
+              "href": "../labs/D4_4_draft_quality_report.ipynb",
+              "steps": [
+                {
+                  "text": "Rebuild from the raw sources with one command",
+                  "minutes": 5
+                },
+                {
+                  "text": "Draft the report from the build outputs",
+                  "minutes": 10
+                },
+                {
+                  "text": "What may leave the analysis environment",
+                  "minutes": 5
+                },
+                {
+                  "text": "Choose your capstone question",
+                  "minutes": 5
+                }
+              ],
+              "stretch": "Corrupt one input file and rebuild"
+            }
+          }
+        ]
+      },
+      {
+        "id": "capstone",
+        "kind": "capstone",
+        "n": 5,
+        "number": null,
+        "label": "Capstone",
+        "title": "Capstone project presentations",
+        "subtitle": "Each participant rebuilds a dataset from raw files, live, and defends it: eight minutes, then four minutes of questions",
+        "shape": "",
+        "deck": "../slides/capstone.html",
+        "md": "../slides/capstone.md",
+        "url": "https://sdaiaacademy.github.io/ds-202/slides/capstone.html",
+        "sessions": []
+      }
+    ],
+    "capstone": {
+      "summary": "A rebuildable dataset for one of three synthetic questions, in a public repository whose README reports row counts per step, rule results and the estimate's sensitivity to missing data; eight-minute defence with a rebuild from raw files",
+      "submission": "A public GitHub repository link. The repository rebuilds the analysis dataset from the raw files of the capstone extract with one command, and holds the provenance file, the rule suite and the set-aside rows (log id, branch and reason, without the household key as typed); its README reports row counts per step, rule results and the sensitivity of the estimate to missing data. No raw personal field is committed, synthetic or not. Then an eight-minute defence with a live rebuild, in which the assessor corrupts one input file and you show which rule fails and why, and four minutes of questions.",
+      "talk_minutes": 8,
+      "qa_minutes": 4,
+      "rubric": [
+        {
+          "criterion": "Provenance",
+          "weight": 15
+        },
+        {
+          "criterion": "Joins and reconciliation",
+          "weight": 25
+        },
+        {
+          "criterion": "Cleaning and validation",
+          "weight": 25
+        },
+        {
+          "criterion": "Missing data and sensitivity",
+          "weight": 20
+        },
+        {
+          "criterion": "Personal data and reproducibility",
+          "weight": 15
+        }
+      ]
+    },
+    "labs": {
+      "kind": "notebooks",
+      "base": "labs/"
+    },
+    "tools": [
+      {
+        "slot": "Analysis environment and notebooks",
+        "examples": [
+          "Python with uv and JupyterLab or marimo",
+          "R with Quarto"
+        ]
+      },
+      {
+        "slot": "Dataframes and analytical SQL engine",
+        "examples": [
+          "DuckDB",
+          "Polars",
+          "pandas"
+        ]
+      },
+      {
+        "slot": "Data validation rules",
+        "examples": [
+          "Pandera",
+          "Great Expectations",
+          "SQL assertions"
+        ]
+      },
+      {
+        "slot": "Record matching",
+        "examples": [
+          "Splink",
+          "RapidFuzz",
+          "rules written in SQL"
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "group": "National references",
+        "items": [
+          {
+            "title": "Personal Data Protection Law",
+            "url": "https://sdaia.gov.sa/en/SDAIA/about/Documents/PersonalDataProtectionLaw.pdf"
+          },
+          {
+            "title": "Implementing Regulation of the Personal Data Protection Law",
+            "url": "https://sdaia.gov.sa/en/SDAIA/about/Documents/ImplementingRegulationPersonalDataProtectionLaw.pdf"
+          },
+          {
+            "title": "Personal Data Destruction, Anonymization and Pseudonymisation Guideline",
+            "url": "https://sdaia.gov.sa/Documents/PersonalDataDestructionAnonymizationAndEncryptionGuideline.pdf"
+          },
+          {
+            "title": "Data Classification Policy",
+            "url": "https://sdaia.gov.sa/en/SDAIA/about/Documents/DataClassificationPolicy.pdf"
+          },
+          {
+            "title": "Data Sharing Policy",
+            "url": "https://sdaia.gov.sa/en/SDAIA/about/Documents/DataSharingPolicyEN.pdf"
+          },
+          {
+            "title": "Open Data Policy",
+            "url": "https://sdaia.gov.sa/en/SDAIA/about/Documents/OpenDataPolicy.pdf"
+          }
+        ]
+      },
+      {
+        "group": "Missing data and documentation",
+        "items": [
+          {
+            "title": "Stef van Buuren, Flexible Imputation of Missing Data, second edition (online book)",
+            "url": "https://stefvanbuuren.name/fimd/"
+          },
+          {
+            "title": "Donald B. Rubin, Inference and missing data, Biometrika 63(3), 1976",
+            "url": "https://www.jstor.org/stable/2335739"
+          },
+          {
+            "title": "Gebru and others, Datasheets for Datasets",
+            "url": "https://arxiv.org/abs/1803.09010"
+          }
+        ]
+      },
+      {
+        "group": "Tools and standards",
+        "items": [
+          {
+            "title": "Pandera documentation",
+            "url": "https://pandera.readthedocs.io/en/stable/"
+          },
+          {
+            "title": "Great Expectations documentation",
+            "url": "https://docs.greatexpectations.io/docs/home/"
+          },
+          {
+            "title": "DuckDB documentation: CSV import",
+            "url": "https://duckdb.org/docs/stable/data/csv/overview"
+          },
+          {
+            "title": "pandas documentation: DataFrame.merge and its validate argument",
+            "url": "https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.merge.html"
+          },
+          {
+            "title": "RapidFuzz documentation",
+            "url": "https://rapidfuzz.github.io/RapidFuzz/"
+          },
+          {
+            "title": "Splink documentation",
+            "url": "https://moj-analytical-services.github.io/splink/"
+          },
+          {
+            "title": "Python documentation: codecs, standard encodings",
+            "url": "https://docs.python.org/3/library/codecs.html"
+          },
+          {
+            "title": "Python documentation: unicodedata",
+            "url": "https://docs.python.org/3/library/unicodedata.html"
+          },
+          {
+            "title": "Unicode Standard Annex 15: Unicode Normalization Forms",
+            "url": "https://unicode.org/reports/tr15/"
+          },
+          {
+            "title": "Python documentation: hmac",
+            "url": "https://docs.python.org/3/library/hmac.html"
+          },
+          {
+            "title": "RFC 2104: HMAC, Keyed-Hashing for Message Authentication",
+            "url": "https://datatracker.ietf.org/doc/html/rfc2104"
+          }
+        ]
+      }
+    ]
+  }
+}

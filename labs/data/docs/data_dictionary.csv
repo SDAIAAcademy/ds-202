@@ -1,0 +1,11 @@
+column,type,required,allowed,meaning
+log_id,text,yes,"branch id, a hyphen and seven digits; never repeated",id of the handout at the branch
+household_key,text,yes,16 hexadecimal characters,keyed pseudonym of the household
+branch_id,text,yes,B01 to B14,branch that handed out
+district_id,text,yes,D01 to D30,district of the household
+handout_date,date,yes,a day of the period of the build,day of the handout
+registered_on,date,yes,on or before handout_date,day the household registered
+parcels,integer,yes,1 to 3,parcels handed out
+weight_kg,number,no,5 to 50; 9 to 15 per parcel,weight in kilograms
+household_size,integer,no,1 to 20,members as reported; blank when not recorded
+eligible,integer,no,0 or 1,1 when income per member is at most 1000 SAR; blank when size is blank

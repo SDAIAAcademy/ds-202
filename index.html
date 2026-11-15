@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-ax="page" data-track="data-science">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data Acquisition, Preparation and Quality · SDAIA Academy</title>
+<meta name="generator" content="SDAIA Academy engine 1.0.0">
+<meta name="description" content="Turn four raw sources into an analysis dataset that rebuilds with one command, with its provenance, its rules and an honest account of what is missing">
+<link rel="icon" href="_engine/icon.svg">
+<link rel="alternate" type="text/markdown" href="index.md">
+<link rel="describedby" href="llms.txt">
+<link rel="stylesheet" href="_engine/academy.css">
+</head>
+<body>
+<header>
+<div class="wrap">
+<div class="top"><div class="logo" id="logo"></div><nav><a href="slides/day1.html">Slides</a><a href="practice.html">Practice</a><a href="index.md" type="text/markdown">Markdown</a></nav></div>
+<div class="kicker">Data Science Track · SDAIA Academy · DS-202</div>
+<h1>Data Acquisition, Preparation and Quality<span class="sub ar" lang="ar" dir="rtl">جمع البيانات وإعدادها وضمان جودتها</span></h1>
+<p>Turn four raw sources into an analysis dataset that rebuilds with one command, with its provenance, its rules and an honest account of what is missing</p>
+<div class="meta"><span class="track">Data Science Track</span><span>4 teaching days + capstone day</span><span>26 hours</span><span>Level 200</span><span>Data Science · Assistant badge</span></div>
+</div>
+</header>
+<main class="wrap">
+<h2>About the course</h2>
+<p>Participants assemble an analysis dataset for a fictional food bank network from four sources: registrations with personal data, branch logs, a donations API and open population data. They record provenance, join with key and cardinality checks, clean Arabic and English text, dates and units, write validation rules that rerun on every build, and measure how missing data and measurement error move a headline estimate. Personal data are minimised and pseudonymised, and the dataset rebuilds from raw sources with one command.</p>
+<p><b>Who it is for:</b> Practitioners. Graduates and early-career analysts who have completed the FN courses or passed the placement test, and analysts moving into data science.</p>
+<p><b>Format:</b> Intensive: 4 teaching days of four sessions and a capstone day, with guided pre-work and a tracked follow-up task</p>
+<h2>The case study</h2>
+<div class="note info"><b>Ghilal Food Bank Network.</b> Ghilal Food Bank Network (شبكة غِلال لبنوك الطعام) is a fictional network of 14 branches serving the 30 districts of a fictional city, Madinat Al-Sidr. Its programmes director asks how many parcels an eligible household received per month in each district in the third quarter of 2026; participants assemble the answer from 40,000 registrations with personal data, 210,000 branch log rows, a local donations API and an open district population table. All data is synthetic and generated with a fixed seed, with planted encoding faults, duplicate and mistyped keys, gaps, unit errors and missing household sizes that each lab finds.</div>
+<h2>The course</h2>
+<div class="day">
+<div class="day-head c-teal"><div><div class="t">Day 1 · 4 sessions · 4 labs</div><h3>Find and document the sources</h3></div><a class="btn" href="slides/day1.html">Open the slides</a></div>
+<div class="scroll"><table>
+<tr><th>Session</th><th>Topic</th><th>Lab</th></tr>
+<tr><td>1</td><td><b>Start from the question, not the files</b><br>The question fixes the unit, the population and the period; the variables follow<ul><li>Take a question apart into unit, population, period and groups</li><li>List the fields a question needs, with a source for each</li><li>Name the fields left out and the gaps no source fills</li></ul></td><td><a href="labs/D1_1_list_variables_question.ipynb">Lab 1.1 · The question before the files</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-202/blob/main/labs/D1_1_list_variables_question.ipynb">Open in Colab</a></td></tr>
+<tr><td>2</td><td><b>Files, APIs and databases</b><br>Files, an API and a database each fail differently: count what arrived against what was sent<ul><li>Load files as text whatever their encoding</li><li>Page through an API and reconcile with its total</li><li>Query a register in SQL and build a source inventory</li></ul></td><td><a href="labs/D1_2_load_logs_page.ipynb">Lab 1.2 · Three ways in</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-202/blob/main/labs/D1_2_load_logs_page.ipynb">Open in Colab</a></td></tr>
+<tr><td>3</td><td><b>Provenance and sharing basis</b><br>A record per source: origin, owner, coverage, sharing basis, refresh date and limits<ul><li>Write a provenance record with its six fields and a classification level</li><li>State the sharing basis and its purpose</li><li>Pass and apply a reviewer checklist</li></ul></td><td><a href="labs/D1_3_write_provenance_records.ipynb">Lab 1.3 · Two provenance records</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-202/blob/main/labs/D1_3_write_provenance_records.ipynb">Open in Colab</a></td></tr>
+<tr><td>4</td><td><b>Coverage and sampling frames</b><br>A register lists who registered, not who is in need; an outside frame shows the gap<ul><li>Compare a register with an outside frame by district</li><li>Account for rows that match on one side only</li><li>Flag under-covered districts and word the caveat</li></ul></td><td><a href="labs/D1_4_compare_registrations_open.ipynb">Lab 1.4 · Who is not in the register</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-202/blob/main/labs/D1_4_compare_registrations_open.ipynb">Open in Colab</a></td></tr>
+</table></div>
+</div>
+<div class="day">
+<div class="day-head c-cyan"><div><div class="t">Day 2 · 4 sessions · 4 labs</div><h3>Join and clean</h3></div><a class="btn" href="slides/day2.html">Open the slides</a></div>
+<div class="scroll"><table>
+<tr><th>Session</th><th>Topic</th><th>Lab</th></tr>
+<tr><td>1</td><td><b>Encodings and Arabic text</b><br>One file, several encodings: decide line by line, repair, and match on a normalised key<ul><li>Decode a file line by line and count each encoding</li><li>Repair names that were decoded twice</li><li>Normalise Arabic letters and digits into a key and log every repair</li></ul></td><td><a href="labs/D2_1_repair_mixed_encodings.ipynb">Lab 2.1 · One file, three encodings</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-202/blob/main/labs/D2_1_repair_mixed_encodings.ipynb">Open in Colab</a></td></tr>
+<tr><td>2</td><td><b>Keys and cardinality</b><br>Repair keys by rule, test the cardinality, and make the row counts add up<ul><li>Repair mistyped keys by stated rules</li><li>Test many-to-one before joining</li><li>Reconcile rows in with rows out plus rows set aside</li></ul></td><td><a href="labs/D2_2_join_logs_registrations.ipynb">Lab 2.2 · A join that loses nothing</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-202/blob/main/labs/D2_2_join_logs_registrations.ipynb">Open in Colab</a></td></tr>
+<tr><td>3</td><td><b>Matching without a clean key</b><br>Block, score and choose a threshold on labelled pairs: a false match costs most<ul><li>Block and score candidate pairs</li><li>Measure false matches and missed matches on labelled pairs</li><li>Choose a threshold and state its cost</li></ul></td><td><a href="labs/D2_3_match_300_records.ipynb">Lab 2.3 · 300 records without a key</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-202/blob/main/labs/D2_3_match_300_records.ipynb">Open in Colab</a></td></tr>
+<tr><td>4</td><td><b>Types, units and dates</b><br>Layout and unit belong to the source, not the value: decide per branch, convert, log<ul><li>Decide a date layout per source from evidence</li><li>Bring weights in two units to one, and catch mislabelled ones</li><li>Write a change log with a count per rule</li></ul></td><td><a href="labs/D2_4_standardise_three_date.ipynb">Lab 2.4 · One calendar, one unit</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-202/blob/main/labs/D2_4_standardise_three_date.ipynb">Open in Colab</a></td></tr>
+</table></div>
+</div>
+<div class="day">
+<div class="day-head c-coral"><div><div class="t">Day 3 · 4 sessions · 4 labs</div><h3>Missing data and measurement</h3></div><a class="btn" href="slides/day3.html">Open the slides</a></div>
+<div class="scroll"><table>
+<tr><th>Session</th><th>Topic</th><th>Lab</th></tr>
+<tr><td>1</td><td><b>Why data go missing</b><br>Three mechanisms of missingness, the evidence for each, and the bias each causes<ul><li>Tabulate missingness against observed fields</li><li>Tell the three mechanisms apart with evidence</li><li>Give the direction of bias each one causes</li></ul></td><td><a href="labs/D3_1_classify_six_missingness.ipynb">Lab 3.1 · Six gaps, six mechanisms</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-202/blob/main/labs/D3_1_classify_six_missingness.ipynb">Open in Colab</a></td></tr>
+<tr><td>2</td><td><b>Imputation and its cost</b><br>Complete cases, one value, or similar households: three assumptions, three answers<ul><li>Compute a complete-case estimate and say what it assumes</li><li>Impute a single value and a value within groups</li><li>Compare the estimates overall and by district</li></ul></td><td><a href="labs/D3_2_estimate_parcels_per.ipynb">Lab 3.2 · Three estimates of one number</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-202/blob/main/labs/D3_2_estimate_parcels_per.ipynb">Open in Colab</a></td></tr>
+<tr><td>3</td><td><b>Sensitivity ranges</b><br>Logical bounds first, then a range under assumptions you can defend<ul><li>Compute the logical bounds of an estimate</li><li>Build a plausible range by shifting the imputed values</li><li>Recommend one estimate with its range and its reason</li></ul></td><td><a href="labs/D3_3_bound_estimate_under.ipynb">Lab 3.3 · How far could it move?</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-202/blob/main/labs/D3_3_bound_estimate_under.ipynb">Open in Colab</a></td></tr>
+<tr><td>4</td><td><b>Measurement error and proxies</b><br>Random error, one-directional error, and what a proxy really measures<ul><li>Measure reporting error against an audit</li><li>Simulate random and one-directional error</li><li>Say what a proxy measures and what it does not</li></ul></td><td><a href="labs/D3_4_simulate_self_report.ipynb">Lab 3.4 · When the answer itself is wrong</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-202/blob/main/labs/D3_4_simulate_self_report.ipynb">Open in Colab</a></td></tr>
+</table></div>
+</div>
+<div class="day">
+<div class="day-head c-purple"><div><div class="t">Day 4 · 4 sessions · 4 labs</div><h3>Validate and protect</h3></div><a class="btn" href="slides/day4.html">Open the slides</a></div>
+<div class="scroll"><table>
+<tr><th>Session</th><th>Topic</th><th>Lab</th></tr>
+<tr><td>1</td><td><b>Quality dimensions as rules</b><br>Completeness, validity, uniqueness and type, written from the data dictionary<ul><li>Translate a data dictionary into column rules</li><li>Name the quality dimension of each rule</li><li>Run the suite on a build and read its failures</li></ul></td><td><a href="labs/D4_1_write_type_range.ipynb">Lab 4.1 · Rules for the joined table</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-202/blob/main/labs/D4_1_write_type_range.ipynb">Open in Colab</a></td></tr>
+<tr><td>2</td><td><b>Cross-field and cross-source checks</b><br>Faults that show only between two fields or two sources, reported so a branch can act<ul><li>Write rules across two fields</li><li>Write a rule across two sources</li><li>Produce a failure report a data owner can act on</li></ul></td><td><a href="labs/D4_2_add_three_consistency.ipynb">Lab 4.2 · Three rules across fields and sources</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-202/blob/main/labs/D4_2_add_three_consistency.ipynb">Open in Colab</a></td></tr>
+<tr><td>3</td><td><b>Minimise and pseudonymise</b><br>A plain hash falls to a list; a keyed hash holds; quasi-identifiers still single people out<ul><li>Re-link a plain hash with a list and by enumeration</li><li>Replace identifiers with a keyed hash</li><li>Measure uniqueness on quasi-identifiers and reduce it by generalising</li></ul></td><td><a href="labs/D4_3_replace_national_id.ipynb">Lab 4.3 · A pseudonym that holds</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-202/blob/main/labs/D4_3_replace_national_id.ipynb">Open in Colab</a></td></tr>
+<tr><td>4</td><td><b>A data-quality report</b><br>Row counts, rule results, what is missing, how far the estimate moves, what may leave<ul><li>Rebuild a dataset from raw sources with one command</li><li>Draft a data-quality report from the build outputs</li><li>Classify outputs and choose a capstone question</li></ul></td><td><a href="labs/D4_4_draft_quality_report.ipynb">Lab 4.4 · The quality report</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-202/blob/main/labs/D4_4_draft_quality_report.ipynb">Open in Colab</a></td></tr>
+</table></div>
+</div>
+<div class="day">
+<div class="day-head c-amber"><div><div class="t">Capstone</div><h3>Capstone project presentations</h3></div><a class="btn" href="slides/capstone.html">Open the slides</a></div>
+<div class="scroll"><table><tr><td>Each participant rebuilds a dataset from raw files, live, and defends it: eight minutes, then four minutes of questions</td></tr></table></div>
+</div>
+<h2>Capstone</h2>
+<div class="two">
+<div><p>A rebuildable dataset for one of three synthetic questions, in a public repository whose README reports row counts per step, rule results and the estimate's sensitivity to missing data; eight-minute defence with a rebuild from raw files</p><p><b>What you submit:</b> A public GitHub repository link. The repository rebuilds the analysis dataset from the raw files of the capstone extract with one command, and holds the provenance file, the rule suite and the set-aside rows (log id, branch and reason, without the household key as typed); its README reports row counts per step, rule results and the sensitivity of the estimate to missing data. No raw personal field is committed, synthetic or not. Then an eight-minute defence with a live rebuild, in which the assessor corrupts one input file and you show which rule fails and why, and four minutes of questions.</p><p><b>Format:</b> 8 min talk and demo · 4 min Q&amp;A</p></div>
+<div><h3>Rubric</h3><div class="bar c-teal"><span>Provenance<i style="--w:60%"></i></span><b>15%</b></div><div class="bar c-cyan"><span>Joins and reconciliation<i style="--w:100%"></i></span><b>25%</b></div><div class="bar c-coral"><span>Cleaning and validation<i style="--w:100%"></i></span><b>25%</b></div><div class="bar c-purple"><span>Missing data and sensitivity<i style="--w:80%"></i></span><b>20%</b></div><div class="bar c-amber"><span>Personal data and reproducibility<i style="--w:60%"></i></span><b>15%</b></div></div>
+</div>
+<h2>Outcomes</h2>
+<p>By the end of the course, participants can:</p>
+<div class="day"><div class="scroll"><table>
+<tr><th></th><th>Outcomes</th><th>Level</th><th>Evidence</th></tr>
+<tr><td><b>LO1</b></td><td>Describe missing-data mechanisms and kinds of measurement error and the bias each can introduce, given six scenarios from the case</td><td>Awareness</td><td>mechanism and bias direction for each, at least five of six correct</td></tr>
+<tr><td><b>LO2</b></td><td>Prepare a provenance record per source covering origin, owner, coverage, sharing basis, refresh date and limits, given the four sources and their documentation</td><td>Applied</td><td>a provenance file that passes a reviewer's checklist</td></tr>
+<tr><td><b>LO3</b></td><td>Implement joins with key checks, cardinality tests and reconciliation counts so that no row is silently lost or duplicated, given tables with seeded duplicate, missing and mistyped keys</td><td>Applied</td><td>a join log of row counts per step and set-aside rows with reasons</td></tr>
+<tr><td><b>LO4</b></td><td>Configure validation rules for types, ranges, uniqueness, completeness and cross-field consistency that run on every rebuild, given the joined table and its data dictionary</td><td>Applied</td><td>a rule suite that passes on the clean build and fails readably on a corrupted batch</td></tr>
+<tr><td><b>LO5</b></td><td>Analyse how complete-case analysis, imputation and a sensitivity range change a headline estimate, given parcels per eligible household by district, with 18% of household sizes missing</td><td>Applied</td><td>a comparison table and a recommended estimate with its reason</td></tr>
+<tr><td><b>LO6</b></td><td>Build a rebuildable analysis dataset from raw sources with personal data minimised and pseudonymised, given a question set by the food bank and the four raw sources</td><td>Performance</td><td>a repository that rebuilds with one command, with provenance, rules and quality report, defended live</td></tr>
+</table></div></div>
+<h2>Tools</h2>
+<div class="grid">
+<div class="card c-teal"><h3>Analysis environment and notebooks</h3><p>Python with uv and JupyterLab or marimo · R with Quarto</p></div>
+<div class="card c-cyan"><h3>Dataframes and analytical SQL engine</h3><p>DuckDB · Polars · pandas</p></div>
+<div class="card c-coral"><h3>Data validation rules</h3><p>Pandera · Great Expectations · SQL assertions</p></div>
+<div class="card c-purple"><h3>Record matching</h3><p>Splink · RapidFuzz · rules written in SQL</p></div>
+</div>
+<h2>Before you start</h2>
+<h3>Prerequisites</h3>
+<ul><li>FN-101 Python for Data and AI Work</li><li>FN-104 SQL and Data Wrangling</li><li>FN-106 Responsible Data and AI Practice in the Kingdom</li><li>Writes SQL joins and group-by queries without assistance</li><li>Setup: a laptop CPU with uv, or Google Colab. No key, account or model is needed. Run 00_setup_check and the two-hour pre-work notebook before Day 1; see labs/README.md.</li></ul>
+<div class="note tip">The labs are notebooks. Open each one in Google Colab from the table above, or clone the repository and run them locally.</div>
+<h2>Sources</h2>
+<h3>National references</h3>
+<ul><li><a href="https://sdaia.gov.sa/en/SDAIA/about/Documents/PersonalDataProtectionLaw.pdf">Personal Data Protection Law</a></li><li><a href="https://sdaia.gov.sa/en/SDAIA/about/Documents/ImplementingRegulationPersonalDataProtectionLaw.pdf">Implementing Regulation of the Personal Data Protection Law</a></li><li><a href="https://sdaia.gov.sa/Documents/PersonalDataDestructionAnonymizationAndEncryptionGuideline.pdf">Personal Data Destruction, Anonymization and Pseudonymisation Guideline</a></li><li><a href="https://sdaia.gov.sa/en/SDAIA/about/Documents/DataClassificationPolicy.pdf">Data Classification Policy</a></li><li><a href="https://sdaia.gov.sa/en/SDAIA/about/Documents/DataSharingPolicyEN.pdf">Data Sharing Policy</a></li><li><a href="https://sdaia.gov.sa/en/SDAIA/about/Documents/OpenDataPolicy.pdf">Open Data Policy</a></li></ul>
+<h3>Missing data and documentation</h3>
+<ul><li><a href="https://stefvanbuuren.name/fimd/">Stef van Buuren, Flexible Imputation of Missing Data, second edition (online book)</a></li><li><a href="https://www.jstor.org/stable/2335739">Donald B. Rubin, Inference and missing data, Biometrika 63(3), 1976</a></li><li><a href="https://arxiv.org/abs/1803.09010">Gebru and others, Datasheets for Datasets</a></li></ul>
+<h3>Tools and standards</h3>
+<ul><li><a href="https://pandera.readthedocs.io/en/stable/">Pandera documentation</a></li><li><a href="https://docs.greatexpectations.io/docs/home/">Great Expectations documentation</a></li><li><a href="https://duckdb.org/docs/stable/data/csv/overview">DuckDB documentation: CSV import</a></li><li><a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.merge.html">pandas documentation: DataFrame.merge and its validate argument</a></li><li><a href="https://rapidfuzz.github.io/RapidFuzz/">RapidFuzz documentation</a></li><li><a href="https://moj-analytical-services.github.io/splink/">Splink documentation</a></li><li><a href="https://docs.python.org/3/library/codecs.html">Python documentation: codecs, standard encodings</a></li><li><a href="https://docs.python.org/3/library/unicodedata.html">Python documentation: unicodedata</a></li><li><a href="https://unicode.org/reports/tr15/">Unicode Standard Annex 15: Unicode Normalization Forms</a></li><li><a href="https://docs.python.org/3/library/hmac.html">Python documentation: hmac</a></li><li><a href="https://datatracker.ietf.org/doc/html/rfc2104">RFC 2104: HMAC, Keyed-Hashing for Message Authentication</a></li></ul>
+<h2>Files and links</h2>
+<div class="files">
+<a href="practice.html"><b>practice.html</b><span>Practice questions with feedback</span></a>
+<a href="index.md"><b>index.md</b><span>This page as Markdown, for an AI assistant</span></a>
+<a href="llms.txt"><b>llms.txt</b><span>The course for AI assistants (llms.txt)</span></a>
+<a href="https://github.com/SDAIAAcademy/ds-202"><b>SDAIAAcademy/ds-202</b><span>The course repository</span></a>
+</div>
+</main>
+<footer><div class="wrap">SDAIA Academy · Data Science Track · Data Acquisition, Preparation and Quality<br><span class="muted">Course version 2027.1.0 · engine 1.0.0 · built 2026-11-15 · commit 87b98e4</span></div></footer>
+<script type="application/json" id="academy-data">{"v":1,"engine":"1.0.0","build":{"at":"2026-11-15T11:22:42Z","version":"2027.1.0","commit":"87b98e4"},"course":{"id":"ds-202","code":"DS-202","title":"Data Acquisition, Preparation and Quality","track":"data-science","lang":"en","dir":"ltr","url":"https://sdaiaacademy.github.io/ds-202/","repo":"SDAIAAcademy/ds-202","home":"index.html"},"ai":{"context":{"course":"context/course.md","courseJs":"context/course.js","day":null,"llms":"llms.txt"},"tasks":[],"tools":[]},"features":{},"strings":{}}</script>
+<script src="_engine/academy.js"></script>
+</body>
+</html>

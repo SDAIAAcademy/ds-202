@@ -1,0 +1,20 @@
+[
+ {
+  "rule": "consistency: 9 to 15 kg per parcel",
+  "rows": 377,
+  "whose": "B05: 377",
+  "what to look at": "median 26.4 per parcel: pounds entered as kilograms?"
+ },
+ {
+  "rule": "consistency: handout on or after registration",
+  "rows": 30,
+  "whose": "B14: 6, B03: 4, B02: 3",
+  "what to look at": "check the household id or the date of these handouts"
+ },
+ {
+  "rule": "consistency across sources: handed out no more than received",
+  "rows": 1,
+  "whose": "B05",
+  "what to look at": "handed 20,005 kg, received 9,574 kg"
+ }
+]

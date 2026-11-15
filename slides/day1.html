@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-ax="deck" data-track="data-science">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 1 · Find and document the sources · Data Acquisition, Preparation and Quality</title>
+<meta name="generator" content="SDAIA Academy engine 1.0.0">
+<link rel="icon" href="../_engine/icon.svg">
+<link rel="alternate" type="text/markdown" href="day1.md">
+<link rel="describedby" href="../llms.txt">
+<link rel="stylesheet" href="../_engine/academy.css">
+</head>
+<body>
+<div class="deck" data-course="Data Acquisition, Preparation and Quality" data-track="data-science" data-day="Day 1">
+<section class="slide title" id="title" data-auto="title" data-label="Welcome" data-n="1">
+  <div class="kicker">SDAIA Academy · Data Acquisition, Preparation and Quality</div>
+  <h1>Find and document the sources</h1>
+  <p class="lead mt">Day 1: The question, the four sources, their provenance and who they leave out</p>
+  <div class="meta"><span class="track">Data Science Track</span><span>4 teaching days + capstone day</span><span>4 sessions · 4 labs</span><span>DS-202</span></div>
+  <aside class="notes"><p>Welcome. Ask who has built a dataset that somebody else had to rebuild later, and what was missing when they tried. Keep two or three answers: they return on Day 4. The rhythm of every session is twenty to twenty-five minutes of concepts, a checkpoint, then a 25-minute lab. Check that the setup notebook ran for everyone: no key and no model is needed in this course. The supervised entry quiz on what the pre-work practised is AI-off; so is the first attempt at every join and rule this week.</p></aside>
+</section>
+
+<section class="slide" id="agenda" data-auto="agenda" data-label="Agenda" data-n="2">
+  <div class="kicker">Today</div>
+  <h2>Find and document the sources</h2>
+  <div class="agenda"><div class="item"><div><b>Session 1 · Start from the question, not the files</b><small>The question fixes the unit, the population and the period; the variables follow</small></div></div><div class="item"><div><b>Session 2 · Files, APIs and databases</b><small>Files, an API and a database each fail differently: count what arrived against what was sent</small></div></div><div class="item"><div><b>Session 3 · Provenance and sharing basis</b><small>A record per source: origin, owner, coverage, sharing basis, refresh date and limits</small></div></div><div class="item"><div><b>Session 4 · Coverage and sampling frames</b><small>A register lists who registered, not who is in need; an outside frame shows the gap</small></div></div></div>
+  <aside class="notes"><p>Day 1 opens no file until the question is taken apart. By the end of the day participants hold a variable list, a source inventory, a provenance file and a coverage table: the first four sections of the quality report they draft on Day 4.</p></aside>
+</section>
+
+<!-- ======================= SESSION 1 ======================= -->
+<section class="slide section" id="s1" data-auto="section" data-session="1" data-n="3">
+  <div class="kicker">Session 1</div>
+  <h1>Start from the question, not the files</h1>
+  <ul class="bullets outcomes"><li>Take a question apart into unit, population, period and groups</li><li>List the fields a question needs, with a source for each</li><li>Name the fields left out and the gaps no source fills</li></ul>
+  <div class="sess-no">01</div>
+</section>
+
+<section class="slide" id="the-request" data-lo="LO6" data-n="4" data-session="1">
+  <div class="kicker">The case</div>
+  <h2>Ghilal Food Bank Network asks one question of four sources</h2>
+  <p class="lead">"In the third quarter of 2026, how many parcels did an eligible household receive per month in each district, and which districts are below our standard of two?"</p>
+  <div class="cols cols-4">
+    <div class="card c-teal"><h4>The register</h4><p class="small mb0">40,000 registrations with personal data. Widad Al-Ghunaim.</p></div>
+    <div class="card c-cyan"><h4>Branch logs</h4><p class="small mb0">210,000 handout rows in 14 files. Hazem Al-Sulaim.</p></div>
+    <div class="card c-purple"><h4>Donations API</h4><p class="small mb0">Every delivery of food to a branch. Talal Al-Wabil.</p></div>
+    <div class="card c-amber"><h4>Open district table</h4><p class="small mb0">Population and households, 2022. The municipality.</p></div>
+  </div>
+  <aside class="notes"><p>The question is Sumayyah Al-Khudair's, the programmes director. Participants play Rimas Al-Sinani, the junior analyst; Ruqayyah Al-Marzouqi is the data protection officer who approves every extract. Say plainly that the organisation, the city of Madinat Al-Sidr and every record are synthetic, generated with a fixed seed, and that the records are treated as personal data from the first lab all the same: beneficiaries are a vulnerable group.</p></aside>
+</section>
+
+<section class="slide" id="four-parts" data-lo="LO6" data-n="5" data-session="1">
+  <div class="kicker">Before any file</div>
+  <h2>A question fixes four things, and each one removes a way to be wrong</h2>
+  <table class="t small">
+    <tr><th>Part</th><th>In this question</th><th>If you leave it open</th></tr>
+    <tr><td><b>Unit</b></td><td>a household</td><td>you count handouts, and a household served twice counts twice</td></tr>
+    <tr><td><b>Population</b></td><td>active, eligible, registered before 1 July 2026</td><td>September registrations get one month and look under-served</td></tr>
+    <tr><td><b>Period</b></td><td>1 July to 30 September 2026</td><td>each branch reports its own "last quarter"</td></tr>
+    <tr><td><b>Groups</b></td><td>the district of the household</td><td>you group by branch, and a branch is not a district</td></tr>
+  </table>
+  <aside class="notes"><p>Step 1 of Lab 1.1. Ask the room for the unit before showing the table; many answer "a parcel" or "a handout". The population row is the one to dwell on: giving every household the same three months of exposure is a decision the analyst proposes and the director confirms, and it is written into the report.</p></aside>
+</section>
+
+<section class="slide" id="eligibility-rule" data-lo="LO5 LO6" data-n="6" data-session="1">
+  <div class="kicker">The rule of the network</div>
+  <h2>Eligibility is income per member, so household size decides who is counted</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Eligible: an active household whose monthly income per member is <b>at most 1,000 SAR</b></li>
+      <li>Income 6,000 SAR with 5 members: 1,200 per member, not eligible</li>
+      <li>The same income with 7 members: 857 per member, eligible</li>
+      <li>A household with no recorded size cannot be classified at all</li>
+    </ul>
+    <div class="card c-coral"><h4>Why this matters on Day 3</h4><p class="small mb0">Household size is blank for 18% of the population of the question. The denominator of the headline depends on a field that is often missing.</p></div>
+  </div>
+  <aside class="notes"><p>The rule is the network's own and is fictional; do not present it as a national rule. The 18% is measured in Lab 3.1 (18.1% of the 35,665 households of the target population). The point for now: a field is "needed" when a step of the answer cannot be computed without it, even when it is personal and often missing.</p></aside>
+</section>
+
+<section class="slide" id="variables-first" data-lo="LO2 LO6" data-n="7" data-session="1">
+  <div class="kicker">Work backwards</div>
+  <h2>From the answer to variables, from variables to fields, and only then to files</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>1 · The answer</b>parcels per eligible household per month, by district</div>
+    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · Variables</b>parcels, date, eligibility, district, a link between the two</div>
+    <div class="arrow frag" data-frag="c">→</div><div class="step c-purple frag" data-frag="c"><b>3 · Fields</b>one source field for each variable</div>
+    <div class="arrow frag" data-frag="d">→</div><div class="step c-coral frag" data-frag="d"><b>4 · Files</b>request only those fields</div>
+  </div>
+  <div class="callout warn mt frag"><b>What goes wrong.</b> Starting from the files: every column looks useful, all of them are taken, and the question is bent to fit what happened to be there.</div>
+  <aside class="notes"><p>Press once per step. For step 2 ask which variables make the numerator (parcels, the date that puts them in the quarter), which decide the denominator (status, registration date, size, income) and which link the two sources (the household id on both sides).</p></aside>
+</section>
+
+<section class="slide" id="nine-fields" data-lo="LO6" data-n="8" data-session="1">
+  <div class="kicker">Lab 1.1, step 2</div>
+  <h2>The answer needs 9 of the 34 fields</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Role</th><th>Field</th><th>Source</th></tr>
+      <tr><td>numerator</td><td>parcels, handout_date</td><td>branch logs</td></tr>
+      <tr><td>link</td><td>household_id</td><td>logs and register</td></tr>
+      <tr><td>population</td><td>status, registered_on</td><td>register</td></tr>
+      <tr><td>eligibility</td><td>household_size, monthly_income_sar</td><td>register</td></tr>
+      <tr><td>groups</td><td>district_id</td><td>register</td></tr>
+    </table>
+    <div class="stack">
+      <div class="stat"><div class="big">9 of 34</div><div class="lbl">fields in the four sources that the headline needs</div></div>
+      <p class="small">Two more, from the open table, are justified by the coverage check of Session 4.</p>
+    </div>
+  </div>
+  <aside class="notes"><p>The catalogue is data/docs/field_catalogue.csv: 11 register fields, 8 log fields, 8 API fields, 7 open-table fields. The donations API gives nothing to the headline; it returns on Day 4 as a cross-source check. Not every source you were given is a source you need.</p></aside>
+</section>
+
+<section class="slide" id="not-taken" data-lo="LO6" data-n="9" data-session="1">
+  <div class="kicker">Minimisation, at the first step</div>
+  <h2>What the purpose does not need is not taken</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Field</th><th>Why it stays behind</th></tr>
+      <tr><td>national_id</td><td>household_id already links the sources</td></tr>
+      <tr><td>head_name</td><td>no step of the answer uses a name</td></tr>
+      <tr><td>phone</td><td>nobody is contacted</td></tr>
+      <tr><td>collected_by</td><td>does not change a count of parcels</td></tr>
+      <tr><td>note</td><td>free text can hold anything</td></tr>
+    </table>
+    <div class="callout tip"><b>The law, in one line.</b> The Personal Data Protection Law limits the content of personal data to the minimum necessary for the purpose. The cheapest moment to apply it is before the extract is requested.</div>
+  </div>
+  <aside class="notes"><p>Sources: Personal Data Protection Law, the article on the purpose and content of collection (read in the English text on sdaia.gov.sa). FN-106 covered the law; here it becomes a column list. Be honest about the labs: names and ID numbers are in the teaching extract because Day 2 teaches text repair and matching and Day 4 pseudonymisation. In the capstone repository no raw personal field is committed.</p></aside>
+</section>
+
+<section class="slide" id="gaps" data-lo="LO2" data-n="10" data-session="1">
+  <div class="kicker">Lab 1.1, step 4</div>
+  <h2>Three things the question needs are in no source</h2>
+  <div class="cols cols-3">
+    <div class="card c-coral"><h4>Households that never registered</h4><p class="small mb0">The register lists who came. Session 4 measures how many did not.</p></div>
+    <div class="card c-purple"><h4>Verified household sizes</h4><p class="small mb0">Sizes are reported by the household. An audit verified 600 of them.</p></div>
+    <div class="card c-amber"><h4>A frame for D29 and D30</h4><p class="small mb0">Two districts established after the open table was made.</p></div>
+  </div>
+  <div class="callout note mt"><b>Write gaps down on Day 1.</b> A gap named before the analysis is a limit. A gap found by a reader afterwards is an error.</div>
+  <aside class="notes"><p>Each gap has its session: coverage today, measurement error in Session 4 of Day 3, and the frame again today. The list goes into variables.json and from there into the quality report.</p></aside>
+</section>
+
+<section class="slide" id="check-question" data-lo="LO6" data-n="11" data-session="1">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which field do you ask for?</h2>
+  <div class="quiz" data-type="single" data-lo="LO6" data-id="check-question-q1">
+    <p class="lead">Widad offers to add any register field to your extract. The headline is parcels per eligible household per month, by district. Which one do you ask her to include?</p>
+    <div class="opts">
+      <div class="opt" data-ok data-k="A">household_size, because eligibility is income per member</div>
+      <div class="opt" data-why="Takes an identifier as a safer link, when household_id already joins the sources and the question names nobody" data-k="B">national_id, to be sure of linking the right household</div>
+      <div class="opt" data-why="Collects for a possible later use; the approval names one purpose and nobody is contacted in it" data-k="C">phone, in case a household must be called to confirm</div>
+      <div class="opt" data-why="Believes more columns make a safer dataset; every field taken must be justified by a step of the answer" data-k="D">every field, since unused columns can be dropped later</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> A field is needed when a step of the answer cannot be computed without it. Size is personal data and it is needed; the ID number is personal data and it is not.</div>
+  </div>
+  <aside class="notes"><p>Answer: A. If the room chooses "every field", ask who will remember to drop the columns, and what the data protection officer approved. Minimisation does not mean taking nothing personal: it means being able to name the step that uses each field.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-1-1" data-auto="lab" data-lab="1.1" data-label="Lab 1.1" data-n="12" data-session="1">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 1.1 · 25 min</div><h2>The question before the files</h2><p class="lead small">Take the question of the programmes director apart, list the variables it needs with one source field for each, write down the fields you will not take and the gaps no source fills.</p><a class="nb" href="../labs/D1_1_list_variables_question.ipynb">D1_1_list_variables_question.ipynb</a></div><ul class="checklist"><li>Take the question apart <span class="min">5 min</span></li><li>The fields the question needs <span class="min">10 min</span></li><li>The fields you will not take <span class="min">5 min</span></li><li>What no source provides <span class="min">5 min</span></li><li class="stretch">✱ Stretch: A second question, and what it adds</li></ul></div>
+  <aside class="notes"><p>AI-off. There is little code here; the work is the reasoning, and the checks read the returned lists. Typical problems: weight and unit listed as needed (they are not, for a count of parcels: the check prints them as "beyond the core, to justify"); branch_id used for the groups. Everyone starts from the field catalogue, so no earlier lab is needed. Anyone who finishes early takes the stretch: the second question, on kilograms per member.</p></aside>
+</section>
+
+<!-- ======================= SESSION 2 ======================= -->
+<section class="slide section" id="s2" data-auto="section" data-session="2" data-n="13">
+  <div class="kicker">Session 2</div>
+  <h1>Files, APIs and databases</h1>
+  <ul class="bullets outcomes"><li>Load files as text whatever their encoding</li><li>Page through an API and reconcile with its total</li><li>Query a register in SQL and build a source inventory</li></ul>
+  <div class="sess-no">02</div>
+</section>
+
+<section class="slide" id="three-doors" data-lo="LO6" data-n="14" data-session="2">
+  <div class="kicker">How data arrive</div>
+  <h2>Files, an API and a database fail in three different ways</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>Files</h4><p class="small mb0">Nothing describes them. Encoding, date layout and units are in nobody's head but the sender's. A file can come twice or not at all.</p></div>
+    <div class="card c-purple"><h4>An API</h4><p class="small mb0">Data come in pages, the service can be busy, and records change while you read. It usually states a total.</p></div>
+    <div class="card c-cyan"><h4>A database</h4><p class="small mb0">Types and keys are declared, but only the ones somebody declared. Your query decides what you see.</p></div>
+  </div>
+  <p class="small mt">One habit covers all three: before reading a value, count what arrived against what the source says it sent.</p>
+  <aside class="notes"><p>In the labs the register is an in-memory DuckDB table loaded from the extract file, and the API is a small server started on the participant's own computer or Colab runtime by G.start_api(); nothing leaves the machine. Say so, so nobody looks for a network address.</p></aside>
+</section>
+
+<section class="slide" id="text-first" data-lo="LO6" data-n="15" data-session="2">
+  <div class="kicker">Recap of FN-104, one step further</div>
+  <h2>Load every column as text first; decide types later, in steps you can count</h2>
+  <ul class="bullets">
+    <li>B01 reads as UTF-8. <b>B03 fails</b> at its first Arabic name: it is in Windows-1256</li>
+    <li>B08 opens, but begins with three extra bytes, <code>EF BB BF</code>: a byte order mark that a spreadsheet wrote</li>
+    <li>A loader that guesses types reads <code>03/07/2026</code> as March or as July, and does not say which</li>
+    <li>As text, nothing is lost: 14 files, <b>210,000 rows</b>, every repair still ahead and countable</li>
+  </ul>
+  <div class="callout warn mt"><b>What goes wrong.</b> The mark becomes part of the first column name, and <code>log_id</code> is "not found" in one file of fourteen.</div>
+  <aside class="notes"><p>Demonstrate: G.log_bytes("B03").decode("utf-8") raises UnicodeDecodeError at byte 0xcc; G.log_bytes("B08")[:6] shows the mark. FN-104 taught code pages on one file per encoding; here the encodings are spread over fourteen files and nobody says which is which. The codec utf-8-sig removes the mark. Sources: Python codecs documentation.</p></aside>
+</section>
+
+<section class="slide" id="paging" data-lo="LO6" data-n="16" data-session="2">
+  <div class="kicker">Reading an API</div>
+  <h2>Follow <code>next</code> until it is null, and expect a busy answer</h2>
+  <div class="cols cols-2">
+    <pre class="code" data-file="Lab 1.2 · fetch_all"><code class="language-python">records, url = [], <span class="hljs-string">&quot;/v1/donations?page=1&amp;per_page=200&quot;</span>
+<span class="hljs-keyword">while</span> url:
+    page = G.get_json(base + url)   <span class="hljs-comment"># retries a 503</span>
+    records += page[<span class="hljs-string">&quot;data&quot;</span>]
+    total, url = page[<span class="hljs-string">&quot;total&quot;</span>], page[<span class="hljs-string">&quot;next&quot;</span>]</code></pre>
+    <ul class="bullets small">
+      <li>The address of the next page comes from the answer; do not compute it</li>
+      <li>503 means "busy, ask again": wait, retry, give up after a few tries</li>
+      <li>Keep the <code>total</code> the service reports: it is its claim about itself</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>The first request for page 5 answers 503 once; G.get_json waits and asks again, up to three times. Ask what a loop without the retry does: it stops with an error after 800 records, which is the good case. A loop that swallows the error and continues would silently skip a page.</p></aside>
+</section>
+
+<section class="slide" id="api-total" data-lo="LO3 LO6" data-n="17" data-session="2">
+  <div class="kicker">Measured in Lab 1.2</div>
+  <h2>The API sent 12 records more than its own total</h2>
+  <div class="cols cols-2">
+    <div class="stack">
+      <div class="stat"><div class="big">5,137 · 5,125</div><div class="lbl">records received, and the total the API reports</div></div>
+    </div>
+    <ul class="bullets">
+      <li>Donations kept arriving while the 26 pages were read</li>
+      <li>Four pages begin with records the page before ended with</li>
+      <li>12 donation ids arrive twice; distinct ids are exactly 5,125</li>
+      <li>The inventory records the distinct count <b>and</b> the 12 that were dropped</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From the Lab 1.2 solution run: 5,137 received, 12 ids repeated, 5,125 distinct, equal to the total. The duplicates would have added whole deliveries to four branches. The lesson is the comparison, not the cause: a count from the source that disagrees with yours is the cheapest test there is.</p></aside>
+</section>
+
+<section class="slide" id="register-sql" data-lo="LO3" data-n="18" data-session="2">
+  <div class="kicker">The register, in SQL</div>
+  <h2>40,000 rows describe 39,820 households</h2>
+  <div class="cols cols-2">
+    <pre class="code" data-file="Lab 1.2 · register_counts"><code class="language-sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">count</span>(<span class="hljs-operator">*</span>),
+       <span class="hljs-built_in">count</span>(<span class="hljs-keyword">DISTINCT</span> household_id),
+       <span class="hljs-built_in">min</span>(registered_on),
+       <span class="hljs-built_in">max</span>(registered_on)
+<span class="hljs-keyword">FROM</span> registrations;</code></pre>
+    <div class="stack">
+      <div class="stat"><div class="big">180</div><div class="lbl">household ids that are in the register twice</div></div>
+      <div class="card c-coral flat"><h4>Not an error, yet</h4><p class="small mb0">A household that registers again at another branch gets a second row. It becomes an error in the first join that assumes one row per id.</p></div>
+    </div>
+  </div>
+  <aside class="notes"><p>Run the query live. Registrations run from 2021-01-03 to 2026-09-28. Show three repeated ids with their two branches. Tomorrow's Lab 2.2 joins 210,000 log rows to this table; ask what happens to the handouts of those 180 households if nobody looks first.</p></aside>
+</section>
+
+<section class="slide" id="inventory" data-lo="LO2 LO6" data-n="19" data-session="2">
+  <div class="kicker">The source inventory</div>
+  <h2>Three sources reconcile; the largest has nothing to reconcile against</h2>
+  <table class="t small">
+    <tr><th>Source</th><th>Arrives as</th><th>Rows</th><th>The source says</th><th>Agrees</th></tr>
+    <tr><td>register</td><td>database extract</td><td>40,000</td><td>40,000 registrations</td><td>yes</td></tr>
+    <tr class="hl"><td>branch logs</td><td>14 files</td><td>210,000</td><td>nothing</td><td>unknown</td></tr>
+    <tr><td>donations</td><td>API, 26 pages</td><td>5,125</td><td>total = 5,125</td><td>yes</td></tr>
+    <tr><td>open district table</td><td>one file</td><td>28</td><td>28 districts of 2022</td><td>yes</td></tr>
+  </table>
+  <div class="callout warn mt"><b>What goes wrong.</b> A week uploaded twice and a week never uploaded both pass this table. The logs hold one of each.</div>
+  <aside class="notes"><p>The table is the output of Lab 1.2, step 4. The logs' silence about themselves is a limit that goes into their provenance record in the next session. The week uploaded twice is found in Lab 2.2 (380 rows at B02), the missing days in Lab 3.1 (B12, nine days of August).</p></aside>
+</section>
+
+<section class="slide" id="check-total" data-lo="LO3" data-n="20" data-session="2">
+  <div class="kicker">Checkpoint</div>
+  <h2>Your count and the count of the source disagree</h2>
+  <div class="quiz" data-type="single" data-lo="LO3" data-id="check-total-q1">
+    <p class="lead">You paged through an API and hold 5,137 records. The API reports a total of 5,125. What goes into the source inventory?</p>
+    <div class="opts">
+      <div class="opt" data-why="Trusts the larger number as the more complete one, without asking where 12 extra records came from" data-k="A">5,137: it is what actually arrived</div>
+      <div class="opt" data-why="Copies the claim of the source without checking that the records held can produce it" data-k="B">5,125: the API knows its own data</div>
+      <div class="opt" data-ok data-k="C">5,125 distinct ids, and a line that 12 repeats were dropped</div>
+      <div class="opt" data-why="Treats a difference of 0.2% as noise, when each record is a whole delivery of food" data-k="D">Either: twelve records cannot change the analysis</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The inventory has to explain the difference, not hide it: what arrived, what was dropped and why, and that the result equals the total the source reports.</div>
+  </div>
+  <aside class="notes"><p>Answer: C. B gives the same number and is still wrong: writing 5,125 without knowing that the distinct ids make exactly that number is luck. Ask what they would do if the distinct count had been 5,119: go back to the owner, Talal, before any analysis.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-1-2" data-auto="lab" data-lab="1.2" data-label="Lab 1.2" data-n="21" data-session="2">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 1.2 · 25 min</div><h2>Three ways in</h2><p class="lead small">Load the 14 branch log files whatever their encoding, page through the donations API until it ends and reconcile with its total, query the register in SQL, and write a source inventory.</p><a class="nb" href="../labs/D1_2_load_logs_page.ipynb">D1_2_load_logs_page.ipynb</a></div><ul class="checklist"><li>Load the 14 log files, whatever their encoding <span class="min">7 min</span></li><li>Page through the donations API and reconcile with its total <span class="min">8 min</span></li><li>Query the register in SQL <span class="min">6 min</span></li><li>The source inventory <span class="min">4 min</span></li><li class="stretch">✱ Stretch: Does a smaller page size change what arrives?</li></ul></div>
+  <aside class="notes"><p>AI-off for the first attempt at each loader. Typical problems: pd.read_csv without dtype=str, which turns blank household ids into NaN and weights into numbers; decoding B08 as plain utf-8 and keeping the mark; a paging loop that builds the next address itself and never ends. The API runs on the participant's machine; if a port is refused on a locked-down laptop, use Colab. If read_branch is not finished the next cells use G.logs_raw(), so everybody reaches the inventory. The last cell stops the API.</p></aside>
+</section>
+
+<!-- ======================= SESSION 3 ======================= -->
+<section class="slide section" id="s3" data-auto="section" data-session="3" data-n="22">
+  <div class="kicker">Session 3</div>
+  <h1>Provenance and sharing basis</h1>
+  <ul class="bullets outcomes"><li>Write a provenance record with its six fields and a classification level</li><li>State the sharing basis and its purpose</li><li>Pass and apply a reviewer checklist</li></ul>
+  <div class="sess-no">03</div>
+</section>
+
+<section class="slide" id="why-provenance" data-lo="LO2" data-n="23" data-session="3">
+  <div class="kicker">A year from now</div>
+  <h2>Somebody will ask where a number came from, and you will not be in the room</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Which extract was this, and from which day?</li>
+      <li>Who can say what a column means?</li>
+      <li>Were we allowed to use it for this?</li>
+      <li>What is it known not to cover?</li>
+    </ul>
+    <div class="card c-teal"><h4>A provenance record</h4><p class="small mb0">One short record per source, kept in the repository beside the code, changed in the same commit as the extract it describes.</p></div>
+  </div>
+  <aside class="notes"><p>Return to the answers from the opening question of the day. Provenance here is deliberately modest: a file with one record per source, not a lineage system. The idea of a short standard document that travels with a dataset is the one behind "Datasheets for Datasets". Sources: Gebru and others, Datasheets for Datasets.</p></aside>
+</section>
+
+<section class="slide" id="six-fields" data-lo="LO2" data-n="24" data-session="3">
+  <div class="kicker">The record</div>
+  <h2>Six fields, and what a reviewer needs to read in each</h2>
+  <table class="t small">
+    <tr><th>Field</th><th>A reviewer needs</th></tr>
+    <tr><td><b>origin</b></td><td>the system, and how the extract was made</td></tr>
+    <tr><td><b>owner</b></td><td>the person to ask, by role</td></tr>
+    <tr><td><b>coverage</b></td><td>which units, which period, and who is not in it</td></tr>
+    <tr><td><b>sharing basis</b></td><td>the consent, agreement or approval, and its purpose</td></tr>
+    <tr><td><b>refresh date</b></td><td>the day your copy was taken</td></tr>
+    <tr><td><b>limits</b></td><td>what the data cannot be trusted for</td></tr>
+  </table>
+  <p class="small mt-s">The labs add a seventh key, the classification level of the source.</p>
+  <aside class="notes"><p>These six are the fields of outcome LO2. The test of each field is whether a stranger could act on it: "Hazem" is not an owner, "Hazem Al-Sulaim, branch operations lead" is. The reviewer checklist of Lab 1.3 checks form (a full phrase, a real date, at least two limits); a trainer checks substance.</p></aside>
+</section>
+
+<section class="slide" id="sharing-basis" data-lo="LO2" data-n="25" data-session="3">
+  <div class="kicker">On what basis</div>
+  <h2>Holding an extract is not permission to use it for the next question</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>The register extract came under approval DS-2026-041, for <b>service coverage analysis, Q3 2026</b></li>
+      <li>The approval names a purpose, the people who may see the data, and that identified records go no further</li>
+      <li>A new question next year is a new request to the data protection officer</li>
+    </ul>
+    <div class="card c-purple"><h4>In the Data Sharing Policy</h4><p class="small mb0">Among its principles: sharing serves a legitimate purpose, and access is authorised on a need-to-know and least-privilege basis.</p></div>
+  </div>
+  <aside class="notes"><p>The approval number is fictional. The policy is written for government entities; Ghilal is a charity that adopts its principles as its own procedure, and the slide should be presented that way. Sources: Data Sharing Policy (National Data Management Office), the principles "Legitimate Purpose" and "Authorized Access", read in the English text.</p></aside>
+</section>
+
+<section class="slide" id="classification" data-lo="LO2" data-n="26" data-session="3">
+  <div class="kicker">The seventh key</div>
+  <h2>Three of the four sources are Restricted; one is Public</h2>
+  <table class="t small">
+    <tr><th>Source</th><th>Level</th><th>Because</th></tr>
+    <tr><td>register</td><td>Restricted</td><td>personal data of beneficiaries</td></tr>
+    <tr><td>branch logs</td><td>Restricted</td><td>household ids and names of collectors</td></tr>
+    <tr><td>donations API</td><td>Restricted</td><td>internal operations, no donor names</td></tr>
+    <tr class="hl"><td>open district table</td><td>Public</td><td>published under an open licence</td></tr>
+  </table>
+  <p class="small mt-s">The national policy has four levels: Top Secret, Secret, Restricted and Public. Anything joined to a Restricted source is at least Restricted.</p>
+  <aside class="notes"><p>FN-106 taught the levels; this is the recap. The last sentence is the practical one: the joined table that carries a district name from the public table is not public. Day 4 returns to which outputs may leave the analysis environment. Sources: Data Classification Policy (National Data Management Office).</p></aside>
+</section>
+
+<section class="slide" id="three-dates" data-lo="LO2" data-n="27" data-session="3">
+  <div class="kicker">Open data has provenance too</div>
+  <h2>The open table has three dates, and only one is the refresh date</h2>
+  <div class="cols cols-3">
+    <div class="card c-coral"><h4>2022</h4><p class="small mb0">The year the rows describe. It belongs in <b>coverage</b>.</p></div>
+    <div class="card c-purple"><h4>15 March 2023</h4><p class="small mb0">The day it was published. It identifies the release, in <b>origin</b>.</p></div>
+    <div class="card c-teal"><h4>2 October 2026</h4><p class="small mb0">The day our copy was downloaded: the <b>refresh date</b>.</p></div>
+  </div>
+  <div class="callout tip mt"><b>And the gap between them is a limit.</b> A table about 2022 used in 2026 describes a city that has since grown, unevenly.</div>
+  <aside class="notes"><p>The publisher, the "Open Data Portal of Madinat Al-Sidr Municipality", is fictional. A licence that allows free reuse with attribution is its sharing basis. The Open Data Policy lists licensing and being up to date among its principles; a user of open data still has to record which release was used. Sources: Open Data Policy (National Data Management Office).</p></aside>
+</section>
+
+<section class="slide" id="weak-record" data-lo="LO2" data-n="28" data-session="3">
+  <div class="kicker">Lab 1.3, step 3</div>
+  <h2>A record written in a hurry fails eight checks</h2>
+  <div class="cols cols-2">
+    <div class="card c-coral"><h4>The draft</h4><p class="small mb0">origin: "files" · owner: "Hazem" · coverage: "this year" · sharing basis: "internal" · refresh date: "October" · limits: "messy" · classification: "Internal"</p></div>
+    <div class="card c-teal"><h4>Repaired from the source note</h4><p class="small mb0">One row per handout, 1 January to 30 September 2026, all 14 branches. Copy of 2026-10-03. Four limits, among them: a week can be uploaded twice or be missing, and no file says so.</p></div>
+  </div>
+  <p class="small mt">"Internal" is not one of the four levels. "This year" will be false in January.</p>
+  <aside class="notes"><p>G.review_provenance returns the eight complaints: four fields that are not a full phrase, a coverage with no year, a refresh date that is not a date, fewer than two limits, a level that does not exist. The checklist cannot tell whether a limit is true; that is why the lab makes participants repair the record from the note and not from imagination.</p></aside>
+</section>
+
+<section class="slide" id="limits-feed-later" data-lo="LO2 LO1" data-n="29" data-session="3">
+  <div class="kicker">Why limits earn their place</div>
+  <h2>A limit written on Day 1 is an explanation on Day 3</h2>
+  <ul class="bullets">
+    <li>"The online form and the call script offer sizes 1 to 6 only": why sizes are missing for large households</li>
+    <li>"No size field on the paper form of B03 and B11 before March 2025": why they are missing at two branches</li>
+    <li>"Sizes are reported, not verified": why an audit was needed</li>
+    <li>"A week can be missing, and no file says so": why a district can look under-served</li>
+  </ul>
+  <aside class="notes"><p>Each line is a planted problem that a named lab finds: Lab 3.1 for the first two and the last, Lab 3.4 for the third. Ask participants to keep the register note open tomorrow and on Day 3. A limit nobody wrote down is rediscovered, at ten times the cost, by whoever analyses the data next.</p></aside>
+</section>
+
+<section class="slide" id="check-provenance" data-lo="LO2" data-n="30" data-session="3">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which coverage line passes a reviewer?</h2>
+  <div class="quiz" data-type="single" data-lo="LO2" data-id="check-provenance-q1">
+    <p class="lead">You are writing the coverage field of the register record. Which line lets a stranger decide what the data can answer?</p>
+    <div class="opts">
+      <div class="opt" data-why="Describes the system and not the copy: the reader cannot tell which period the extract holds" data-k="A">All households registered with the network</div>
+      <div class="opt" data-ok data-k="B">Registrations 2021-01-03 to 2026-09-28; households that never registered are absent</div>
+      <div class="opt" data-why="Confuses the size of the file with what it covers: a row count says nothing about who is missing" data-k="C">40,000 rows, 11 columns, 4.4 MB</div>
+      <div class="opt" data-why="States the refresh date in the coverage field: the day of the copy is not the period it covers" data-k="D">Extract taken on 2026-10-04 from the register</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Coverage says which units and which period, and names who is not in it. The absent households are the most important part of the line.</div>
+  </div>
+  <aside class="notes"><p>Answer: B. D is a correct sentence in the wrong field. If someone defends A, ask which year "all" refers to and whether a household registered tomorrow is covered.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-1-3" data-auto="lab" data-lab="1.3" data-label="Lab 1.3" data-n="31" data-session="3">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 1.3 · 25 min</div><h2>Two provenance records</h2><p class="lead small">Write the provenance records of the register and of the open district table from their source notes, repair a weak record with the reviewer checklist, and assemble the provenance file of the project.</p><a class="nb" href="../labs/D1_3_write_provenance_records.ipynb">D1_3_write_provenance_records.ipynb</a></div><ul class="checklist"><li>The record of the register <span class="min">9 min</span></li><li>The record of the open district table <span class="min">7 min</span></li><li>Run the checklist and repair a weak record <span class="min">5 min</span></li><li>Assemble provenance.json <span class="min">4 min</span></li><li class="stretch">✱ Stretch: A record for the audit file</li></ul></div>
+  <aside class="notes"><p>AI-off: the source notes are short and reading them is the task. Typical problems: the reference year 2022 written as the refresh date of the open table; a sharing basis without the approval, which the checklist rejects for anything that is not Public; one long limit instead of a list. The records of the logs and the API are supplied in data/reference/provenance_supplied.json, so step 4 never depends on step 3. provenance.json is the evidence of LO2: look at two or three while they work.</p></aside>
+</section>
+
+<!-- ======================= SESSION 4 ======================= -->
+<section class="slide section" id="s4" data-auto="section" data-session="4" data-n="32">
+  <div class="kicker">Session 4</div>
+  <h1>Coverage and sampling frames</h1>
+  <ul class="bullets outcomes"><li>Compare a register with an outside frame by district</li><li>Account for rows that match on one side only</li><li>Flag under-covered districts and word the caveat</li></ul>
+  <div class="sess-no">04</div>
+</section>
+
+<section class="slide" id="frame-vs-register" data-lo="LO1 LO2" data-n="33" data-session="4">
+  <div class="kicker">Three populations</div>
+  <h2>The question is about households in need; the register lists households that came</h2>
+  <div class="flow">
+    <div class="step c-coral"><b>In need</b>every low-income household of the city. Nobody has this list.</div>
+    <div class="arrow">→</div><div class="step c-purple"><b>The frame</b>a 2022 survey estimate of low-income households, by district</div>
+    <div class="arrow">→</div><div class="step c-teal"><b>The register</b>households that registered, by district</div>
+  </div>
+  <div class="callout note mt"><b>Coverage</b> is the register divided by the frame. It says how much of the population of interest the data can speak for.</div>
+  <aside class="notes"><p>A sampling frame is the list a study can reach; the gap between the frame and the population is coverage error. Here even the frame is an estimate. The headline will describe eligible registered households; this session measures how far that is from households in need, district by district.</p></aside>
+</section>
+
+<section class="slide" id="outer-join" data-lo="LO3" data-n="34" data-session="4">
+  <div class="kicker">Lab 1.4, step 2</div>
+  <h2>A join against an outside list has three outcomes; an inner join shows one</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>In both · 28</h4><p class="small mb0">Districts with a registered count and a frame.</p></div>
+    <div class="card c-coral"><h4>Register only · 2</h4><p class="small mb0">D29 and D30: 2,523 registered households, no row in the frame.</p></div>
+    <div class="card c-purple"><h4>Frame only · 0</h4><p class="small mb0">No district of the frame is without registrations.</p></div>
+  </div>
+  <p class="small mt">With an inner join the table has 28 tidy rows, and 2,523 households leave the analysis without a message.</p>
+  <aside class="notes"><p>From the Lab 1.4 run: 37,333 active registered households in 30 districts; D29 has 1,039 and D30 has 1,484. The lab uses a full outer join with an indicator column and validate="one_to_one". Tomorrow's rule, "no row silently lost", starts here: the rows that do not match are the finding.</p></aside>
+</section>
+
+<section class="slide" id="coverage-numbers" data-lo="LO1" data-n="35" data-session="4">
+  <div class="kicker">Measured in Lab 1.4</div>
+  <h2>In four districts the register reaches about a third of the households in need</h2>
+  <div class="bars">
+    <div class="row"><span>D07 Al-Mahjar</span><div class="bar c-coral" style="--w:31%"></div><span class="val">0.31</span></div>
+    <div class="row"><span>D22 Al-Jabal</span><div class="bar c-coral" style="--w:34%"></div><span class="val">0.34</span></div>
+    <div class="row"><span>D26 Wadi Al-Sidr</span><div class="bar c-coral" style="--w:34%"></div><span class="val">0.34</span></div>
+    <div class="row"><span>D15 Al-Sahil</span><div class="bar c-coral" style="--w:36%"></div><span class="val">0.36</span></div>
+    <div class="row"><span>23 other districts</span><div class="bar c-teal" style="--w:80%"></div><span class="val">0.71 to 0.90</span></div>
+    <div class="row"><span>D03 Al-Waha</span><div class="bar c-purple" style="--w:100%"></div><span class="val">1.18</span></div>
+  </div>
+  <aside class="notes"><p>Coverage = active registered households divided by low_income_households_est. The four under-covered districts are flagged below 0.50. Ask what parcels per registered household can say about D07: something about 606 households, and nothing about the roughly 1,360 that the frame expects and the register does not hold.</p></aside>
+</section>
+
+<section class="slide" id="over-100" data-lo="LO1 LO2" data-n="36" data-session="4">
+  <div class="kicker">A ratio above 1</div>
+  <h2>Coverage of 118% says the frame is old, not that the register is wrong</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>D03: 1,113 registered households against an estimate of 940</li>
+      <li>The frame describes 2022; the district has grown since</li>
+      <li>The estimate is from a survey, with no published margin of error</li>
+      <li>"Low income" in the survey is not the eligibility rule of the network</li>
+    </ul>
+    <div class="callout warn"><b>What goes wrong.</b> Reading the ratio as a fact about the register: "178 fabricated households". The denominator is the uncertain part.</div>
+  </div>
+  <aside class="notes"><p>All three limits were written into the provenance record of the open table in Lab 1.3. Coverage ratios are approximate in every district, not only in the one where the approximation happens to show. Report them to one decimal less than you computed.</p></aside>
+</section>
+
+<section class="slide" id="missing-units" data-lo="LO1" data-n="37" data-session="4">
+  <div class="kicker">A first kind of missing data</div>
+  <h2>Under-coverage is whole households missing, and not at random</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Missing <b>values</b>: the household is there, a field is blank. Day 3, Sessions 1 to 3</li>
+      <li>Missing <b>units</b>: the household is not in the data at all</li>
+      <li>Households far from a branch register less; they are also the ones served least</li>
+      <li>The headline is therefore too kind to exactly the districts it is meant to find</li>
+    </ul>
+    <div class="card c-coral"><h4>No repair, only a report</h4><p class="small mb0">No imputation of a field brings back a household that was never listed. The coverage table goes beside the headline.</p></div>
+  </div>
+  <aside class="notes"><p>This is the first of the scenarios of LO1: the mechanism (absence related to the outcome itself) and the direction of bias (the figure for under-covered districts is too high as a description of households in need). Day 3 gives the vocabulary; today participants meet the thing itself.</p></aside>
+</section>
+
+<section class="slide" id="coverage-note" data-lo="LO2" data-n="38" data-session="4">
+  <div class="kicker">Lab 1.4, step 4</div>
+  <h2>Three sentences go under the headline</h2>
+  <ul class="bullets">
+    <li>The figure describes registered households only; in D07, D15, D22 and D26 fewer than half of the estimated low-income households are registered</li>
+    <li>For D29 and D30 the share of households in need that are registered is unknown: the frame has no row</li>
+    <li>The frame is a 2022 survey estimate; coverage ratios are approximate</li>
+  </ul>
+  <div class="callout warn mt"><b>And two that must not.</b> "Low coverage means low need." "Coverage above 100% shows fabricated households."</div>
+  <aside class="notes"><p>The catalog entry asks that coverage gaps do not hide under-served districts: this note is how. It is written once, on Day 1, and reused in the quality report of Lab 4.4.</p></aside>
+</section>
+
+<section class="slide" id="check-coverage" data-lo="LO1" data-n="39" data-session="4">
+  <div class="kicker">Checkpoint</div>
+  <h2>A district that looks well served</h2>
+  <div class="quiz" data-type="single" data-lo="LO1" data-id="check-coverage-q1">
+    <p class="lead">District D22 shows a healthy number of parcels per registered household, and its coverage is 0.34. What may the report say about D22?</p>
+    <div class="opts">
+      <div class="opt" data-why="Lets the registered third stand for everyone, when two thirds of the estimated households are in no file" data-k="A">D22 is well served and needs no attention</div>
+      <div class="opt" data-why="Corrects the figure with a frame that is itself a rough 2022 estimate, and presents the product as a measurement" data-k="B">Its true figure is the reported one multiplied by 0.34</div>
+      <div class="opt" data-why="Discards a real finding about real households because the data do not answer a larger question" data-k="C">Nothing: with such coverage the district must be dropped</div>
+      <div class="opt" data-ok data-k="D">Its registered households are served; most households in need are not registered</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The data speak for the households they contain. The coverage ratio says how many they do not contain, and that sentence sits beside the figure.</div>
+  </div>
+  <aside class="notes"><p>Answer: D. B is tempting to quantitative people: it turns two uncertain numbers into one that looks exact. Report the figure and the coverage side by side and let the director see both.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-1-4" data-auto="lab" data-lab="1.4" data-label="Lab 1.4" data-n="40" data-session="4">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 1.4 · 25 min</div><h2>Who is not in the register</h2><p class="lead small">Count registered households per district in SQL, join them to the open table with a full outer join, compute coverage ratios, flag the under-covered districts and choose the sentences that go under the headline.</p><a class="nb" href="../labs/D1_4_compare_registrations_open.ipynb">D1_4_compare_registrations_open.ipynb</a></div><ul class="checklist"><li>Registered households per district, in SQL <span class="min">5 min</span></li><li>Join to the open table and find what does not match <span class="min">7 min</span></li><li>Coverage ratios and flags <span class="min">8 min</span></li><li>The coverage note <span class="min">5 min</span></li><li class="stretch">✱ Stretch: A second frame: all households</li></ul></div>
+  <aside class="notes"><p>AI-off for the first attempt. Typical problems: count(*) instead of count(DISTINCT household_id), which adds the 180 repeated ids; an inner join, which loses D29 and D30 (the check names them); a ratio computed the wrong way round. The lab starts from G.registry(), so it needs nothing from the earlier labs of the day. The flags must come out as four under-covered, one above 100%, two without a frame.</p></aside>
+</section>
+
+<!-- ======================= CLOSING ======================= -->
+<section class="slide" id="wrap-up" data-n="41" data-session="4">
+  <div class="kicker">Day 1 · wrap-up</div>
+  <h2>Three things to keep</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>The question chooses the fields</h4><p class="small mb0">Unit, population, period, groups. Nine fields of 34; five identifying fields stay behind.</p></div>
+    <div class="card c-purple"><h4>Count before you read</h4><p class="small mb0">What arrived against what the source says: 5,125 of 5,125, 40,000 rows for 39,820 households, and logs that say nothing.</p></div>
+    <div class="card c-coral"><h4>Write down what a source cannot do</h4><p class="small mb0">Six fields per source, and a coverage table that keeps four districts from looking well served.</p></div>
+  </div>
+  <aside class="notes"><p>Ask each participant for the limit they would have missed. Collect provenance.json from two volunteers and read one field of each aloud: is it something a stranger could act on?</p></aside>
+</section>
+
+<section class="slide dark" id="next" data-label="Day 2" data-n="42" data-session="4">
+  <div class="kicker">Next · Day 2</div>
+  <h2>Join and clean: every repair counted</h2>
+  <ul class="bullets">
+    <li>One register file in three states of encoding, and names that must match</li>
+    <li>210,000 log rows joined to the register without losing or adding a row</li>
+    <li>300 walk-in records with no key at all</li>
+    <li>Three date layouts and two weight units that no file declares</li>
+  </ul>
+  <aside class="notes"><p>Nothing to prepare. Tomorrow's labs each start from the raw files, not from today's outputs. Remind participants that the first attempt at each join is AI-off; a hint-only tutor is allowed for regular expressions.</p></aside>
+</section>
+</div>
+<script type="application/json" id="academy-data">{"v":1,"engine":"1.0.0","build":{"at":"2026-11-15T11:22:42Z","version":"2027.1.0","commit":"87b98e4"},"course":{"id":"ds-202","code":"DS-202","title":"Data Acquisition, Preparation and Quality","track":"data-science","lang":"en","dir":"ltr","url":"https://sdaiaacademy.github.io/ds-202/","repo":"SDAIAAcademy/ds-202","home":"../index.html"},"deck":{"id":"day1","kind":"day","day":1,"label":"Day 1","title":"Find and document the sources","prev":null,"next":"day2.html","md":"day1.md","alt":{}},"sessions":[{"n":1,"label":"Session 1","title":"Start from the question, not the files","slide":"s1","outcomes":["Take a question apart into unit, population, period and groups","List the fields a question needs, with a source for each","Name the fields left out and the gaps no source fills"],"minutes":50,"lab":{"id":"1.1","title":"The question before the files","minutes":25,"href":"../labs/D1_1_list_variables_question.ipynb"}},{"n":2,"label":"Session 2","title":"Files, APIs and databases","slide":"s2","outcomes":["Load files as text whatever their encoding","Page through an API and reconcile with its total","Query a register in SQL and build a source inventory"],"minutes":50,"lab":{"id":"1.2","title":"Three ways in","minutes":25,"href":"../labs/D1_2_load_logs_page.ipynb"}},{"n":3,"label":"Session 3","title":"Provenance and sharing basis","slide":"s3","outcomes":["Write a provenance record with its six fields and a classification level","State the sharing basis and its purpose","Pass and apply a reviewer checklist"],"minutes":50,"lab":{"id":"1.3","title":"Two provenance records","minutes":25,"href":"../labs/D1_3_write_provenance_records.ipynb"}},{"n":4,"label":"Session 4","title":"Coverage and sampling frames","slide":"s4","outcomes":["Compare a register with an outside frame by district","Account for rows that match on one side only","Flag under-covered districts and word the caveat"],"minutes":50,"lab":{"id":"1.4","title":"Who is not in the register","minutes":25,"href":"../labs/D1_4_compare_registrations_open.ipynb"}}],"slides":[{"id":"title","n":1,"title":"Find and document the sources","kind":"title","session":0,"hash":"b4c5c2df","md":"#### [day1#title] Find and document the sources\n\n*SDAIA Academy · Data Acquisition, Preparation and Quality*\n\nDay 1: The question, the four sources, their provenance and who they leave out\n\nData Science Track · 4 teaching days + capstone day · 4 sessions · 4 labs · DS-202","notes":"Welcome. Ask who has built a dataset that somebody else had to rebuild later, and what was missing when they tried. Keep two or three answers: they return on Day 4. The rhythm of every session is twenty to twenty-five minutes of concepts, a checkpoint, then a 25-minute lab. Check that the setup notebook ran for everyone: no key and no model is needed in this course. The supervised entry quiz on what the pre-work practised is AI-off; so is the first attempt at every join and rule this week.","minutes":null,"lo":[]},{"id":"agenda","n":2,"title":"Find and document the sources","kind":"content","session":0,"hash":"30351344","md":"#### [day1#agenda] Find and document the sources\n\n*Today*\n\n- **Session 1 · Start from the question, not the files**: The question fixes the unit, the population and the period; the variables follow\n- **Session 2 · Files, APIs and databases**: Files, an API and a database each fail differently: count what arrived against what was sent\n- **Session 3 · Provenance and sharing basis**: A record per source: origin, owner, coverage, sharing basis, refresh date and limits\n- **Session 4 · Coverage and sampling frames**: A register lists who registered, not who is in need; an outside frame shows the gap","notes":"Day 1 opens no file until the question is taken apart. By the end of the day participants hold a variable list, a source inventory, a provenance file and a coverage table: the first four sections of the quality report they draft on Day 4.","minutes":null,"lo":[]},{"id":"s1","n":3,"title":"Start from the question, not the files","kind":"section","session":1,"hash":"d4e1adbb","md":"#### [day1#s1] Start from the question, not the files\n\n*Session 1*\n\n- Take a question apart into unit, population, period and groups\n- List the fields a question needs, with a source for each\n- Name the fields left out and the gaps no source fills","notes":"","minutes":null,"lo":["LO2","LO6"]},{"id":"the-request","n":4,"title":"Ghilal Food Bank Network asks one question of four sources","kind":"content","session":1,"hash":"0ca9f75c","md":"#### [day1#the-request] Ghilal Food Bank Network asks one question of four sources\n\n*The case*\n\n\"In the third quarter of 2026, how many parcels did an eligible household receive per month in each district, and which districts are below our standard of two?\"\n\n- **The register.** 40,000 registrations with personal data. Widad Al-Ghunaim.\n- **Branch logs.** 210,000 handout rows in 14 files. Hazem Al-Sulaim.\n- **Donations API.** Every delivery of food to a branch. Talal Al-Wabil.\n- **Open district table.** Population and households, 2022. The municipality.","notes":"The question is Sumayyah Al-Khudair's, the programmes director. Participants play Rimas Al-Sinani, the junior analyst; Ruqayyah Al-Marzouqi is the data protection officer who approves every extract. Say plainly that the organisation, the city of Madinat Al-Sidr and every record are synthetic, generated with a fixed seed, and that the records are treated as personal data from the first lab all the same: beneficiaries are a vulnerable group.","minutes":null,"lo":["LO6"]},{"id":"four-parts","n":5,"title":"A question fixes four things, and each one removes a way to be wrong","kind":"content","session":1,"hash":"9229210c","md":"#### [day1#four-parts] A question fixes four things, and each one removes a way to be wrong\n\n*Before any file*\n\n| Part | In this question | If you leave it open |\n| --- | --- | --- |\n| **Unit** | a household | you count handouts, and a household served twice counts twice |\n| **Population** | active, eligible, registered before 1 July 2026 | September registrations get one month and look under-served |\n| **Period** | 1 July to 30 September 2026 | each branch reports its own \"last quarter\" |\n| **Groups** | the district of the household | you group by branch, and a branch is not a district |","notes":"Step 1 of Lab 1.1. Ask the room for the unit before showing the table; many answer \"a parcel\" or \"a handout\". The population row is the one to dwell on: giving every household the same three months of exposure is a decision the analyst proposes and the director confirms, and it is written into the report.","minutes":null,"lo":["LO6"]},{"id":"eligibility-rule","n":6,"title":"Eligibility is income per member, so household size decides who is counted","kind":"content","session":1,"hash":"b34b90a4","md":"#### [day1#eligibility-rule] Eligibility is income per member, so household size decides who is counted\n\n*The rule of the network*\n\n- Eligible: an active household whose monthly income per member is **at most 1,000 SAR**\n- Income 6,000 SAR with 5 members: 1,200 per member, not eligible\n- The same income with 7 members: 857 per member, eligible\n- A household with no recorded size cannot be classified at all\n\n- **Why this matters on Day 3.** Household size is blank for 18% of the population of the question. The denominator of the headline depends on a field that is often missing.","notes":"The rule is the network's own and is fictional; do not present it as a national rule. The 18% is measured in Lab 3.1 (18.1% of the 35,665 households of the target population). The point for now: a field is \"needed\" when a step of the answer cannot be computed without it, even when it is personal and often missing.","minutes":null,"lo":["LO5","LO6"]},{"id":"variables-first","n":7,"title":"From the answer to variables, from variables to fields, and only then to files","kind":"content","session":1,"hash":"e1ad446d","md":"#### [day1#variables-first] From the answer to variables, from variables to fields, and only then to files\n\n*Work backwards*\n\n1. **1 · The answer** parcels per eligible household per month, by district\n2. **2 · Variables** parcels, date, eligibility, district, a link between the two\n3. **3 · Fields** one source field for each variable\n4. **4 · Files** request only those fields\n\n> **What goes wrong.** Starting from the files: every column looks useful, all of them are taken, and the question is bent to fit what happened to be there.","notes":"Press once per step. For step 2 ask which variables make the numerator (parcels, the date that puts them in the quarter), which decide the denominator (status, registration date, size, income) and which link the two sources (the household id on both sides).","minutes":null,"lo":["LO2","LO6"]},{"id":"nine-fields","n":8,"title":"The answer needs 9 of the 34 fields","kind":"content","session":1,"hash":"a706f3e5","md":"#### [day1#nine-fields] The answer needs 9 of the 34 fields\n\n*Lab 1.1, step 2*\n\n| Role | Field | Source |\n| --- | --- | --- |\n| numerator | parcels, handout_date | branch logs |\n| link | household_id | logs and register |\n| population | status, registered_on | register |\n| eligibility | household_size, monthly_income_sar | register |\n| groups | district_id | register |\n\n**9 of 34** fields in the four sources that the headline needs\n\nTwo more, from the open table, are justified by the coverage check of Session 4.","notes":"The catalogue is data/docs/field_catalogue.csv: 11 register fields, 8 log fields, 8 API fields, 7 open-table fields. The donations API gives nothing to the headline; it returns on Day 4 as a cross-source check. Not every source you were given is a source you need.","minutes":null,"lo":["LO6"]},{"id":"not-taken","n":9,"title":"What the purpose does not need is not taken","kind":"content","session":1,"hash":"f563eb0d","md":"#### [day1#not-taken] What the purpose does not need is not taken\n\n*Minimisation, at the first step*\n\n| Field | Why it stays behind |\n| --- | --- |\n| national_id | household_id already links the sources |\n| head_name | no step of the answer uses a name |\n| phone | nobody is contacted |\n| collected_by | does not change a count of parcels |\n| note | free text can hold anything |\n\n> **The law, in one line.** The Personal Data Protection Law limits the content of personal data to the minimum necessary for the purpose. The cheapest moment to apply it is before the extract is requested.","notes":"Sources: Personal Data Protection Law, the article on the purpose and content of collection (read in the English text on sdaia.gov.sa). FN-106 covered the law; here it becomes a column list. Be honest about the labs: names and ID numbers are in the teaching extract because Day 2 teaches text repair and matching and Day 4 pseudonymisation. In the capstone repository no raw personal field is committed.","minutes":null,"lo":["LO6"]},{"id":"gaps","n":10,"title":"Three things the question needs are in no source","kind":"content","session":1,"hash":"ed2a64d4","md":"#### [day1#gaps] Three things the question needs are in no source\n\n*Lab 1.1, step 4*\n\n- **Households that never registered.** The register lists who came. Session 4 measures how many did not.\n- **Verified household sizes.** Sizes are reported by the household. An audit verified 600 of them.\n- **A frame for D29 and D30.** Two districts established after the open table was made.\n\n> **Write gaps down on Day 1.** A gap named before the analysis is a limit. A gap found by a reader afterwards is an error.","notes":"Each gap has its session: coverage today, measurement error in Session 4 of Day 3, and the frame again today. The list goes into variables.json and from there into the quality report.","minutes":null,"lo":["LO2"]},{"id":"check-question","n":11,"title":"Which field do you ask for?","kind":"quiz","session":1,"hash":"803f0b98","md":"#### [day1#check-question] Which field do you ask for?\n\n*Checkpoint*\n\n**Question:** Widad offers to add any register field to your extract. The headline is parcels per eligible household per month, by district. Which one do you ask her to include?\n\n- A. household_size, because eligibility is income per member\n- B. national_id, to be sure of linking the right household\n- C. phone, in case a household must be called to confirm\n- D. every field, since unused columns can be dropped later","notes":"Answer: A. If the room chooses \"every field\", ask who will remember to drop the columns, and what the data protection officer approved. Minimisation does not mean taking nothing personal: it means being able to name the step that uses each field.","minutes":null,"lo":["LO6"]},{"id":"lab-1-1","n":12,"title":"The question before the files","kind":"lab","session":1,"hash":"0e426e48","md":"#### [day1#lab-1-1] The question before the files\n\nLab 1.1 · 25 min\n\nTake the question of the programmes director apart, list the variables it needs with one source field for each, write down the fields you will not take and the gaps no source fills.\n\n[D1_1_list_variables_question.ipynb](https://sdaiaacademy.github.io/ds-202/labs/D1_1_list_variables_question.ipynb)\n\n- [ ] Take the question apart (5 min)\n- [ ] The fields the question needs (10 min)\n- [ ] The fields you will not take (5 min)\n- [ ] What no source provides (5 min)\n- [ ] ✱ Stretch: A second question, and what it adds","notes":"AI-off. There is little code here; the work is the reasoning, and the checks read the returned lists. Typical problems: weight and unit listed as needed (they are not, for a count of parcels: the check prints them as \"beyond the core, to justify\"); branch_id used for the groups. Everyone starts from the field catalogue, so no earlier lab is needed. Anyone who finishes early takes the stretch: the second question, on kilograms per member.","minutes":null,"lo":[]},{"id":"s2","n":13,"title":"Files, APIs and databases","kind":"section","session":2,"hash":"a4c315b5","md":"#### [day1#s2] Files, APIs and databases\n\n*Session 2*\n\n- Load files as text whatever their encoding\n- Page through an API and reconcile with its total\n- Query a register in SQL and build a source inventory","notes":"","minutes":null,"lo":["LO6","LO3"]},{"id":"three-doors","n":14,"title":"Files, an API and a database fail in three different ways","kind":"content","session":2,"hash":"72170b85","md":"#### [day1#three-doors] Files, an API and a database fail in three different ways\n\n*How data arrive*\n\n- **Files.** Nothing describes them. Encoding, date layout and units are in nobody's head but the sender's. A file can come twice or not at all.\n- **An API.** Data come in pages, the service can be busy, and records change while you read. It usually states a total.\n- **A database.** Types and keys are declared, but only the ones somebody declared. Your query decides what you see.\n\nOne habit covers all three: before reading a value, count what arrived against what the source says it sent.","notes":"In the labs the register is an in-memory DuckDB table loaded from the extract file, and the API is a small server started on the participant's own computer or Colab runtime by G.start_api(); nothing leaves the machine. Say so, so nobody looks for a network address.","minutes":null,"lo":["LO6"]},{"id":"text-first","n":15,"title":"Load every column as text first; decide types later, in steps you can count","kind":"content","session":2,"hash":"c49d8f2f","md":"#### [day1#text-first] Load every column as text first; decide types later, in steps you can count\n\n*Recap of FN-104, one step further*\n\n- B01 reads as UTF-8. **B03 fails** at its first Arabic name: it is in Windows-1256\n- B08 opens, but begins with three extra bytes, `EF BB BF`: a byte order mark that a spreadsheet wrote\n- A loader that guesses types reads `03/07/2026` as March or as July, and does not say which\n- As text, nothing is lost: 14 files, **210,000 rows**, every repair still ahead and countable\n\n> **What goes wrong.** The mark becomes part of the first column name, and `log_id` is \"not found\" in one file of fourteen.","notes":"Demonstrate: G.log_bytes(\"B03\").decode(\"utf-8\") raises UnicodeDecodeError at byte 0xcc; G.log_bytes(\"B08\")[:6] shows the mark. FN-104 taught code pages on one file per encoding; here the encodings are spread over fourteen files and nobody says which is which. The codec utf-8-sig removes the mark. Sources: Python codecs documentation.","minutes":null,"lo":["LO6"]},{"id":"paging","n":16,"title":"Follow next until it is null, and expect a busy answer","kind":"content","session":2,"hash":"caf4ade3","md":"#### [day1#paging] Follow next until it is null, and expect a busy answer\n\n*Reading an API*\n\n```python\n# file: Lab 1.2 · fetch_all\nrecords, url = [], \"/v1/donations?page=1&per_page=200\"\nwhile url:\n    page = G.get_json(base + url)   # retries a 503\n    records += page[\"data\"]\n    total, url = page[\"total\"], page[\"next\"]\n```\n\n- The address of the next page comes from the answer; do not compute it\n- 503 means \"busy, ask again\": wait, retry, give up after a few tries\n- Keep the `total` the service reports: it is its claim about itself","notes":"The first request for page 5 answers 503 once; G.get_json waits and asks again, up to three times. Ask what a loop without the retry does: it stops with an error after 800 records, which is the good case. A loop that swallows the error and continues would silently skip a page.","minutes":null,"lo":["LO6"]},{"id":"api-total","n":17,"title":"The API sent 12 records more than its own total","kind":"content","session":2,"hash":"2d6b8747","md":"#### [day1#api-total] The API sent 12 records more than its own total\n\n*Measured in Lab 1.2*\n\n**5,137 · 5,125** records received, and the total the API reports\n\n- Donations kept arriving while the 26 pages were read\n- Four pages begin with records the page before ended with\n- 12 donation ids arrive twice; distinct ids are exactly 5,125\n- The inventory records the distinct count **and** the 12 that were dropped","notes":"From the Lab 1.2 solution run: 5,137 received, 12 ids repeated, 5,125 distinct, equal to the total. The duplicates would have added whole deliveries to four branches. The lesson is the comparison, not the cause: a count from the source that disagrees with yours is the cheapest test there is.","minutes":null,"lo":["LO3","LO6"]},{"id":"register-sql","n":18,"title":"40,000 rows describe 39,820 households","kind":"content","session":2,"hash":"8e1e9eb9","md":"#### [day1#register-sql] 40,000 rows describe 39,820 households\n\n*The register, in SQL*\n\n```sql\n-- file: Lab 1.2 · register_counts\nSELECT count(*),\n       count(DISTINCT household_id),\n       min(registered_on),\n       max(registered_on)\nFROM registrations;\n```\n\n**180** household ids that are in the register twice\n\n- **Not an error, yet.** A household that registers again at another branch gets a second row. It becomes an error in the first join that assumes one row per id.","notes":"Run the query live. Registrations run from 2021-01-03 to 2026-09-28. Show three repeated ids with their two branches. Tomorrow's Lab 2.2 joins 210,000 log rows to this table; ask what happens to the handouts of those 180 households if nobody looks first.","minutes":null,"lo":["LO3"]},{"id":"inventory","n":19,"title":"Three sources reconcile; the largest has nothing to reconcile against","kind":"content","session":2,"hash":"93b18931","md":"#### [day1#inventory] Three sources reconcile; the largest has nothing to reconcile against\n\n*The source inventory*\n\n| Source | Arrives as | Rows | The source says | Agrees |\n| --- | --- | --- | --- | --- |\n| register | database extract | 40,000 | 40,000 registrations | yes |\n| branch logs | 14 files | 210,000 | nothing | unknown |\n| donations | API, 26 pages | 5,125 | total = 5,125 | yes |\n| open district table | one file | 28 | 28 districts of 2022 | yes |\n\n> **What goes wrong.** A week uploaded twice and a week never uploaded both pass this table. The logs hold one of each.","notes":"The table is the output of Lab 1.2, step 4. The logs' silence about themselves is a limit that goes into their provenance record in the next session. The week uploaded twice is found in Lab 2.2 (380 rows at B02), the missing days in Lab 3.1 (B12, nine days of August).","minutes":null,"lo":["LO2","LO6"]},{"id":"check-total","n":20,"title":"Your count and the count of the source disagree","kind":"quiz","session":2,"hash":"0874a1a9","md":"#### [day1#check-total] Your count and the count of the source disagree\n\n*Checkpoint*\n\n**Question:** You paged through an API and hold 5,137 records. The API reports a total of 5,125. What goes into the source inventory?\n\n- A. 5,137: it is what actually arrived\n- B. 5,125: the API knows its own data\n- C. 5,125 distinct ids, and a line that 12 repeats were dropped\n- D. Either: twelve records cannot change the analysis","notes":"Answer: C. B gives the same number and is still wrong: writing 5,125 without knowing that the distinct ids make exactly that number is luck. Ask what they would do if the distinct count had been 5,119: go back to the owner, Talal, before any analysis.","minutes":null,"lo":["LO3"]},{"id":"lab-1-2","n":21,"title":"Three ways in","kind":"lab","session":2,"hash":"1240a654","md":"#### [day1#lab-1-2] Three ways in\n\nLab 1.2 · 25 min\n\nLoad the 14 branch log files whatever their encoding, page through the donations API until it ends and reconcile with its total, query the register in SQL, and write a source inventory.\n\n[D1_2_load_logs_page.ipynb](https://sdaiaacademy.github.io/ds-202/labs/D1_2_load_logs_page.ipynb)\n\n- [ ] Load the 14 log files, whatever their encoding (7 min)\n- [ ] Page through the donations API and reconcile with its total (8 min)\n- [ ] Query the register in SQL (6 min)\n- [ ] The source inventory (4 min)\n- [ ] ✱ Stretch: Does a smaller page size change what arrives?","notes":"AI-off for the first attempt at each loader. Typical problems: pd.read_csv without dtype=str, which turns blank household ids into NaN and weights into numbers; decoding B08 as plain utf-8 and keeping the mark; a paging loop that builds the next address itself and never ends. The API runs on the participant's machine; if a port is refused on a locked-down laptop, use Colab. If read_branch is not finished the next cells use G.logs_raw(), so everybody reaches the inventory. The last cell stops the API.","minutes":null,"lo":[]},{"id":"s3","n":22,"title":"Provenance and sharing basis","kind":"section","session":3,"hash":"a88315a5","md":"#### [day1#s3] Provenance and sharing basis\n\n*Session 3*\n\n- Write a provenance record with its six fields and a classification level\n- State the sharing basis and its purpose\n- Pass and apply a reviewer checklist","notes":"","minutes":null,"lo":["LO2"]},{"id":"why-provenance","n":23,"title":"Somebody will ask where a number came from, and you will not be in the room","kind":"content","session":3,"hash":"c4e5277f","md":"#### [day1#why-provenance] Somebody will ask where a number came from, and you will not be in the room\n\n*A year from now*\n\n- Which extract was this, and from which day?\n- Who can say what a column means?\n- Were we allowed to use it for this?\n- What is it known not to cover?\n\n- **A provenance record.** One short record per source, kept in the repository beside the code, changed in the same commit as the extract it describes.","notes":"Return to the answers from the opening question of the day. Provenance here is deliberately modest: a file with one record per source, not a lineage system. The idea of a short standard document that travels with a dataset is the one behind \"Datasheets for Datasets\". Sources: Gebru and others, Datasheets for Datasets.","minutes":null,"lo":["LO2"]},{"id":"six-fields","n":24,"title":"Six fields, and what a reviewer needs to read in each","kind":"content","session":3,"hash":"d79f7575","md":"#### [day1#six-fields] Six fields, and what a reviewer needs to read in each\n\n*The record*\n\n| Field | A reviewer needs |\n| --- | --- |\n| **origin** | the system, and how the extract was made |\n| **owner** | the person to ask, by role |\n| **coverage** | which units, which period, and who is not in it |\n| **sharing basis** | the consent, agreement or approval, and its purpose |\n| **refresh date** | the day your copy was taken |\n| **limits** | what the data cannot be trusted for |\n\nThe labs add a seventh key, the classification level of the source.","notes":"These six are the fields of outcome LO2. The test of each field is whether a stranger could act on it: \"Hazem\" is not an owner, \"Hazem Al-Sulaim, branch operations lead\" is. The reviewer checklist of Lab 1.3 checks form (a full phrase, a real date, at least two limits); a trainer checks substance.","minutes":null,"lo":["LO2"]},{"id":"sharing-basis","n":25,"title":"Holding an extract is not permission to use it for the next question","kind":"content","session":3,"hash":"aae7d953","md":"#### [day1#sharing-basis] Holding an extract is not permission to use it for the next question\n\n*On what basis*\n\n- The register extract came under approval DS-2026-041, for **service coverage analysis, Q3 2026**\n- The approval names a purpose, the people who may see the data, and that identified records go no further\n- A new question next year is a new request to the data protection officer\n\n- **In the Data Sharing Policy.** Among its principles: sharing serves a legitimate purpose, and access is authorised on a need-to-know and least-privilege basis.","notes":"The approval number is fictional. The policy is written for government entities; Ghilal is a charity that adopts its principles as its own procedure, and the slide should be presented that way. Sources: Data Sharing Policy (National Data Management Office), the principles \"Legitimate Purpose\" and \"Authorized Access\", read in the English text.","minutes":null,"lo":["LO2"]},{"id":"classification","n":26,"title":"Three of the four sources are Restricted; one is Public","kind":"content","session":3,"hash":"d9922448","md":"#### [day1#classification] Three of the four sources are Restricted; one is Public\n\n*The seventh key*\n\n| Source | Level | Because |\n| --- | --- | --- |\n| register | Restricted | personal data of beneficiaries |\n| branch logs | Restricted | household ids and names of collectors |\n| donations API | Restricted | internal operations, no donor names |\n| open district table | Public | published under an open licence |\n\nThe national policy has four levels: Top Secret, Secret, Restricted and Public. Anything joined to a Restricted source is at least Restricted.","notes":"FN-106 taught the levels; this is the recap. The last sentence is the practical one: the joined table that carries a district name from the public table is not public. Day 4 returns to which outputs may leave the analysis environment. Sources: Data Classification Policy (National Data Management Office).","minutes":null,"lo":["LO2"]},{"id":"three-dates","n":27,"title":"The open table has three dates, and only one is the refresh date","kind":"content","session":3,"hash":"6fe4a3e5","md":"#### [day1#three-dates] The open table has three dates, and only one is the refresh date\n\n*Open data has provenance too*\n\n- **2022.** The year the rows describe. It belongs in **coverage**.\n- **15 March 2023.** The day it was published. It identifies the release, in **origin**.\n- **2 October 2026.** The day our copy was downloaded: the **refresh date**.\n\n> **And the gap between them is a limit.** A table about 2022 used in 2026 describes a city that has since grown, unevenly.","notes":"The publisher, the \"Open Data Portal of Madinat Al-Sidr Municipality\", is fictional. A licence that allows free reuse with attribution is its sharing basis. The Open Data Policy lists licensing and being up to date among its principles; a user of open data still has to record which release was used. Sources: Open Data Policy (National Data Management Office).","minutes":null,"lo":["LO2"]},{"id":"weak-record","n":28,"title":"A record written in a hurry fails eight checks","kind":"content","session":3,"hash":"fce52ec6","md":"#### [day1#weak-record] A record written in a hurry fails eight checks\n\n*Lab 1.3, step 3*\n\n- **The draft.** origin: \"files\" · owner: \"Hazem\" · coverage: \"this year\" · sharing basis: \"internal\" · refresh date: \"October\" · limits: \"messy\" · classification: \"Internal\"\n- **Repaired from the source note.** One row per handout, 1 January to 30 September 2026, all 14 branches. Copy of 2026-10-03. Four limits, among them: a week can be uploaded twice or be missing, and no file says so.\n\n\"Internal\" is not one of the four levels. \"This year\" will be false in January.","notes":"G.review_provenance returns the eight complaints: four fields that are not a full phrase, a coverage with no year, a refresh date that is not a date, fewer than two limits, a level that does not exist. The checklist cannot tell whether a limit is true; that is why the lab makes participants repair the record from the note and not from imagination.","minutes":null,"lo":["LO2"]},{"id":"limits-feed-later","n":29,"title":"A limit written on Day 1 is an explanation on Day 3","kind":"content","session":3,"hash":"7993e9d7","md":"#### [day1#limits-feed-later] A limit written on Day 1 is an explanation on Day 3\n\n*Why limits earn their place*\n\n- \"The online form and the call script offer sizes 1 to 6 only\": why sizes are missing for large households\n- \"No size field on the paper form of B03 and B11 before March 2025\": why they are missing at two branches\n- \"Sizes are reported, not verified\": why an audit was needed\n- \"A week can be missing, and no file says so\": why a district can look under-served","notes":"Each line is a planted problem that a named lab finds: Lab 3.1 for the first two and the last, Lab 3.4 for the third. Ask participants to keep the register note open tomorrow and on Day 3. A limit nobody wrote down is rediscovered, at ten times the cost, by whoever analyses the data next.","minutes":null,"lo":["LO2","LO1"]},{"id":"check-provenance","n":30,"title":"Which coverage line passes a reviewer?","kind":"quiz","session":3,"hash":"ba15ff27","md":"#### [day1#check-provenance] Which coverage line passes a reviewer?\n\n*Checkpoint*\n\n**Question:** You are writing the coverage field of the register record. Which line lets a stranger decide what the data can answer?\n\n- A. All households registered with the network\n- B. Registrations 2021-01-03 to 2026-09-28; households that never registered are absent\n- C. 40,000 rows, 11 columns, 4.4 MB\n- D. Extract taken on 2026-10-04 from the register","notes":"Answer: B. D is a correct sentence in the wrong field. If someone defends A, ask which year \"all\" refers to and whether a household registered tomorrow is covered.","minutes":null,"lo":["LO2"]},{"id":"lab-1-3","n":31,"title":"Two provenance records","kind":"lab","session":3,"hash":"f95ef315","md":"#### [day1#lab-1-3] Two provenance records\n\nLab 1.3 · 25 min\n\nWrite the provenance records of the register and of the open district table from their source notes, repair a weak record with the reviewer checklist, and assemble the provenance file of the project.\n\n[D1_3_write_provenance_records.ipynb](https://sdaiaacademy.github.io/ds-202/labs/D1_3_write_provenance_records.ipynb)\n\n- [ ] The record of the register (9 min)\n- [ ] The record of the open district table (7 min)\n- [ ] Run the checklist and repair a weak record (5 min)\n- [ ] Assemble provenance.json (4 min)\n- [ ] ✱ Stretch: A record for the audit file","notes":"AI-off: the source notes are short and reading them is the task. Typical problems: the reference year 2022 written as the refresh date of the open table; a sharing basis without the approval, which the checklist rejects for anything that is not Public; one long limit instead of a list. The records of the logs and the API are supplied in data/reference/provenance_supplied.json, so step 4 never depends on step 3. provenance.json is the evidence of LO2: look at two or three while they work.","minutes":null,"lo":[]},{"id":"s4","n":32,"title":"Coverage and sampling frames","kind":"section","session":4,"hash":"6e035fd7","md":"#### [day1#s4] Coverage and sampling frames\n\n*Session 4*\n\n- Compare a register with an outside frame by district\n- Account for rows that match on one side only\n- Flag under-covered districts and word the caveat","notes":"","minutes":null,"lo":["LO1","LO2"]},{"id":"frame-vs-register","n":33,"title":"The question is about households in need; the register lists households that came","kind":"content","session":4,"hash":"8bd10ea7","md":"#### [day1#frame-vs-register] The question is about households in need; the register lists households that came\n\n*Three populations*\n\n1. **In need** every low-income household of the city. Nobody has this list.\n2. **The frame** a 2022 survey estimate of low-income households, by district\n3. **The register** households that registered, by district\n\n> **Coverage** is the register divided by the frame. It says how much of the population of interest the data can speak for.","notes":"A sampling frame is the list a study can reach; the gap between the frame and the population is coverage error. Here even the frame is an estimate. The headline will describe eligible registered households; this session measures how far that is from households in need, district by district.","minutes":null,"lo":["LO1","LO2"]},{"id":"outer-join","n":34,"title":"A join against an outside list has three outcomes; an inner join shows one","kind":"content","session":4,"hash":"a158d4bc","md":"#### [day1#outer-join] A join against an outside list has three outcomes; an inner join shows one\n\n*Lab 1.4, step 2*\n\n- **In both · 28.** Districts with a registered count and a frame.\n- **Register only · 2.** D29 and D30: 2,523 registered households, no row in the frame.\n- **Frame only · 0.** No district of the frame is without registrations.\n\nWith an inner join the table has 28 tidy rows, and 2,523 households leave the analysis without a message.","notes":"From the Lab 1.4 run: 37,333 active registered households in 30 districts; D29 has 1,039 and D30 has 1,484. The lab uses a full outer join with an indicator column and validate=\"one_to_one\". Tomorrow's rule, \"no row silently lost\", starts here: the rows that do not match are the finding.","minutes":null,"lo":["LO3"]},{"id":"coverage-numbers","n":35,"title":"In four districts the register reaches about a third of the households in need","kind":"content","session":4,"hash":"a842a11e","md":"#### [day1#coverage-numbers] In four districts the register reaches about a third of the households in need\n\n*Measured in Lab 1.4*\n\n| Item | Value |\n| --- | --- |\n| D07 Al-Mahjar | 0.31 |\n| D22 Al-Jabal | 0.34 |\n| D26 Wadi Al-Sidr | 0.34 |\n| D15 Al-Sahil | 0.36 |\n| 23 other districts | 0.71 to 0.90 |\n| D03 Al-Waha | 1.18 |","notes":"Coverage = active registered households divided by low_income_households_est. The four under-covered districts are flagged below 0.50. Ask what parcels per registered household can say about D07: something about 606 households, and nothing about the roughly 1,360 that the frame expects and the register does not hold.","minutes":null,"lo":["LO1"]},{"id":"over-100","n":36,"title":"Coverage of 118% says the frame is old, not that the register is wrong","kind":"content","session":4,"hash":"6fe94d77","md":"#### [day1#over-100] Coverage of 118% says the frame is old, not that the register is wrong\n\n*A ratio above 1*\n\n- D03: 1,113 registered households against an estimate of 940\n- The frame describes 2022; the district has grown since\n- The estimate is from a survey, with no published margin of error\n- \"Low income\" in the survey is not the eligibility rule of the network\n\n> **What goes wrong.** Reading the ratio as a fact about the register: \"178 fabricated households\". The denominator is the uncertain part.","notes":"All three limits were written into the provenance record of the open table in Lab 1.3. Coverage ratios are approximate in every district, not only in the one where the approximation happens to show. Report them to one decimal less than you computed.","minutes":null,"lo":["LO1","LO2"]},{"id":"missing-units","n":37,"title":"Under-coverage is whole households missing, and not at random","kind":"content","session":4,"hash":"e72039a6","md":"#### [day1#missing-units] Under-coverage is whole households missing, and not at random\n\n*A first kind of missing data*\n\n- Missing **values**: the household is there, a field is blank. Day 3, Sessions 1 to 3\n- Missing **units**: the household is not in the data at all\n- Households far from a branch register less; they are also the ones served least\n- The headline is therefore too kind to exactly the districts it is meant to find\n\n- **No repair, only a report.** No imputation of a field brings back a household that was never listed. The coverage table goes beside the headline.","notes":"This is the first of the scenarios of LO1: the mechanism (absence related to the outcome itself) and the direction of bias (the figure for under-covered districts is too high as a description of households in need). Day 3 gives the vocabulary; today participants meet the thing itself.","minutes":null,"lo":["LO1"]},{"id":"coverage-note","n":38,"title":"Three sentences go under the headline","kind":"content","session":4,"hash":"5cb1a2ac","md":"#### [day1#coverage-note] Three sentences go under the headline\n\n*Lab 1.4, step 4*\n\n- The figure describes registered households only; in D07, D15, D22 and D26 fewer than half of the estimated low-income households are registered\n- For D29 and D30 the share of households in need that are registered is unknown: the frame has no row\n- The frame is a 2022 survey estimate; coverage ratios are approximate\n\n> **And two that must not.** \"Low coverage means low need.\" \"Coverage above 100% shows fabricated households.\"","notes":"The catalog entry asks that coverage gaps do not hide under-served districts: this note is how. It is written once, on Day 1, and reused in the quality report of Lab 4.4.","minutes":null,"lo":["LO2"]},{"id":"check-coverage","n":39,"title":"A district that looks well served","kind":"quiz","session":4,"hash":"69e1f051","md":"#### [day1#check-coverage] A district that looks well served\n\n*Checkpoint*\n\n**Question:** District D22 shows a healthy number of parcels per registered household, and its coverage is 0.34. What may the report say about D22?\n\n- A. D22 is well served and needs no attention\n- B. Its true figure is the reported one multiplied by 0.34\n- C. Nothing: with such coverage the district must be dropped\n- D. Its registered households are served; most households in need are not registered","notes":"Answer: D. B is tempting to quantitative people: it turns two uncertain numbers into one that looks exact. Report the figure and the coverage side by side and let the director see both.","minutes":null,"lo":["LO1"]},{"id":"lab-1-4","n":40,"title":"Who is not in the register","kind":"lab","session":4,"hash":"12ea4196","md":"#### [day1#lab-1-4] Who is not in the register\n\nLab 1.4 · 25 min\n\nCount registered households per district in SQL, join them to the open table with a full outer join, compute coverage ratios, flag the under-covered districts and choose the sentences that go under the headline.\n\n[D1_4_compare_registrations_open.ipynb](https://sdaiaacademy.github.io/ds-202/labs/D1_4_compare_registrations_open.ipynb)\n\n- [ ] Registered households per district, in SQL (5 min)\n- [ ] Join to the open table and find what does not match (7 min)\n- [ ] Coverage ratios and flags (8 min)\n- [ ] The coverage note (5 min)\n- [ ] ✱ Stretch: A second frame: all households","notes":"AI-off for the first attempt. Typical problems: count(\\*) instead of count(DISTINCT household_id), which adds the 180 repeated ids; an inner join, which loses D29 and D30 (the check names them); a ratio computed the wrong way round. The lab starts from G.registry(), so it needs nothing from the earlier labs of the day. The flags must come out as four under-covered, one above 100%, two without a frame.","minutes":null,"lo":[]},{"id":"wrap-up","n":41,"title":"Three things to keep","kind":"content","session":4,"hash":"6a6ac33e","md":"#### [day1#wrap-up] Three things to keep\n\n*Day 1 · wrap-up*\n\n- **The question chooses the fields.** Unit, population, period, groups. Nine fields of 34; five identifying fields stay behind.\n- **Count before you read.** What arrived against what the source says: 5,125 of 5,125, 40,000 rows for 39,820 households, and logs that say nothing.\n- **Write down what a source cannot do.** Six fields per source, and a coverage table that keeps four districts from looking well served.","notes":"Ask each participant for the limit they would have missed. Collect provenance.json from two volunteers and read one field of each aloud: is it something a stranger could act on?","minutes":null,"lo":[]},{"id":"next","n":42,"title":"Join and clean: every repair counted","kind":"content","session":4,"hash":"5d7c923a","md":"#### [day1#next] Join and clean: every repair counted\n\n*Next · Day 2*\n\n- One register file in three states of encoding, and names that must match\n- 210,000 log rows joined to the register without losing or adding a row\n- 300 walk-in records with no key at all\n- Three date layouts and two weight units that no file declares","notes":"Nothing to prepare. Tomorrow's labs each start from the raw files, not from today's outputs. Remind participants that the first attempt at each join is AI-off; a hint-only tutor is allowed for regular expressions.","minutes":null,"lo":[]}],"activities":[{"id":"check-question-q1","slide":"check-question","type":"single","prompt":"Widad offers to add any register field to your extract. The headline is parcels per eligible household per month, by district. Which one do you ask her to include?","options":[{"key":"A","text":"household_size, because eligibility is income per member"},{"key":"B","text":"national_id, to be sure of linking the right household"},{"key":"C","text":"phone, in case a household must be called to confirm"},{"key":"D","text":"every field, since unused columns can be dropped later"}],"correct":[0],"explanation":"A field is needed when a step of the answer cannot be computed without it. Size is personal data and it is needed; the ID number is personal data and it is not.","misconceptions":["","Takes an identifier as a safer link, when household_id already joins the sources and the question names nobody","Collects for a possible later use; the approval names one purpose and nobody is contacted in it","Believes more columns make a safer dataset; every field taken must be justified by a step of the answer"],"lo":["LO6"]},{"id":"check-total-q1","slide":"check-total","type":"single","prompt":"You paged through an API and hold 5,137 records. The API reports a total of 5,125. What goes into the source inventory?","options":[{"key":"A","text":"5,137: it is what actually arrived"},{"key":"B","text":"5,125: the API knows its own data"},{"key":"C","text":"5,125 distinct ids, and a line that 12 repeats were dropped"},{"key":"D","text":"Either: twelve records cannot change the analysis"}],"correct":[2],"explanation":"The inventory has to explain the difference, not hide it: what arrived, what was dropped and why, and that the result equals the total the source reports.","misconceptions":["Trusts the larger number as the more complete one, without asking where 12 extra records came from","Copies the claim of the source without checking that the records held can produce it","","Treats a difference of 0.2% as noise, when each record is a whole delivery of food"],"lo":["LO3"]},{"id":"check-provenance-q1","slide":"check-provenance","type":"single","prompt":"You are writing the coverage field of the register record. Which line lets a stranger decide what the data can answer?","options":[{"key":"A","text":"All households registered with the network"},{"key":"B","text":"Registrations 2021-01-03 to 2026-09-28; households that never registered are absent"},{"key":"C","text":"40,000 rows, 11 columns, 4.4 MB"},{"key":"D","text":"Extract taken on 2026-10-04 from the register"}],"correct":[1],"explanation":"Coverage says which units and which period, and names who is not in it. The absent households are the most important part of the line.","misconceptions":["Describes the system and not the copy: the reader cannot tell which period the extract holds","","Confuses the size of the file with what it covers: a row count says nothing about who is missing","States the refresh date in the coverage field: the day of the copy is not the period it covers"],"lo":["LO2"]},{"id":"check-coverage-q1","slide":"check-coverage","type":"single","prompt":"District D22 shows a healthy number of parcels per registered household, and its coverage is 0.34. What may the report say about D22?","options":[{"key":"A","text":"D22 is well served and needs no attention"},{"key":"B","text":"Its true figure is the reported one multiplied by 0.34"},{"key":"C","text":"Nothing: with such coverage the district must be dropped"},{"key":"D","text":"Its registered households are served; most households in need are not registered"}],"correct":[3],"explanation":"The data speak for the households they contain. The coverage ratio says how many they do not contain, and that sentence sits beside the figure.","misconceptions":["Lets the registered third stand for everyone, when two thirds of the estimated households are in no file","Corrects the figure with a frame that is itself a rough 2022 estimate, and presents the product as a measurement","Discards a real finding about real households because the data do not answer a larger question",""],"lo":["LO1"]}],"ai":{"context":{"course":"../context/course.md","courseJs":"../context/course.js","day":"day1.md","llms":"../llms.txt"},"tasks":[],"tools":[]},"bridge":{"allowedOrigins":[]},"features":{},"strings":{}}</script>
+<script src="../_engine/academy.js"></script>
+</body>
+</html>

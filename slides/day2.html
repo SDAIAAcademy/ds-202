@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-ax="deck" data-track="data-science">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 2 · Join and clean · Data Acquisition, Preparation and Quality</title>
+<meta name="generator" content="SDAIA Academy engine 1.0.0">
+<link rel="icon" href="../_engine/icon.svg">
+<link rel="alternate" type="text/markdown" href="day2.md">
+<link rel="describedby" href="../llms.txt">
+<link rel="stylesheet" href="../_engine/academy.css">
+</head>
+<body>
+<div class="deck" data-course="Data Acquisition, Preparation and Quality" data-track="data-science" data-day="Day 2">
+<section class="slide title" id="title" data-auto="title" data-label="Welcome" data-n="1">
+  <div class="kicker">SDAIA Academy · Data Acquisition, Preparation and Quality</div>
+  <h1>Join and clean</h1>
+  <p class="lead mt">Day 2: Bytes, keys, people without keys, dates and units, each repair counted</p>
+  <div class="meta"><span class="track">Data Science Track</span><span>4 teaching days + capstone day</span><span>4 sessions · 4 labs</span><span>DS-202</span></div>
+  <aside class="notes"><p>Yesterday described the sources without changing a value. Today every session changes values, and the discipline is the same in all four: a repair is a rule, the rule has a count, and the original is kept. Each lab starts from the raw files, so nobody depends on yesterday's outputs or on an earlier lab of today.</p></aside>
+</section>
+
+<section class="slide" id="review-day-1" data-lo="LO2" data-n="2">
+  <div class="kicker">Review of Day 1</div>
+  <h2>A count that nobody can check</h2>
+  <div class="quiz" data-type="single" data-lo="LO2" data-id="review-day-1-q1">
+    <p class="lead">The inventory of Day 1 shows 210,000 log rows from 14 files, and the logs state no total of their own. What does that line of the inventory allow you to say?</p>
+    <div class="opts">
+      <div class="opt" data-why="Takes the absence of a contradiction for a confirmation; nothing was compared" data-k="A">The logs are complete: 210,000 rows arrived</div>
+      <div class="opt" data-ok data-k="B">210,000 rows arrived; whether any are missing or doubled is unknown</div>
+      <div class="opt" data-why="Believes a large round number signals an error by itself" data-k="C">The logs are wrong: a round number is suspicious</div>
+      <div class="opt" data-why="Discards a source for lacking metadata instead of recording the limit and testing for it" data-k="D">The logs cannot be used until the branches state totals</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> A count with nothing to reconcile against is a fact about what arrived, not about what happened. Today finds a week that arrived twice; Day 3 finds days that never arrived.</div>
+  </div>
+  <aside class="notes"><p>Answer: B. The limit was written into the provenance record of the logs: "a week can be uploaded twice or be missing, and no file says so". Lab 2.2 finds the 380 doubled rows of B02.</p></aside>
+</section>
+
+<section class="slide" id="agenda" data-auto="agenda" data-label="Agenda" data-n="3">
+  <div class="kicker">Today</div>
+  <h2>Join and clean</h2>
+  <div class="agenda"><div class="item"><div><b>Session 1 · Encodings and Arabic text</b><small>One file, several encodings: decide line by line, repair, and match on a normalised key</small></div></div><div class="item"><div><b>Session 2 · Keys and cardinality</b><small>Repair keys by rule, test the cardinality, and make the row counts add up</small></div></div><div class="item"><div><b>Session 3 · Matching without a clean key</b><small>Block, score and choose a threshold on labelled pairs: a false match costs most</small></div></div><div class="item"><div><b>Session 4 · Types, units and dates</b><small>Layout and unit belong to the source, not the value: decide per branch, convert, log</small></div></div></div>
+</section>
+
+<!-- ======================= SESSION 1 ======================= -->
+<section class="slide section" id="s1" data-auto="section" data-session="1" data-n="4">
+  <div class="kicker">Session 1</div>
+  <h1>Encodings and Arabic text</h1>
+  <ul class="bullets outcomes"><li>Decode a file line by line and count each encoding</li><li>Repair names that were decoded twice</li><li>Normalise Arabic letters and digits into a key and log every repair</li></ul>
+  <div class="sess-no">01</div>
+</section>
+
+<section class="slide" id="three-states" data-lo="LO6" data-n="5" data-session="1">
+  <div class="kicker">One file, appended from 14 exports</div>
+  <h2>A line of the register is in one of three states, and no encoding reads them all</h2>
+  <table class="t small">
+    <tr><th>State</th><th>What you see</th><th>Lines</th></tr>
+    <tr><td>UTF-8, correct</td><td><span dir="rtl">ماجد محمد باوزير</span></td><td>most</td></tr>
+    <tr><td>Windows-1256 bytes (B03, B11)</td><td>fails as UTF-8</td><td>5,458</td></tr>
+    <tr><td>UTF-8 that was decoded twice (B06)</td><td><span dir="rtl">ط¨ظ†ط¯ط± …</span>: valid UTF-8, wrong letters</td><td>2,732 names</td></tr>
+  </table>
+  <div class="callout warn mt"><b>What goes wrong.</b> Reading the whole file as Windows-1256 raises no error: every byte is a letter in that code page. The 34,542 UTF-8 lines become nonsense, quietly.</div>
+  <aside class="notes"><p>FN-104 taught the two repairs on separate files (Lab 4.2 there). What is new is the mixture inside one file, which is what appending branch exports produces. Numbers from the Lab 2.1 run: 34,542 lines decode as UTF-8, 5,458 only as Windows-1256, 2,732 names at B06 were decoded twice. No error is not the same as correct: say it twice.</p></aside>
+</section>
+
+<section class="slide" id="line-by-line" data-lo="LO6" data-n="6" data-session="1">
+  <div class="kicker">The decision rule</div>
+  <h2>Decide per line: valid UTF-8 is UTF-8; what is not is the legacy code page</h2>
+  <div class="cols cols-2">
+    <pre class="code" data-file="Lab 2.1 · decode"><code class="language-python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">decode</span>(<span class="hljs-params">b: <span class="hljs-built_in">bytes</span></span>):
+    <span class="hljs-keyword">try</span>:
+        <span class="hljs-keyword">return</span> b.decode(<span class="hljs-string">&quot;utf-8&quot;</span>), <span class="hljs-string">&quot;utf-8&quot;</span>
+    <span class="hljs-keyword">except</span> UnicodeDecodeError:
+        <span class="hljs-keyword">return</span> b.decode(<span class="hljs-string">&quot;cp1256&quot;</span>), <span class="hljs-string">&quot;cp1256&quot;</span></code></pre>
+    <ul class="bullets small">
+      <li>Arabic in Windows-1256 is almost never valid UTF-8, so the test is safe in this direction</li>
+      <li>Return the encoding with the text and <b>count</b> it</li>
+      <li>The count has a shape: all 5,458 lines are from two branches. A scatter over all branches would mean the rule is wrong</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>The order matters: try the strict encoding first. UTF-8 has structure (lead and continuation bytes) that random legacy bytes almost never satisfy; cp1256 accepts anything. Lines with only Latin letters and digits are the same bytes in both and decode as UTF-8, which is harmless. Sources: Python codecs documentation.</p></aside>
+</section>
+
+<section class="slide" id="decoded-twice" data-lo="LO6" data-n="7" data-session="1">
+  <div class="kicker">The state that raises no error anywhere</div>
+  <h2>Undo the wrong step, and prove the rule leaves correct text alone</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>1 · Typed</b><span dir="rtl">بندر</span> stored as UTF-8 bytes</div>
+    <div class="arrow">→</div><div class="step c-coral"><b>2 · Misread</b>the branch system read the bytes as Windows-1256 and saved the result</div>
+    <div class="arrow">→</div><div class="step c-purple"><b>3 · Repair</b><code>s.encode("cp1256").decode("utf-8")</code></div>
+  </div>
+  <ul class="bullets small mt">
+    <li>Correct Arabic does not survive that round trip: the decode fails and the function returns the text unchanged</li>
+    <li>So the function is safe on all 40,000 names, and changes 2,732, every one at B06</li>
+  </ul>
+  <aside class="notes"><p>The tell is the repeated ط and ظ: the bytes D8 and D9 that begin every Arabic letter in UTF-8. Show head_name_raw beside head_name for three rows of B06. The check that all repaired rows are at one branch is the evidence that the rule did what it claims.</p></aside>
+</section>
+
+<section class="slide" id="letters-and-keys" data-lo="LO6" data-n="8" data-session="1">
+  <div class="kicker">After the bytes, the letters</div>
+  <h2>A key is a normalised copy for matching; the stored name is never replaced</h2>
+  <table class="t small">
+    <tr><th>Rule</th><th>Example</th></tr>
+    <tr><td>drop marks and the stretch mark</td><td><span dir="rtl">مُحمّد</span> → <span dir="rtl">محمد</span></td></tr>
+    <tr><td>one alef; <span dir="rtl">ى</span> → <span dir="rtl">ي</span>; <span dir="rtl">ة</span> → <span dir="rtl">ه</span></td><td><span dir="rtl">أحمد</span> → <span dir="rtl">احمد</span></td></tr>
+    <tr><td>join <span dir="rtl">عبد</span> to the next word</td><td><span dir="rtl">عبد الله</span> → <span dir="rtl">عبدالله</span></td></tr>
+    <tr><td>one space between words</td><td>trailing and double spaces go</td></tr>
+  </table>
+  <p class="small mt-s">24,355 distinct Arabic names as typed are 21,252 distinct keys: about one "different" name in eight was a spelling variant.</p>
+  <aside class="notes"><p>Recap of FN-104, in one slide. The key loses information on purpose (ة and ه are different letters), which is why it sits in its own column. Unicode normalisation form NFKC folds presentation forms first. Sources: Unicode Standard Annex 15; Python unicodedata documentation. Numbers from the Lab 2.1 repair log.</p></aside>
+</section>
+
+<section class="slide" id="digits-hide" data-lo="LO3 LO6" data-n="9" data-session="1">
+  <div class="kicker">Digits are text too</div>
+  <h2>An ID number typed in Arabic-Indic digits is a different string</h2>
+  <div class="cols cols-2">
+    <div class="stack">
+      <div class="stat"><div class="big">39,851 → 39,820</div><div class="lbl">distinct national ids, before and after the digit rule</div></div>
+    </div>
+    <ul class="bullets">
+      <li>One branch typed 2,784 ID numbers as <span dir="rtl">١٠٩٠…</span></li>
+      <li>31 households registered there and again elsewhere: one person, two strings</li>
+      <li>A count of distinct people, or a join on the id, was wrong with no error</li>
+      <li>Normalise digits in every key before you compare it with anything</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From the Lab 2.1 run. The rule maps both the Arabic-Indic digits and the Eastern (Persian) forms to 0 to 9. After it, distinct ids equal the 39,820 households of yesterday's SQL count, which is the reconciliation that tells you the rule is complete.</p></aside>
+</section>
+
+<section class="slide" id="repair-log" data-lo="LO6" data-n="10" data-session="1">
+  <div class="kicker">The habit of the day</div>
+  <h2>A repair that is not counted cannot be checked, repeated or reversed</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>A rule</h4><p class="small mb0">Written as code, applied to every row, never by hand to a few.</p></div>
+    <div class="card c-cyan"><h4>A count</h4><p class="small mb0">One line per rule in a log: how many rows it changed, and where.</p></div>
+    <div class="card c-purple"><h4>The original</h4><p class="small mb0">Kept beside the repaired value, so a reviewer can disagree.</p></div>
+  </div>
+  <div class="callout tip mt"><b>The same three in every lab today:</b> a repair log, a join log, a threshold table, a change log.</div>
+  <aside class="notes"><p>These four files are sections of the quality report on Day 4, and of the capstone README: the rubric gives 25 points to joins and reconciliation and 25 to cleaning and validation, and the evidence for both is counts per step.</p></aside>
+</section>
+
+<section class="slide" id="check-encoding" data-lo="LO6" data-n="11" data-session="1">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which loader do you trust?</h2>
+  <div class="quiz" data-type="single" data-lo="LO6" data-id="check-encoding-q1">
+    <p class="lead">A file was appended from several systems. Four loaders are proposed. Which one do you run?</p>
+    <div class="opts">
+      <div class="opt" data-why="Believes the absence of an error proves a correct reading; this code page accepts every byte" data-k="A">Read it all as Windows-1256: it raises no error</div>
+      <div class="opt" data-why="Keeps the file loading by throwing away the bytes that carry the names" data-k="B">Read it as UTF-8 and replace undecodable bytes with a mark</div>
+      <div class="opt" data-why="Lets a library guess one encoding for a file that has several" data-k="C">Let a detection library pick the encoding of the file</div>
+      <div class="opt" data-ok data-k="D">Decode line by line, UTF-8 first, and count the lines of each encoding</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The file has no single encoding, so the decision has to be made where the encoding changes, per line, and the count per encoding is the check on the decision.</div>
+  </div>
+  <aside class="notes"><p>Answer: D. Option B is the common one in practice (errors="replace") and destroys 5,458 names for good. A detection library answers a different question: the most likely single encoding.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-2-1" data-auto="lab" data-lab="2.1" data-label="Lab 2.1" data-n="12" data-session="1">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 2.1 · 25 min</div><h2>One file, three encodings</h2><p class="lead small">Decode the register extract line by line, repair the names that were decoded twice, normalise Arabic letters and digits into matching keys, and write the repair log that shows what the digits were hiding.</p><a class="nb" href="../labs/D2_1_repair_mixed_encodings.ipynb">D2_1_repair_mixed_encodings.ipynb</a></div><ul class="checklist"><li>Decode the extract line by line and count <span class="min">6 min</span></li><li>Repair the names that were decoded twice <span class="min">6 min</span></li><li>Normalise letters and digits into keys <span class="min">8 min</span></li><li>The repair log, and what the digits were hiding <span class="min">5 min</span></li><li class="stretch">✱ Stretch: Names in Latin letters: case and hyphens</li></ul></div>
+  <aside class="notes"><p>AI-tutor, hinting only, for regular expressions. Typical problems: trying cp1256 before UTF-8 (everything "decodes"); a repair function without the except branch, which fails on the first correct name; mapping digits in the name. If decode is not finished the next cells use G.decode_line, and the reference steps of build_dataset stand in for the others, so everyone reaches the log. The lab starts from the bytes of the extract and needs nothing from Day 1.</p></aside>
+</section>
+
+<!-- ======================= SESSION 2 ======================= -->
+<section class="slide section" id="s2" data-auto="section" data-session="2" data-n="13">
+  <div class="kicker">Session 2</div>
+  <h1>Keys and cardinality</h1>
+  <ul class="bullets outcomes"><li>Repair mistyped keys by stated rules</li><li>Test many-to-one before joining</li><li>Reconcile rows in with rows out plus rows set aside</li></ul>
+  <div class="sess-no">02</div>
+</section>
+
+<section class="slide" id="three-silent-failures" data-lo="LO3" data-n="14" data-session="2">
+  <div class="kicker">Many handouts, one household</div>
+  <h2>A join can lose rows, add rows, and report neither</h2>
+  <div class="cols cols-3">
+    <div class="card c-coral"><h4>Lost</h4><p class="small mb0">A key typed by hand does not match. In an inner join the handout disappears.</p></div>
+    <div class="card c-purple"><h4>Added</h4><p class="small mb0">A household that is in the register twice gets every handout twice.</p></div>
+    <div class="card c-amber"><h4>Unnoticed</h4><p class="small mb0">The result is a table of plausible size. Nothing compares it with what went in.</p></div>
+  </div>
+  <p class="small mt">The remedy has three parts, in this order: repair keys by rule, test the cardinality, count rows at every step.</p>
+  <aside class="notes"><p>FN-104 showed fan-out in SQL and validate= in pandas. Outcome LO3 asks for more: a join log of row counts per step and set-aside rows with reasons. That log is 25 of the 100 points of the capstone rubric.</p></aside>
+</section>
+
+<section class="slide" id="key-repair" data-lo="LO3" data-n="15" data-session="2">
+  <div class="kicker">Lab 2.2, step 1</div>
+  <h2>A repair is safe when it cannot change which household is meant</h2>
+  <table class="t small">
+    <tr><th>As typed</th><th>Rule</th><th>Safe because</th></tr>
+    <tr><td><code>h482913</code></td><td>upper-case</td><td>case carries no information in this id</td></tr>
+    <tr><td><code>&nbsp;H482913&nbsp;&nbsp;</code></td><td>strip spaces</td><td>nor do spaces</td></tr>
+    <tr><td><code>H-482913</code></td><td>remove the hyphen</td><td>nor a separator</td></tr>
+    <tr><td><code>H48O913</code></td><td>letter O to digit 0</td><td>after the H only digits are possible</td></tr>
+  </table>
+  <div class="callout warn mt"><b>Never a repair:</b> replacing an id by "the most similar one in the register". That picks a household, and it can pick the wrong one.</div>
+  <aside class="notes"><p>From the Lab 2.2 run: 2,757 keys are not in the form H plus six digits; 2,446 are repaired by the four rules; 311 are blank. Ask the room about the O rule: it is safe only because the form of the id is known. In an id that mixes letters and digits it would be a guess.</p></aside>
+</section>
+
+<section class="slide" id="cardinality-test" data-lo="LO3" data-n="16" data-session="2">
+  <div class="kicker">Lab 2.2, step 2</div>
+  <h2>Without the test, 209,620 rows went in and 210,585 came out</h2>
+  <div class="cols cols-2">
+    <pre class="code" data-file="Lab 2.2"><code class="language-python">logs.merge(reg, on=<span class="hljs-string">&quot;household_id&quot;</span>,
+           how=<span class="hljs-string">&quot;left&quot;</span>,
+           validate=<span class="hljs-string">&quot;many_to_one&quot;</span>)
+<span class="hljs-comment"># MergeError: Merge keys are not unique</span>
+<span class="hljs-comment"># in right dataset</span></code></pre>
+    <ul class="bullets small">
+      <li>A left join never loses a left row; it <b>adds</b> one for every extra match on the right</li>
+      <li>180 household ids are in the register twice: +965 rows, every one a handout counted double</li>
+      <li><code>validate</code> turns the assumption "one row per household" into a test that stops the join</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>Run both lines live. Then the rule of the network, which is a decision and not a technical default: the first registration stands; the 180 later registrations of the same id are set aside and reported to Widad. Keeping the latest one instead would date some households after their own handouts. Sources: pandas documentation, DataFrame.merge.</p></aside>
+</section>
+
+<section class="slide" id="set-aside" data-lo="LO3" data-n="17" data-session="2">
+  <div class="kicker">What cannot be joined</div>
+  <h2>Rows without a household are set aside with a reason, not deleted</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Reason</th><th>Rows</th></tr>
+      <tr><td>key not in the register</td><td>421</td></tr>
+      <tr><td>blank key</td><td>311</td></tr>
+      <tr class="hl"><td>set aside</td><td>732</td></tr>
+    </table>
+    <ul class="bullets small">
+      <li>They are handouts that happened: deleting them is an undercount with no trace</li>
+      <li>The file goes to the owner of the logs; a corrected key enters the next build</li>
+      <li>Unknown keys are spread over every branch: well-formed typing errors</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>732 rows are 0.35% of the logs. Whether that matters is not for the cleaning step to decide: the join log states it and the quality report carries it. The stretch finds 79 more rows whose key exists and is still wrong, because the handout is dated before the household registered; the reference build sets those aside as well.</p></aside>
+</section>
+
+<section class="slide" id="join-log" data-lo="LO3" data-n="18" data-session="2">
+  <div class="kicker">The evidence of LO3</div>
+  <h2>The join log: every row that came in is on one of its lines</h2>
+  <table class="t small">
+    <tr><th>Step</th><th>Rows</th><th>Note</th></tr>
+    <tr><td>log rows read</td><td>210,000</td><td>14 branch files</td></tr>
+    <tr><td>exact copies dropped</td><td>209,620</td><td>380 rows: a week of B02 uploaded twice</td></tr>
+    <tr><td>keys repaired</td><td>209,620</td><td>2,446 keys by four rules</td></tr>
+    <tr><td>set aside</td><td>732</td><td>421 unknown, 311 blank</td></tr>
+    <tr class="hl"><td>joined to a household</td><td>208,888</td><td>many to one, tested</td></tr>
+  </table>
+  <p class="small mt-s">210,000 = 380 copies + 732 set aside + 208,888 joined.</p>
+  <aside class="notes"><p>The 380 copies are safe to drop because the log_id itself repeats with every field equal: a copy of a record, not a second handout. Two handouts to one household on one day with different log ids are not duplicates. Ask participants to do the sum on the slide; a log whose lines do not add up is the first thing an assessor checks.</p></aside>
+</section>
+
+<section class="slide" id="check-join" data-lo="LO3" data-n="19" data-session="2">
+  <div class="kicker">Checkpoint</div>
+  <h2>More rows out than in</h2>
+  <div class="quiz" data-type="single" data-lo="LO3" data-id="check-join-q1">
+    <p class="lead">A left join of 209,620 log rows to the register returns 210,585 rows and no error. What is the first thing you check?</p>
+    <div class="opts">
+      <div class="opt" data-ok data-k="A">Whether household_id is unique in the register</div>
+      <div class="opt" data-why="Looks for unmatched keys, which leave the row count of a left join unchanged" data-k="B">How many log keys have no match in the register</div>
+      <div class="opt" data-why="Suspects the reader, when the two tables had their expected sizes before the join" data-k="C">Whether a branch file was loaded twice</div>
+      <div class="opt" data-why="Removes the symptom after the join; the repeated rows differ in register columns and stay" data-k="D">Nothing: drop duplicate rows from the result</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Only a key that matches several rows on the right can add rows to a left join. Test uniqueness on the right before joining, and the join cannot surprise you.</div>
+  </div>
+  <aside class="notes"><p>Answer: A. If the room says B, draw a left join on the board: an unmatched left row stays exactly one row. D is what happens under time pressure, and it hides the fan-out without removing it.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-2-2" data-auto="lab" data-lab="2.2" data-label="Lab 2.2" data-n="20" data-session="2">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 2.2 · 25 min</div><h2>A join that loses nothing</h2><p class="lead small">Repair the household ids of the logs, test the join against the register for one-to-many breaks, join, and write a join log in which rows in equal rows out plus rows set aside, each with a reason.</p><a class="nb" href="../labs/D2_2_join_logs_registrations.ipynb">D2_2_join_logs_registrations.ipynb</a></div><ul class="checklist"><li>Repair the keys and name what cannot be repaired <span class="min">8 min</span></li><li>Test the cardinality before joining <span class="min">5 min</span></li><li>Join and reconcile <span class="min">7 min</span></li><li>The join log and the set-aside file <span class="min">5 min</span></li><li class="stretch">✱ Stretch: Handouts dated before the registration</li></ul></div>
+  <aside class="notes"><p>AI-off for the first attempt at the join. Typical problems: forgetting keep_default_na=False somewhere, so a blank key becomes NaN and never equals ""; replacing every O in the whole id including a possible letter position; keeping the latest registration; an inner join, after which the counts cannot add up. The lab starts from G.logs_raw() and G.registry_text(). The last check prints the sum 210,000 = 380 + 732 + 208,888: nobody leaves without seeing it.</p></aside>
+</section>
+
+<!-- ======================= SESSION 3 ======================= -->
+<section class="slide section" id="s3" data-auto="section" data-session="3" data-n="21">
+  <div class="kicker">Session 3</div>
+  <h1>Matching without a clean key</h1>
+  <ul class="bullets outcomes"><li>Block and score candidate pairs</li><li>Measure false matches and missed matches on labelled pairs</li><li>Choose a threshold and state its cost</li></ul>
+  <div class="sess-no">03</div>
+</section>
+
+<section class="slide" id="no-key" data-lo="LO3" data-n="22" data-session="3">
+  <div class="kicker">The problem</div>
+  <h2>300 handouts were written on paper, with a name and no id</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>A satellite point of B04 and B05, during Ramadan</li>
+      <li>A name, a district ticked on the form, a phone for seven in ten</li>
+      <li>4,937 active households of the two branches to search</li>
+      <li>Staff labelled 848 candidate pairs by hand: 255 true, 593 not</li>
+    </ul>
+    <div class="card c-coral"><h4>Two errors, two prices</h4><p class="small mb0"><b>Missed match:</b> a handout stays uncounted, and you can see it.<br><b>False match:</b> one family is credited with another's parcels, and it looks like a success.</p></div>
+  </div>
+  <aside class="notes"><p>The labelled pairs are the most valuable file of the session: without them a threshold is an opinion. In real work, labelling a few hundred pairs is half a day for two people and is always worth it. The 593 non-matches were chosen to be hard: same first name and family name, another person.</p></aside>
+</section>
+
+<section class="slide" id="block-score-decide" data-lo="LO3" data-n="23" data-session="3">
+  <div class="kicker">Three steps</div>
+  <h2>Block, score, decide</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>1 · Block</b>compare only pairs that agree on a reliable field: the district</div>
+    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · Score</b>how alike are the two name keys, from 0 to 100</div>
+    <div class="arrow frag" data-frag="c">→</div><div class="step c-purple frag" data-frag="c"><b>3 · Decide</b>accept, reject, or send to a person</div>
+  </div>
+  <ul class="bullets small mt frag">
+    <li>Blocking: 311,703 candidate pairs instead of 1,481,100, and all 255 true pairs survive it</li>
+    <li>A true pair that disagrees on the blocking field is never compared: check that on the labelled pairs</li>
+  </ul>
+  <aside class="notes"><p>The score in the lab is token_sort_ratio from RapidFuzz: sort the words, then an edit-based similarity. It is one of many; the method of measuring does not depend on the choice. Sources: RapidFuzz documentation.</p></aside>
+</section>
+
+<section class="slide" id="threshold-trade" data-lo="LO3" data-n="24" data-session="3">
+  <div class="kicker">Measured on the 848 labelled pairs</div>
+  <h2>A higher threshold buys fewer false matches with more missed ones</h2>
+  <table class="t small">
+    <tr><th>Rule</th><th>Accepted</th><th>False</th><th>False-match rate</th><th>Missed of 255</th></tr>
+    <tr><td>name score ≥ 70</td><td>309</td><td>86</td><td>27.8%</td><td>32</td></tr>
+    <tr><td>name score ≥ 85</td><td>149</td><td>11</td><td>7.4%</td><td>117</td></tr>
+    <tr><td>name score ≥ 95</td><td>117</td><td>4</td><td>3.4%</td><td>142</td></tr>
+  </table>
+  <div class="callout warn mt"><b>No threshold gives both.</b> Even at 95, four accepted pairs are the wrong family, and more than half of the true pairs are missed.</div>
+  <aside class="notes"><p>From the Lab 2.3 run. The four false matches at 95 are pairs with identical name keys: two people called the same. No amount of tuning the name score can separate them. Ask: which of these three would you run on the register? None is acceptable, which is the point of the next slide.</p></aside>
+</section>
+
+<section class="slide" id="second-field" data-lo="LO3" data-n="25" data-session="3">
+  <div class="kicker">Lab 2.3, step 4</div>
+  <h2>A second field breaks the trade</h2>
+  <div class="cols cols-2">
+    <div class="stack">
+      <div class="stat"><div class="big">172 · 0</div><div class="lbl">pairs accepted and false matches, when names are alike and phones agree on nine of ten digits</div></div>
+    </div>
+    <ul class="bullets">
+      <li>Two fields that agree by accident are rare; one field that agrees by accident is common</li>
+      <li>83 true pairs are not accepted: mostly walk-ins who gave no phone</li>
+      <li>They go to a <b>review queue</b> for a person, not through a lower threshold</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From the Lab 2.3 run: 172 accepted, 0 false, 83 for review. Be exact about the claim: zero false matches on 848 labelled pairs, not zero in general. Tools for probabilistic record linkage, Splink for example, estimate how much weight each field deserves from the data; the measurement on labelled pairs is the same. Sources: Splink documentation.</p></aside>
+</section>
+
+<section class="slide" id="three-outcomes" data-lo="LO3" data-n="26" data-session="3">
+  <div class="kicker">The decision has three outcomes</div>
+  <h2>Accept, reject, or ask a person</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>Accept automatically</h4><p class="small mb0">The rule that showed no false match on labelled pairs. 172 of 300 walk-ins.</p></div>
+    <div class="card c-purple"><h4>Review</h4><p class="small mb0">Likely names without a phone, or several candidates. A person decides, and the decision is recorded.</p></div>
+    <div class="card c-coral"><h4>Leave unmatched</h4><p class="small mb0">45 walk-ins are new households. An unmatched record is an honest result.</p></div>
+  </div>
+  <div class="callout note mt"><b>Report it like a join:</b> 300 records in, so many matched by rule, so many by review, so many unmatched.</div>
+  <aside class="notes"><p>The 45 new households are known only because the data is synthetic; in real work the unmatched pile mixes new people with missed matches, and the review queue is how you find out. The stretch counts 128 walk-ins with no accepted candidate.</p></aside>
+</section>
+
+<section class="slide" id="check-threshold" data-lo="LO3" data-n="27" data-session="3">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which rule goes into the build?</h2>
+  <div class="quiz" data-type="single" data-lo="LO3" data-id="check-threshold-q1">
+    <p class="lead">A false match credits one family with another's parcels. On labelled pairs: name ≥ 70 accepts 309 with 86 false; name ≥ 95 accepts 117 with 4 false; name and phone accepts 172 with 0 false. Which do you automate?</p>
+    <div class="opts">
+      <div class="opt" data-why="Counts matches found, not matches that are right: more than one in four would be wrong" data-k="A">Name ≥ 70: it finds the most matches</div>
+      <div class="opt" data-why="Accepts a small rate of the costly error when a rule without it exists" data-k="B">Name ≥ 95: 3.4% false is good enough</div>
+      <div class="opt" data-ok data-k="C">Name and phone, with the rest sent to review</div>
+      <div class="opt" data-why="Gives up automation entirely, although a rule with no false match on labelled pairs handles most records" data-k="D">None: match all 300 by hand</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The costly error decides. Automate the rule that did not make it on labelled pairs, and spend human time on the records the rule leaves.</div>
+  </div>
+  <aside class="notes"><p>Answer: C. If someone argues for B, ask them to explain to the four families what happened. Then ask what would change the answer: if a false match were cheap (a mailing list, say), the name-only rule might be fine. The threshold follows from the cost, not from the score.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-2-3" data-auto="lab" data-lab="2.3" data-label="Lab 2.3" data-n="28" data-session="3">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 2.3 · 25 min</div><h2>300 records without a key</h2><p class="lead small">Match 300 walk-in records to the register of two branches by normalised name, measure false and missed matches on staff-labelled pairs at three thresholds, add the phone as a second field, and choose the rule to run.</p><a class="nb" href="../labs/D2_3_match_300_records.ipynb">D2_3_match_300_records.ipynb</a></div><ul class="checklist"><li>Normalise and block <span class="min">5 min</span></li><li>Score the candidate pairs <span class="min">6 min</span></li><li>False matches at three thresholds <span class="min">7 min</span></li><li>Add the phone, measure again, choose <span class="min">7 min</span></li><li class="stretch">✱ Stretch: The review queue</li></ul></div>
+  <aside class="notes"><p>AI-tutor, hinting only. The register used here is the reference clean register (B.clean_registry), so the lab does not depend on Lab 2.1. Typical problems: scoring raw names instead of keys; blocking on the family name, which loses pairs with a typing error there; computing the false-match rate over all labelled pairs instead of over the accepted ones. Scoring 311,703 pairs takes a few seconds on a laptop CPU.</p></aside>
+</section>
+
+<!-- ======================= SESSION 4 ======================= -->
+<section class="slide section" id="s4" data-auto="section" data-session="4" data-n="29">
+  <div class="kicker">Session 4</div>
+  <h1>Types, units and dates</h1>
+  <ul class="bullets outcomes"><li>Decide a date layout per source from evidence</li><li>Bring weights in two units to one, and catch mislabelled ones</li><li>Write a change log with a count per rule</li></ul>
+  <div class="sess-no">04</div>
+</section>
+
+<section class="slide" id="value-has-no-evidence" data-lo="LO6" data-n="30" data-session="4">
+  <div class="kicker">The same string, two days</div>
+  <h2><code>03/07/2026</code> is 3 July at one branch and 7 March at another</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>8 branches write <code>2026-07-03</code></li>
+      <li>4 branches write day first: <code>03/07/2026</code></li>
+      <li>2 branches, on donated software, write month first: <code>07/03/2026</code></li>
+      <li>No file says which</li>
+    </ul>
+    <div class="stat"><div class="big">36,002 of 91,403</div><div class="lbl">slash dates in which both parts are 12 or less: the value alone cannot be read</div></div>
+  </div>
+  <aside class="notes"><p>From the Lab 2.4 run. FN-104 covered calendars (Hijri to Gregorian) and time zones; that is not repeated here. The problem today is more ordinary and more common: the same calendar written in different orders by different systems.</p></aside>
+</section>
+
+<section class="slide" id="layout-per-source" data-lo="LO6" data-n="31" data-session="4">
+  <div class="kicker">Where the evidence is</div>
+  <h2>A layout belongs to the source: one unambiguous date settles the whole file</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>1 · Group by branch</b>a branch uses one layout</div>
+    <div class="arrow">→</div><div class="step c-cyan"><b>2 · Look for a part above 12</b>if the first part ever exceeds 12 it is the day</div>
+    <div class="arrow">→</div><div class="step c-purple"><b>3 · Parse strictly</b>with that one format; a value that does not fit is an error</div>
+  </div>
+  <div class="callout tip mt"><b>And then test the result.</b> Every branch has handouts in every month. A branch read with the wrong layout would have none after day 12.</div>
+  <aside class="notes"><p>Two details. Raise an error when the evidence does not decide, rather than defaulting: a file of twelve days could be honestly ambiguous. And use an explicit format in pd.to_datetime; the convenient options (dayfirst, errors="coerce") are how wrong dates get in.</p></aside>
+</section>
+
+<section class="slide" id="guessing-cost" data-lo="LO6" data-n="32" data-session="4">
+  <div class="kicker">The stretch of Lab 2.4</div>
+  <h2>Guessing day first for a month-first branch loses 61% and corrupts 36%</h2>
+  <div class="bars">
+    <div class="row"><span>lost: no such date</span><div class="bar c-coral" style="--w:61%"></div><span class="val">11,625</span></div>
+    <div class="row"><span>wrong, silently</span><div class="bar c-purple" style="--w:36%"></div><span class="val">6,960</span></div>
+    <div class="row"><span>right by luck</span><div class="bar c-teal" style="--w:3%"></div><span class="val">620</span></div>
+  </div>
+  <p class="small mt">The 19,205 handouts of B05, parsed day first with unreadable values turned into "no date". The 6,960 are the dangerous ones: a real-looking date, in the wrong month.</p>
+  <aside class="notes"><p>From the Lab 2.4 stretch. The 620 that come out right are the dates whose day equals their month. A quarter built on these dates would move thousands of handouts between quarters and nothing would fail.</p></aside>
+</section>
+
+<section class="slide" id="units-evidence" data-lo="LO6" data-n="33" data-session="4">
+  <div class="kicker">Lab 2.4, step 3</div>
+  <h2>The weight per parcel shows which unit a number is in</h2>
+  <table class="t small">
+    <tr><th>Branch, unit as labelled</th><th>Median per parcel</th><th>Reading</th></tr>
+    <tr><td>B01, kg</td><td>12.0</td><td>kilograms: the packing standard</td></tr>
+    <tr><td>B05, lb</td><td>26.4</td><td>pounds, labelled as pounds</td></tr>
+    <tr><td>B13, kg (1,312 rows)</td><td>26.4</td><td>pounds labelled as kilograms</td></tr>
+    <tr><td>B09, kg (150 rows)</td><td>above 9,000</td><td>grams typed into a kilogram field</td></tr>
+  </table>
+  <p class="small mt-s">Between 15 and 19.8 per parcel there is no value at all: the two clouds do not touch, so a rule can separate them.</p>
+  <aside class="notes"><p>From the Lab 2.4 run: 37,360 rows converted from labelled pounds, 1,312 rows at B13 from 14 September relabelled, 150 gram rows at B09. One pound is 0.45359237 kg. The mislabelled rows are all one branch after one date, which is what makes the rule defensible, and why the change log names branches.</p></aside>
+</section>
+
+<section class="slide" id="blanks-stay" data-lo="LO1 LO6" data-n="34" data-session="4">
+  <div class="kicker">What cleaning must not do</div>
+  <h2>734 blank weights stay blank</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>All at B09, 4 to 17 May: the scale was away for repair</li>
+      <li>A blank is not zero and is not 12 kg per parcel</li>
+      <li>Filling it is a decision about missing data, with consequences for every average of weight</li>
+      <li>The change log says "left missing", with the count</li>
+    </ul>
+    <div class="card c-purple"><h4>Tomorrow</h4><p class="small mb0">Day 3 asks why a value is missing before deciding what to do about it. This one has a known cause and a recorded date range.</p></div>
+  </div>
+  <aside class="notes"><p>The provenance record of the logs already holds this limit. It is the fourth of the six patterns of Lab 3.1. The headline counts parcels and is not touched; a weight-based question would be.</p></aside>
+</section>
+
+<section class="slide" id="change-log" data-lo="LO6" data-n="35" data-session="4">
+  <div class="kicker">Lab 2.4, step 4</div>
+  <h2>The change log names every rule, its rows and its branches</h2>
+  <table class="t small">
+    <tr><th>Change</th><th>Rows</th><th>Branches</th></tr>
+    <tr><td>dates read as ISO</td><td>118,217</td><td>8 branches</td></tr>
+    <tr><td>dates read day first</td><td>52,731</td><td>B03, B08, B10, B11</td></tr>
+    <tr><td>dates read month first</td><td>38,672</td><td>B05, B13</td></tr>
+    <tr><td>pounds to kilograms</td><td>37,360</td><td>B05, B13</td></tr>
+    <tr><td>pounds labelled kg</td><td>1,312</td><td>B13</td></tr>
+    <tr><td>grams to kilograms</td><td>150</td><td>B09</td></tr>
+    <tr><td>weight missing, left missing</td><td>734</td><td>B09</td></tr>
+  </table>
+  <aside class="notes"><p>The date lines add up to the 209,620 rows after copies were dropped, and so do the weight lines once the 170,064 unchanged rows are added. Hazem can confirm each line with one telephone call per branch: that is what a change log is for.</p></aside>
+</section>
+
+<section class="slide" id="check-date" data-lo="LO6" data-n="36" data-session="4">
+  <div class="kicker">Checkpoint</div>
+  <h2>A date that could be two days</h2>
+  <div class="quiz" data-type="single" data-lo="LO6" data-id="check-date-q1">
+    <p class="lead">A branch file holds <code>05/06/2026</code> and, further down, <code>09/27/2026</code>. How do you read the first date?</p>
+    <div class="opts">
+      <div class="opt" data-why="Applies the local habit to a file whose own rows contradict it" data-k="A">5 June: day first is the convention here</div>
+      <div class="opt" data-ok data-k="B">6 May: the file holds a second part above 12, so the month comes first</div>
+      <div class="opt" data-why="Treats each value alone and discards what the rest of the file says" data-k="C">It cannot be known: set it aside as ambiguous</div>
+      <div class="opt" data-why="Lets a library decide value by value, which can read one file both ways" data-k="D">Either: let the date parser infer it</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> 27 cannot be a month, so in this file the second part is the day, for every row. The evidence is in the source, not in the value.</div>
+  </div>
+  <aside class="notes"><p>Answer: B. If C is popular, agree that the value alone is ambiguous and ask what else they know about it: which file it came from.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-2-4" data-auto="lab" data-lab="2.4" data-label="Lab 2.4" data-n="37" data-session="4">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 2.4 · 25 min</div><h2>One calendar, one unit</h2><p class="lead small">Find the date layout of each branch from its own rows, parse every date with it, bring pounds, grams and mislabelled weights to kilograms, and write the change log.</p><a class="nb" href="../labs/D2_4_standardise_three_date.ipynb">D2_4_standardise_three_date.ipynb</a></div><ul class="checklist"><li>Find the date layout of each branch <span class="min">7 min</span></li><li>Parse every date with the layout of its branch <span class="min">5 min</span></li><li>Bring every weight to kilograms <span class="min">8 min</span></li><li>The change log <span class="min">5 min</span></li><li class="stretch">✱ Stretch: What guessing value by value would have done</li></ul></div>
+  <aside class="notes"><p>AI-tutor, hinting only, for format codes. Typical problems: deciding the layout on the first rows only (January dates are all ambiguous); pd.to_datetime with dayfirst=True and no format; converting the mislabelled pounds before computing the per-parcel evidence; filling blank weights. Every check prints a count; the last one verifies that the log lines add up to 209,620. The lab starts from G.logs_raw().</p></aside>
+</section>
+
+<!-- ======================= CLOSING ======================= -->
+<section class="slide" id="wrap-up" data-n="38" data-session="4">
+  <div class="kicker">Day 2 · wrap-up</div>
+  <h2>Three things to keep</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>No error is not correct</h4><p class="small mb0">The wrong encoding, the wrong date order and a doubled household all run without a message.</p></div>
+    <div class="card c-purple"><h4>Rows in = rows out + rows set aside</h4><p class="small mb0">210,000 = 380 + 732 + 208,888. Each line has a reason.</p></div>
+    <div class="card c-coral"><h4>Evidence lives in the source</h4><p class="small mb0">The layout, the unit and the encoding are decided per file or per line, and measured before they are trusted.</p></div>
+  </div>
+  <aside class="notes"><p>Ask which of the four logs they would least like to defend to an assessor, and why. That is the one to rehearse before the capstone.</p></aside>
+</section>
+
+<section class="slide dark" id="next" data-label="Day 3" data-n="39" data-session="4">
+  <div class="kicker">Next · Day 3</div>
+  <h2>Missing data and measurement: how far can the headline move?</h2>
+  <ul class="bullets">
+    <li>Household size is blank for 18% of the population of the question</li>
+    <li>Three reasons for a blank, and what each does to the estimate</li>
+    <li>Three estimates of one number, then a range you can defend</li>
+    <li>Sizes that are recorded, and wrong</li>
+  </ul>
+  <aside class="notes"><p>Nothing to prepare. Day 3 starts from a supplied household table, so a participant who struggled today is not behind tomorrow. Ask them to reread the limits in the source note of the register tonight: two of them explain tomorrow's first lab.</p></aside>
+</section>
+</div>
+<script type="application/json" id="academy-data">{"v":1,"engine":"1.0.0","build":{"at":"2026-11-15T11:22:42Z","version":"2027.1.0","commit":"87b98e4"},"course":{"id":"ds-202","code":"DS-202","title":"Data Acquisition, Preparation and Quality","track":"data-science","lang":"en","dir":"ltr","url":"https://sdaiaacademy.github.io/ds-202/","repo":"SDAIAAcademy/ds-202","home":"../index.html"},"deck":{"id":"day2","kind":"day","day":2,"label":"Day 2","title":"Join and clean","prev":"day1.html","next":"day3.html","md":"day2.md","alt":{}},"sessions":[{"n":1,"label":"Session 1","title":"Encodings and Arabic text","slide":"s1","outcomes":["Decode a file line by line and count each encoding","Repair names that were decoded twice","Normalise Arabic letters and digits into a key and log every repair"],"minutes":50,"lab":{"id":"2.1","title":"One file, three encodings","minutes":25,"href":"../labs/D2_1_repair_mixed_encodings.ipynb"}},{"n":2,"label":"Session 2","title":"Keys and cardinality","slide":"s2","outcomes":["Repair mistyped keys by stated rules","Test many-to-one before joining","Reconcile rows in with rows out plus rows set aside"],"minutes":50,"lab":{"id":"2.2","title":"A join that loses nothing","minutes":25,"href":"../labs/D2_2_join_logs_registrations.ipynb"}},{"n":3,"label":"Session 3","title":"Matching without a clean key","slide":"s3","outcomes":["Block and score candidate pairs","Measure false matches and missed matches on labelled pairs","Choose a threshold and state its cost"],"minutes":50,"lab":{"id":"2.3","title":"300 records without a key","minutes":25,"href":"../labs/D2_3_match_300_records.ipynb"}},{"n":4,"label":"Session 4","title":"Types, units and dates","slide":"s4","outcomes":["Decide a date layout per source from evidence","Bring weights in two units to one, and catch mislabelled ones","Write a change log with a count per rule"],"minutes":50,"lab":{"id":"2.4","title":"One calendar, one unit","minutes":25,"href":"../labs/D2_4_standardise_three_date.ipynb"}}],"slides":[{"id":"title","n":1,"title":"Join and clean","kind":"title","session":0,"hash":"9472ab72","md":"#### [day2#title] Join and clean\n\n*SDAIA Academy · Data Acquisition, Preparation and Quality*\n\nDay 2: Bytes, keys, people without keys, dates and units, each repair counted\n\nData Science Track · 4 teaching days + capstone day · 4 sessions · 4 labs · DS-202","notes":"Yesterday described the sources without changing a value. Today every session changes values, and the discipline is the same in all four: a repair is a rule, the rule has a count, and the original is kept. Each lab starts from the raw files, so nobody depends on yesterday's outputs or on an earlier lab of today.","minutes":null,"lo":[]},{"id":"review-day-1","n":2,"title":"A count that nobody can check","kind":"quiz","session":0,"hash":"f0415f10","md":"#### [day2#review-day-1] A count that nobody can check\n\n*Review of Day 1*\n\n**Question:** The inventory of Day 1 shows 210,000 log rows from 14 files, and the logs state no total of their own. What does that line of the inventory allow you to say?\n\n- A. The logs are complete: 210,000 rows arrived\n- B. 210,000 rows arrived; whether any are missing or doubled is unknown\n- C. The logs are wrong: a round number is suspicious\n- D. The logs cannot be used until the branches state totals","notes":"Answer: B. The limit was written into the provenance record of the logs: \"a week can be uploaded twice or be missing, and no file says so\". Lab 2.2 finds the 380 doubled rows of B02.","minutes":null,"lo":["LO2"]},{"id":"agenda","n":3,"title":"Join and clean","kind":"content","session":0,"hash":"35d67491","md":"#### [day2#agenda] Join and clean\n\n*Today*\n\n- **Session 1 · Encodings and Arabic text**: One file, several encodings: decide line by line, repair, and match on a normalised key\n- **Session 2 · Keys and cardinality**: Repair keys by rule, test the cardinality, and make the row counts add up\n- **Session 3 · Matching without a clean key**: Block, score and choose a threshold on labelled pairs: a false match costs most\n- **Session 4 · Types, units and dates**: Layout and unit belong to the source, not the value: decide per branch, convert, log","notes":"","minutes":null,"lo":[]},{"id":"s1","n":4,"title":"Encodings and Arabic text","kind":"section","session":1,"hash":"0f648fc9","md":"#### [day2#s1] Encodings and Arabic text\n\n*Session 1*\n\n- Decode a file line by line and count each encoding\n- Repair names that were decoded twice\n- Normalise Arabic letters and digits into a key and log every repair","notes":"","minutes":null,"lo":["LO6"]},{"id":"three-states","n":5,"title":"A line of the register is in one of three states, and no encoding reads them all","kind":"content","session":1,"hash":"ed4f8e37","md":"#### [day2#three-states] A line of the register is in one of three states, and no encoding reads them all\n\n*One file, appended from 14 exports*\n\n| State | What you see | Lines |\n| --- | --- | --- |\n| UTF-8, correct | ماجد محمد باوزير | most |\n| Windows-1256 bytes (B03, B11) | fails as UTF-8 | 5,458 |\n| UTF-8 that was decoded twice (B06) | ط¨ظ†ط¯ط± …: valid UTF-8, wrong letters | 2,732 names |\n\n> **What goes wrong.** Reading the whole file as Windows-1256 raises no error: every byte is a letter in that code page. The 34,542 UTF-8 lines become nonsense, quietly.","notes":"FN-104 taught the two repairs on separate files (Lab 4.2 there). What is new is the mixture inside one file, which is what appending branch exports produces. Numbers from the Lab 2.1 run: 34,542 lines decode as UTF-8, 5,458 only as Windows-1256, 2,732 names at B06 were decoded twice. No error is not the same as correct: say it twice.","minutes":null,"lo":["LO6"]},{"id":"line-by-line","n":6,"title":"Decide per line: valid UTF-8 is UTF-8; what is not is the legacy code page","kind":"content","session":1,"hash":"5bb241d3","md":"#### [day2#line-by-line] Decide per line: valid UTF-8 is UTF-8; what is not is the legacy code page\n\n*The decision rule*\n\n```python\n# file: Lab 2.1 · decode\ndef decode(b: bytes):\n    try:\n        return b.decode(\"utf-8\"), \"utf-8\"\n    except UnicodeDecodeError:\n        return b.decode(\"cp1256\"), \"cp1256\"\n```\n\n- Arabic in Windows-1256 is almost never valid UTF-8, so the test is safe in this direction\n- Return the encoding with the text and **count** it\n- The count has a shape: all 5,458 lines are from two branches. A scatter over all branches would mean the rule is wrong","notes":"The order matters: try the strict encoding first. UTF-8 has structure (lead and continuation bytes) that random legacy bytes almost never satisfy; cp1256 accepts anything. Lines with only Latin letters and digits are the same bytes in both and decode as UTF-8, which is harmless. Sources: Python codecs documentation.","minutes":null,"lo":["LO6"]},{"id":"decoded-twice","n":7,"title":"Undo the wrong step, and prove the rule leaves correct text alone","kind":"content","session":1,"hash":"84d5df66","md":"#### [day2#decoded-twice] Undo the wrong step, and prove the rule leaves correct text alone\n\n*The state that raises no error anywhere*\n\n1. **1 · Typed** بندر stored as UTF-8 bytes\n2. **2 · Misread** the branch system read the bytes as Windows-1256 and saved the result\n3. **3 · Repair** `s.encode(\"cp1256\").decode(\"utf-8\")`\n\n- Correct Arabic does not survive that round trip: the decode fails and the function returns the text unchanged\n- So the function is safe on all 40,000 names, and changes 2,732, every one at B06","notes":"The tell is the repeated ط and ظ: the bytes D8 and D9 that begin every Arabic letter in UTF-8. Show head_name_raw beside head_name for three rows of B06. The check that all repaired rows are at one branch is the evidence that the rule did what it claims.","minutes":null,"lo":["LO6"]},{"id":"letters-and-keys","n":8,"title":"A key is a normalised copy for matching; the stored name is never replaced","kind":"content","session":1,"hash":"ad9c3aa3","md":"#### [day2#letters-and-keys] A key is a normalised copy for matching; the stored name is never replaced\n\n*After the bytes, the letters*\n\n| Rule | Example |\n| --- | --- |\n| drop marks and the stretch mark | مُحمّد → محمد |\n| one alef; ى → ي; ة → ه | أحمد → احمد |\n| join عبد to the next word | عبد الله → عبدالله |\n| one space between words | trailing and double spaces go |\n\n24,355 distinct Arabic names as typed are 21,252 distinct keys: about one \"different\" name in eight was a spelling variant.","notes":"Recap of FN-104, in one slide. The key loses information on purpose (ة and ه are different letters), which is why it sits in its own column. Unicode normalisation form NFKC folds presentation forms first. Sources: Unicode Standard Annex 15; Python unicodedata documentation. Numbers from the Lab 2.1 repair log.","minutes":null,"lo":["LO6"]},{"id":"digits-hide","n":9,"title":"An ID number typed in Arabic-Indic digits is a different string","kind":"content","session":1,"hash":"f2e2bf3c","md":"#### [day2#digits-hide] An ID number typed in Arabic-Indic digits is a different string\n\n*Digits are text too*\n\n**39,851 → 39,820** distinct national ids, before and after the digit rule\n\n- One branch typed 2,784 ID numbers as ١٠٩٠…\n- 31 households registered there and again elsewhere: one person, two strings\n- A count of distinct people, or a join on the id, was wrong with no error\n- Normalise digits in every key before you compare it with anything","notes":"From the Lab 2.1 run. The rule maps both the Arabic-Indic digits and the Eastern (Persian) forms to 0 to 9. After it, distinct ids equal the 39,820 households of yesterday's SQL count, which is the reconciliation that tells you the rule is complete.","minutes":null,"lo":["LO3","LO6"]},{"id":"repair-log","n":10,"title":"A repair that is not counted cannot be checked, repeated or reversed","kind":"content","session":1,"hash":"34d73679","md":"#### [day2#repair-log] A repair that is not counted cannot be checked, repeated or reversed\n\n*The habit of the day*\n\n- **A rule.** Written as code, applied to every row, never by hand to a few.\n- **A count.** One line per rule in a log: how many rows it changed, and where.\n- **The original.** Kept beside the repaired value, so a reviewer can disagree.\n\n> **The same three in every lab today:** a repair log, a join log, a threshold table, a change log.","notes":"These four files are sections of the quality report on Day 4, and of the capstone README: the rubric gives 25 points to joins and reconciliation and 25 to cleaning and validation, and the evidence for both is counts per step.","minutes":null,"lo":["LO6"]},{"id":"check-encoding","n":11,"title":"Which loader do you trust?","kind":"quiz","session":1,"hash":"8e5f6ee9","md":"#### [day2#check-encoding] Which loader do you trust?\n\n*Checkpoint*\n\n**Question:** A file was appended from several systems. Four loaders are proposed. Which one do you run?\n\n- A. Read it all as Windows-1256: it raises no error\n- B. Read it as UTF-8 and replace undecodable bytes with a mark\n- C. Let a detection library pick the encoding of the file\n- D. Decode line by line, UTF-8 first, and count the lines of each encoding","notes":"Answer: D. Option B is the common one in practice (errors=\"replace\") and destroys 5,458 names for good. A detection library answers a different question: the most likely single encoding.","minutes":null,"lo":["LO6"]},{"id":"lab-2-1","n":12,"title":"One file, three encodings","kind":"lab","session":1,"hash":"c2792615","md":"#### [day2#lab-2-1] One file, three encodings\n\nLab 2.1 · 25 min\n\nDecode the register extract line by line, repair the names that were decoded twice, normalise Arabic letters and digits into matching keys, and write the repair log that shows what the digits were hiding.\n\n[D2_1_repair_mixed_encodings.ipynb](https://sdaiaacademy.github.io/ds-202/labs/D2_1_repair_mixed_encodings.ipynb)\n\n- [ ] Decode the extract line by line and count (6 min)\n- [ ] Repair the names that were decoded twice (6 min)\n- [ ] Normalise letters and digits into keys (8 min)\n- [ ] The repair log, and what the digits were hiding (5 min)\n- [ ] ✱ Stretch: Names in Latin letters: case and hyphens","notes":"AI-tutor, hinting only, for regular expressions. Typical problems: trying cp1256 before UTF-8 (everything \"decodes\"); a repair function without the except branch, which fails on the first correct name; mapping digits in the name. If decode is not finished the next cells use G.decode_line, and the reference steps of build_dataset stand in for the others, so everyone reaches the log. The lab starts from the bytes of the extract and needs nothing from Day 1.","minutes":null,"lo":[]},{"id":"s2","n":13,"title":"Keys and cardinality","kind":"section","session":2,"hash":"85d1e794","md":"#### [day2#s2] Keys and cardinality\n\n*Session 2*\n\n- Repair mistyped keys by stated rules\n- Test many-to-one before joining\n- Reconcile rows in with rows out plus rows set aside","notes":"","minutes":null,"lo":["LO3"]},{"id":"three-silent-failures","n":14,"title":"A join can lose rows, add rows, and report neither","kind":"content","session":2,"hash":"e71512cb","md":"#### [day2#three-silent-failures] A join can lose rows, add rows, and report neither\n\n*Many handouts, one household*\n\n- **Lost.** A key typed by hand does not match. In an inner join the handout disappears.\n- **Added.** A household that is in the register twice gets every handout twice.\n- **Unnoticed.** The result is a table of plausible size. Nothing compares it with what went in.\n\nThe remedy has three parts, in this order: repair keys by rule, test the cardinality, count rows at every step.","notes":"FN-104 showed fan-out in SQL and validate= in pandas. Outcome LO3 asks for more: a join log of row counts per step and set-aside rows with reasons. That log is 25 of the 100 points of the capstone rubric.","minutes":null,"lo":["LO3"]},{"id":"key-repair","n":15,"title":"A repair is safe when it cannot change which household is meant","kind":"content","session":2,"hash":"a3e64520","md":"#### [day2#key-repair] A repair is safe when it cannot change which household is meant\n\n*Lab 2.2, step 1*\n\n| As typed | Rule | Safe because |\n| --- | --- | --- |\n| `h482913` | upper-case | case carries no information in this id |\n| ` H482913 ` | strip spaces | nor do spaces |\n| `H-482913` | remove the hyphen | nor a separator |\n| `H48O913` | letter O to digit 0 | after the H only digits are possible |\n\n> **Never a repair:** replacing an id by \"the most similar one in the register\". That picks a household, and it can pick the wrong one.","notes":"From the Lab 2.2 run: 2,757 keys are not in the form H plus six digits; 2,446 are repaired by the four rules; 311 are blank. Ask the room about the O rule: it is safe only because the form of the id is known. In an id that mixes letters and digits it would be a guess.","minutes":null,"lo":["LO3"]},{"id":"cardinality-test","n":16,"title":"Without the test, 209,620 rows went in and 210,585 came out","kind":"content","session":2,"hash":"bf458427","md":"#### [day2#cardinality-test] Without the test, 209,620 rows went in and 210,585 came out\n\n*Lab 2.2, step 2*\n\n```python\n# file: Lab 2.2\nlogs.merge(reg, on=\"household_id\",\n           how=\"left\",\n           validate=\"many_to_one\")\n# MergeError: Merge keys are not unique\n# in right dataset\n```\n\n- A left join never loses a left row; it **adds** one for every extra match on the right\n- 180 household ids are in the register twice: +965 rows, every one a handout counted double\n- `validate` turns the assumption \"one row per household\" into a test that stops the join","notes":"Run both lines live. Then the rule of the network, which is a decision and not a technical default: the first registration stands; the 180 later registrations of the same id are set aside and reported to Widad. Keeping the latest one instead would date some households after their own handouts. Sources: pandas documentation, DataFrame.merge.","minutes":null,"lo":["LO3"]},{"id":"set-aside","n":17,"title":"Rows without a household are set aside with a reason, not deleted","kind":"content","session":2,"hash":"2b335feb","md":"#### [day2#set-aside] Rows without a household are set aside with a reason, not deleted\n\n*What cannot be joined*\n\n| Reason | Rows |\n| --- | --- |\n| key not in the register | 421 |\n| blank key | 311 |\n| set aside | 732 |\n\n- They are handouts that happened: deleting them is an undercount with no trace\n- The file goes to the owner of the logs; a corrected key enters the next build\n- Unknown keys are spread over every branch: well-formed typing errors","notes":"732 rows are 0.35% of the logs. Whether that matters is not for the cleaning step to decide: the join log states it and the quality report carries it. The stretch finds 79 more rows whose key exists and is still wrong, because the handout is dated before the household registered; the reference build sets those aside as well.","minutes":null,"lo":["LO3"]},{"id":"join-log","n":18,"title":"The join log: every row that came in is on one of its lines","kind":"content","session":2,"hash":"ad9ab994","md":"#### [day2#join-log] The join log: every row that came in is on one of its lines\n\n*The evidence of LO3*\n\n| Step | Rows | Note |\n| --- | --- | --- |\n| log rows read | 210,000 | 14 branch files |\n| exact copies dropped | 209,620 | 380 rows: a week of B02 uploaded twice |\n| keys repaired | 209,620 | 2,446 keys by four rules |\n| set aside | 732 | 421 unknown, 311 blank |\n| joined to a household | 208,888 | many to one, tested |\n\n210,000 = 380 copies + 732 set aside + 208,888 joined.","notes":"The 380 copies are safe to drop because the log_id itself repeats with every field equal: a copy of a record, not a second handout. Two handouts to one household on one day with different log ids are not duplicates. Ask participants to do the sum on the slide; a log whose lines do not add up is the first thing an assessor checks.","minutes":null,"lo":["LO3"]},{"id":"check-join","n":19,"title":"More rows out than in","kind":"quiz","session":2,"hash":"bdf0205b","md":"#### [day2#check-join] More rows out than in\n\n*Checkpoint*\n\n**Question:** A left join of 209,620 log rows to the register returns 210,585 rows and no error. What is the first thing you check?\n\n- A. Whether household_id is unique in the register\n- B. How many log keys have no match in the register\n- C. Whether a branch file was loaded twice\n- D. Nothing: drop duplicate rows from the result","notes":"Answer: A. If the room says B, draw a left join on the board: an unmatched left row stays exactly one row. D is what happens under time pressure, and it hides the fan-out without removing it.","minutes":null,"lo":["LO3"]},{"id":"lab-2-2","n":20,"title":"A join that loses nothing","kind":"lab","session":2,"hash":"9a8b1d8b","md":"#### [day2#lab-2-2] A join that loses nothing\n\nLab 2.2 · 25 min\n\nRepair the household ids of the logs, test the join against the register for one-to-many breaks, join, and write a join log in which rows in equal rows out plus rows set aside, each with a reason.\n\n[D2_2_join_logs_registrations.ipynb](https://sdaiaacademy.github.io/ds-202/labs/D2_2_join_logs_registrations.ipynb)\n\n- [ ] Repair the keys and name what cannot be repaired (8 min)\n- [ ] Test the cardinality before joining (5 min)\n- [ ] Join and reconcile (7 min)\n- [ ] The join log and the set-aside file (5 min)\n- [ ] ✱ Stretch: Handouts dated before the registration","notes":"AI-off for the first attempt at the join. Typical problems: forgetting keep_default_na=False somewhere, so a blank key becomes NaN and never equals \"\"; replacing every O in the whole id including a possible letter position; keeping the latest registration; an inner join, after which the counts cannot add up. The lab starts from G.logs_raw() and G.registry_text(). The last check prints the sum 210,000 = 380 + 732 + 208,888: nobody leaves without seeing it.","minutes":null,"lo":[]},{"id":"s3","n":21,"title":"Matching without a clean key","kind":"section","session":3,"hash":"bbdeed87","md":"#### [day2#s3] Matching without a clean key\n\n*Session 3*\n\n- Block and score candidate pairs\n- Measure false matches and missed matches on labelled pairs\n- Choose a threshold and state its cost","notes":"","minutes":null,"lo":["LO3"]},{"id":"no-key","n":22,"title":"300 handouts were written on paper, with a name and no id","kind":"content","session":3,"hash":"985bbf1d","md":"#### [day2#no-key] 300 handouts were written on paper, with a name and no id\n\n*The problem*\n\n- A satellite point of B04 and B05, during Ramadan\n- A name, a district ticked on the form, a phone for seven in ten\n- 4,937 active households of the two branches to search\n- Staff labelled 848 candidate pairs by hand: 255 true, 593 not\n\n- **Two errors, two prices.** **Missed match:** a handout stays uncounted, and you can see it.\n  **False match:** one family is credited with another's parcels, and it looks like a success.","notes":"The labelled pairs are the most valuable file of the session: without them a threshold is an opinion. In real work, labelling a few hundred pairs is half a day for two people and is always worth it. The 593 non-matches were chosen to be hard: same first name and family name, another person.","minutes":null,"lo":["LO3"]},{"id":"block-score-decide","n":23,"title":"Block, score, decide","kind":"content","session":3,"hash":"6754f29a","md":"#### [day2#block-score-decide] Block, score, decide\n\n*Three steps*\n\n1. **1 · Block** compare only pairs that agree on a reliable field: the district\n2. **2 · Score** how alike are the two name keys, from 0 to 100\n3. **3 · Decide** accept, reject, or send to a person\n\n- Blocking: 311,703 candidate pairs instead of 1,481,100, and all 255 true pairs survive it\n- A true pair that disagrees on the blocking field is never compared: check that on the labelled pairs","notes":"The score in the lab is token_sort_ratio from RapidFuzz: sort the words, then an edit-based similarity. It is one of many; the method of measuring does not depend on the choice. Sources: RapidFuzz documentation.","minutes":null,"lo":["LO3"]},{"id":"threshold-trade","n":24,"title":"A higher threshold buys fewer false matches with more missed ones","kind":"content","session":3,"hash":"f78a293c","md":"#### [day2#threshold-trade] A higher threshold buys fewer false matches with more missed ones\n\n*Measured on the 848 labelled pairs*\n\n| Rule | Accepted | False | False-match rate | Missed of 255 |\n| --- | --- | --- | --- | --- |\n| name score ≥ 70 | 309 | 86 | 27.8% | 32 |\n| name score ≥ 85 | 149 | 11 | 7.4% | 117 |\n| name score ≥ 95 | 117 | 4 | 3.4% | 142 |\n\n> **No threshold gives both.** Even at 95, four accepted pairs are the wrong family, and more than half of the true pairs are missed.","notes":"From the Lab 2.3 run. The four false matches at 95 are pairs with identical name keys: two people called the same. No amount of tuning the name score can separate them. Ask: which of these three would you run on the register? None is acceptable, which is the point of the next slide.","minutes":null,"lo":["LO3"]},{"id":"second-field","n":25,"title":"A second field breaks the trade","kind":"content","session":3,"hash":"2b993dad","md":"#### [day2#second-field] A second field breaks the trade\n\n*Lab 2.3, step 4*\n\n**172 · 0** pairs accepted and false matches, when names are alike and phones agree on nine of ten digits\n\n- Two fields that agree by accident are rare; one field that agrees by accident is common\n- 83 true pairs are not accepted: mostly walk-ins who gave no phone\n- They go to a **review queue** for a person, not through a lower threshold","notes":"From the Lab 2.3 run: 172 accepted, 0 false, 83 for review. Be exact about the claim: zero false matches on 848 labelled pairs, not zero in general. Tools for probabilistic record linkage, Splink for example, estimate how much weight each field deserves from the data; the measurement on labelled pairs is the same. Sources: Splink documentation.","minutes":null,"lo":["LO3"]},{"id":"three-outcomes","n":26,"title":"Accept, reject, or ask a person","kind":"content","session":3,"hash":"8ca669fe","md":"#### [day2#three-outcomes] Accept, reject, or ask a person\n\n*The decision has three outcomes*\n\n- **Accept automatically.** The rule that showed no false match on labelled pairs. 172 of 300 walk-ins.\n- **Review.** Likely names without a phone, or several candidates. A person decides, and the decision is recorded.\n- **Leave unmatched.** 45 walk-ins are new households. An unmatched record is an honest result.\n\n> **Report it like a join:** 300 records in, so many matched by rule, so many by review, so many unmatched.","notes":"The 45 new households are known only because the data is synthetic; in real work the unmatched pile mixes new people with missed matches, and the review queue is how you find out. The stretch counts 128 walk-ins with no accepted candidate.","minutes":null,"lo":["LO3"]},{"id":"check-threshold","n":27,"title":"Which rule goes into the build?","kind":"quiz","session":3,"hash":"26bdaf07","md":"#### [day2#check-threshold] Which rule goes into the build?\n\n*Checkpoint*\n\n**Question:** A false match credits one family with another's parcels. On labelled pairs: name ≥ 70 accepts 309 with 86 false; name ≥ 95 accepts 117 with 4 false; name and phone accepts 172 with 0 false. Which do you automate?\n\n- A. Name ≥ 70: it finds the most matches\n- B. Name ≥ 95: 3.4% false is good enough\n- C. Name and phone, with the rest sent to review\n- D. None: match all 300 by hand","notes":"Answer: C. If someone argues for B, ask them to explain to the four families what happened. Then ask what would change the answer: if a false match were cheap (a mailing list, say), the name-only rule might be fine. The threshold follows from the cost, not from the score.","minutes":null,"lo":["LO3"]},{"id":"lab-2-3","n":28,"title":"300 records without a key","kind":"lab","session":3,"hash":"848e5763","md":"#### [day2#lab-2-3] 300 records without a key\n\nLab 2.3 · 25 min\n\nMatch 300 walk-in records to the register of two branches by normalised name, measure false and missed matches on staff-labelled pairs at three thresholds, add the phone as a second field, and choose the rule to run.\n\n[D2_3_match_300_records.ipynb](https://sdaiaacademy.github.io/ds-202/labs/D2_3_match_300_records.ipynb)\n\n- [ ] Normalise and block (5 min)\n- [ ] Score the candidate pairs (6 min)\n- [ ] False matches at three thresholds (7 min)\n- [ ] Add the phone, measure again, choose (7 min)\n- [ ] ✱ Stretch: The review queue","notes":"AI-tutor, hinting only. The register used here is the reference clean register (B.clean_registry), so the lab does not depend on Lab 2.1. Typical problems: scoring raw names instead of keys; blocking on the family name, which loses pairs with a typing error there; computing the false-match rate over all labelled pairs instead of over the accepted ones. Scoring 311,703 pairs takes a few seconds on a laptop CPU.","minutes":null,"lo":[]},{"id":"s4","n":29,"title":"Types, units and dates","kind":"section","session":4,"hash":"6e163bc9","md":"#### [day2#s4] Types, units and dates\n\n*Session 4*\n\n- Decide a date layout per source from evidence\n- Bring weights in two units to one, and catch mislabelled ones\n- Write a change log with a count per rule","notes":"","minutes":null,"lo":["LO6"]},{"id":"value-has-no-evidence","n":30,"title":"03/07/2026 is 3 July at one branch and 7 March at another","kind":"content","session":4,"hash":"a6d04ca9","md":"#### [day2#value-has-no-evidence] 03/07/2026 is 3 July at one branch and 7 March at another\n\n*The same string, two days*\n\n- 8 branches write `2026-07-03`\n- 4 branches write day first: `03/07/2026`\n- 2 branches, on donated software, write month first: `07/03/2026`\n- No file says which\n\n**36,002 of 91,403** slash dates in which both parts are 12 or less: the value alone cannot be read","notes":"From the Lab 2.4 run. FN-104 covered calendars (Hijri to Gregorian) and time zones; that is not repeated here. The problem today is more ordinary and more common: the same calendar written in different orders by different systems.","minutes":null,"lo":["LO6"]},{"id":"layout-per-source","n":31,"title":"A layout belongs to the source: one unambiguous date settles the whole file","kind":"content","session":4,"hash":"b82142bf","md":"#### [day2#layout-per-source] A layout belongs to the source: one unambiguous date settles the whole file\n\n*Where the evidence is*\n\n1. **1 · Group by branch** a branch uses one layout\n2. **2 · Look for a part above 12** if the first part ever exceeds 12 it is the day\n3. **3 · Parse strictly** with that one format; a value that does not fit is an error\n\n> **And then test the result.** Every branch has handouts in every month. A branch read with the wrong layout would have none after day 12.","notes":"Two details. Raise an error when the evidence does not decide, rather than defaulting: a file of twelve days could be honestly ambiguous. And use an explicit format in pd.to_datetime; the convenient options (dayfirst, errors=\"coerce\") are how wrong dates get in.","minutes":null,"lo":["LO6"]},{"id":"guessing-cost","n":32,"title":"Guessing day first for a month-first branch loses 61% and corrupts 36%","kind":"content","session":4,"hash":"1815fe60","md":"#### [day2#guessing-cost] Guessing day first for a month-first branch loses 61% and corrupts 36%\n\n*The stretch of Lab 2.4*\n\n| Item | Value |\n| --- | --- |\n| lost: no such date | 11,625 |\n| wrong, silently | 6,960 |\n| right by luck | 620 |\n\nThe 19,205 handouts of B05, parsed day first with unreadable values turned into \"no date\". The 6,960 are the dangerous ones: a real-looking date, in the wrong month.","notes":"From the Lab 2.4 stretch. The 620 that come out right are the dates whose day equals their month. A quarter built on these dates would move thousands of handouts between quarters and nothing would fail.","minutes":null,"lo":["LO6"]},{"id":"units-evidence","n":33,"title":"The weight per parcel shows which unit a number is in","kind":"content","session":4,"hash":"defb2dce","md":"#### [day2#units-evidence] The weight per parcel shows which unit a number is in\n\n*Lab 2.4, step 3*\n\n| Branch, unit as labelled | Median per parcel | Reading |\n| --- | --- | --- |\n| B01, kg | 12.0 | kilograms: the packing standard |\n| B05, lb | 26.4 | pounds, labelled as pounds |\n| B13, kg (1,312 rows) | 26.4 | pounds labelled as kilograms |\n| B09, kg (150 rows) | above 9,000 | grams typed into a kilogram field |\n\nBetween 15 and 19.8 per parcel there is no value at all: the two clouds do not touch, so a rule can separate them.","notes":"From the Lab 2.4 run: 37,360 rows converted from labelled pounds, 1,312 rows at B13 from 14 September relabelled, 150 gram rows at B09. One pound is 0.45359237 kg. The mislabelled rows are all one branch after one date, which is what makes the rule defensible, and why the change log names branches.","minutes":null,"lo":["LO6"]},{"id":"blanks-stay","n":34,"title":"734 blank weights stay blank","kind":"content","session":4,"hash":"c111d099","md":"#### [day2#blanks-stay] 734 blank weights stay blank\n\n*What cleaning must not do*\n\n- All at B09, 4 to 17 May: the scale was away for repair\n- A blank is not zero and is not 12 kg per parcel\n- Filling it is a decision about missing data, with consequences for every average of weight\n- The change log says \"left missing\", with the count\n\n- **Tomorrow.** Day 3 asks why a value is missing before deciding what to do about it. This one has a known cause and a recorded date range.","notes":"The provenance record of the logs already holds this limit. It is the fourth of the six patterns of Lab 3.1. The headline counts parcels and is not touched; a weight-based question would be.","minutes":null,"lo":["LO1","LO6"]},{"id":"change-log","n":35,"title":"The change log names every rule, its rows and its branches","kind":"content","session":4,"hash":"f6420e5b","md":"#### [day2#change-log] The change log names every rule, its rows and its branches\n\n*Lab 2.4, step 4*\n\n| Change | Rows | Branches |\n| --- | --- | --- |\n| dates read as ISO | 118,217 | 8 branches |\n| dates read day first | 52,731 | B03, B08, B10, B11 |\n| dates read month first | 38,672 | B05, B13 |\n| pounds to kilograms | 37,360 | B05, B13 |\n| pounds labelled kg | 1,312 | B13 |\n| grams to kilograms | 150 | B09 |\n| weight missing, left missing | 734 | B09 |","notes":"The date lines add up to the 209,620 rows after copies were dropped, and so do the weight lines once the 170,064 unchanged rows are added. Hazem can confirm each line with one telephone call per branch: that is what a change log is for.","minutes":null,"lo":["LO6"]},{"id":"check-date","n":36,"title":"A date that could be two days","kind":"quiz","session":4,"hash":"9f65f525","md":"#### [day2#check-date] A date that could be two days\n\n*Checkpoint*\n\n**Question:** A branch file holds `05/06/2026` and, further down, `09/27/2026`. How do you read the first date?\n\n- A. 5 June: day first is the convention here\n- B. 6 May: the file holds a second part above 12, so the month comes first\n- C. It cannot be known: set it aside as ambiguous\n- D. Either: let the date parser infer it","notes":"Answer: B. If C is popular, agree that the value alone is ambiguous and ask what else they know about it: which file it came from.","minutes":null,"lo":["LO6"]},{"id":"lab-2-4","n":37,"title":"One calendar, one unit","kind":"lab","session":4,"hash":"947c2434","md":"#### [day2#lab-2-4] One calendar, one unit\n\nLab 2.4 · 25 min\n\nFind the date layout of each branch from its own rows, parse every date with it, bring pounds, grams and mislabelled weights to kilograms, and write the change log.\n\n[D2_4_standardise_three_date.ipynb](https://sdaiaacademy.github.io/ds-202/labs/D2_4_standardise_three_date.ipynb)\n\n- [ ] Find the date layout of each branch (7 min)\n- [ ] Parse every date with the layout of its branch (5 min)\n- [ ] Bring every weight to kilograms (8 min)\n- [ ] The change log (5 min)\n- [ ] ✱ Stretch: What guessing value by value would have done","notes":"AI-tutor, hinting only, for format codes. Typical problems: deciding the layout on the first rows only (January dates are all ambiguous); pd.to_datetime with dayfirst=True and no format; converting the mislabelled pounds before computing the per-parcel evidence; filling blank weights. Every check prints a count; the last one verifies that the log lines add up to 209,620. The lab starts from G.logs_raw().","minutes":null,"lo":[]},{"id":"wrap-up","n":38,"title":"Three things to keep","kind":"content","session":4,"hash":"fcbb44b9","md":"#### [day2#wrap-up] Three things to keep\n\n*Day 2 · wrap-up*\n\n- **No error is not correct.** The wrong encoding, the wrong date order and a doubled household all run without a message.\n- **Rows in = rows out + rows set aside.** 210,000 = 380 + 732 + 208,888. Each line has a reason.\n- **Evidence lives in the source.** The layout, the unit and the encoding are decided per file or per line, and measured before they are trusted.","notes":"Ask which of the four logs they would least like to defend to an assessor, and why. That is the one to rehearse before the capstone.","minutes":null,"lo":[]},{"id":"next","n":39,"title":"Missing data and measurement: how far can the headline move?","kind":"content","session":4,"hash":"8dd2e981","md":"#### [day2#next] Missing data and measurement: how far can the headline move?\n\n*Next · Day 3*\n\n- Household size is blank for 18% of the population of the question\n- Three reasons for a blank, and what each does to the estimate\n- Three estimates of one number, then a range you can defend\n- Sizes that are recorded, and wrong","notes":"Nothing to prepare. Day 3 starts from a supplied household table, so a participant who struggled today is not behind tomorrow. Ask them to reread the limits in the source note of the register tonight: two of them explain tomorrow's first lab.","minutes":null,"lo":[]}],"activities":[{"id":"review-day-1-q1","slide":"review-day-1","type":"single","prompt":"The inventory of Day 1 shows 210,000 log rows from 14 files, and the logs state no total of their own. What does that line of the inventory allow you to say?","options":[{"key":"A","text":"The logs are complete: 210,000 rows arrived"},{"key":"B","text":"210,000 rows arrived; whether any are missing or doubled is unknown"},{"key":"C","text":"The logs are wrong: a round number is suspicious"},{"key":"D","text":"The logs cannot be used until the branches state totals"}],"correct":[1],"explanation":"A count with nothing to reconcile against is a fact about what arrived, not about what happened. Today finds a week that arrived twice; Day 3 finds days that never arrived.","misconceptions":["Takes the absence of a contradiction for a confirmation; nothing was compared","","Believes a large round number signals an error by itself","Discards a source for lacking metadata instead of recording the limit and testing for it"],"lo":["LO2"]},{"id":"check-encoding-q1","slide":"check-encoding","type":"single","prompt":"A file was appended from several systems. Four loaders are proposed. Which one do you run?","options":[{"key":"A","text":"Read it all as Windows-1256: it raises no error"},{"key":"B","text":"Read it as UTF-8 and replace undecodable bytes with a mark"},{"key":"C","text":"Let a detection library pick the encoding of the file"},{"key":"D","text":"Decode line by line, UTF-8 first, and count the lines of each encoding"}],"correct":[3],"explanation":"The file has no single encoding, so the decision has to be made where the encoding changes, per line, and the count per encoding is the check on the decision.","misconceptions":["Believes the absence of an error proves a correct reading; this code page accepts every byte","Keeps the file loading by throwing away the bytes that carry the names","Lets a library guess one encoding for a file that has several",""],"lo":["LO6"]},{"id":"check-join-q1","slide":"check-join","type":"single","prompt":"A left join of 209,620 log rows to the register returns 210,585 rows and no error. What is the first thing you check?","options":[{"key":"A","text":"Whether household_id is unique in the register"},{"key":"B","text":"How many log keys have no match in the register"},{"key":"C","text":"Whether a branch file was loaded twice"},{"key":"D","text":"Nothing: drop duplicate rows from the result"}],"correct":[0],"explanation":"Only a key that matches several rows on the right can add rows to a left join. Test uniqueness on the right before joining, and the join cannot surprise you.","misconceptions":["","Looks for unmatched keys, which leave the row count of a left join unchanged","Suspects the reader, when the two tables had their expected sizes before the join","Removes the symptom after the join; the repeated rows differ in register columns and stay"],"lo":["LO3"]},{"id":"check-threshold-q1","slide":"check-threshold","type":"single","prompt":"A false match credits one family with another's parcels. On labelled pairs: name ≥ 70 accepts 309 with 86 false; name ≥ 95 accepts 117 with 4 false; name and phone accepts 172 with 0 false. Which do you automate?","options":[{"key":"A","text":"Name ≥ 70: it finds the most matches"},{"key":"B","text":"Name ≥ 95: 3.4% false is good enough"},{"key":"C","text":"Name and phone, with the rest sent to review"},{"key":"D","text":"None: match all 300 by hand"}],"correct":[2],"explanation":"The costly error decides. Automate the rule that did not make it on labelled pairs, and spend human time on the records the rule leaves.","misconceptions":["Counts matches found, not matches that are right: more than one in four would be wrong","Accepts a small rate of the costly error when a rule without it exists","","Gives up automation entirely, although a rule with no false match on labelled pairs handles most records"],"lo":["LO3"]},{"id":"check-date-q1","slide":"check-date","type":"single","prompt":"A branch file holds 05/06/2026 and, further down, 09/27/2026. How do you read the first date?","options":[{"key":"A","text":"5 June: day first is the convention here"},{"key":"B","text":"6 May: the file holds a second part above 12, so the month comes first"},{"key":"C","text":"It cannot be known: set it aside as ambiguous"},{"key":"D","text":"Either: let the date parser infer it"}],"correct":[1],"explanation":"27 cannot be a month, so in this file the second part is the day, for every row. The evidence is in the source, not in the value.","misconceptions":["Applies the local habit to a file whose own rows contradict it","","Treats each value alone and discards what the rest of the file says","Lets a library decide value by value, which can read one file both ways"],"lo":["LO6"]}],"ai":{"context":{"course":"../context/course.md","courseJs":"../context/course.js","day":"day2.md","llms":"../llms.txt"},"tasks":[],"tools":[]},"bridge":{"allowedOrigins":[]},"features":{},"strings":{}}</script>
+<script src="../_engine/academy.js"></script>
+</body>
+</html>

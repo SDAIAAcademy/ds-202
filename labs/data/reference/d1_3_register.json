@@ -1,0 +1,15 @@
+{
+ "origin": "Registration system of Ghilal Food Bank Network; extract made by appending the 14 branch exports",
+ "owner": "Widad Al-Ghunaim, registration supervisor; extracts approved by the data protection officer",
+ "coverage": "One row per registration, 2021-01-03 to 2026-09-28; households that never registered are absent",
+ "sharing_basis": "Consent at registration for delivering and planning food support; internal approval DS-2026-041 for service coverage analysis, Q3 2026; no onward sharing of identified records",
+ "refresh_date": "2026-10-04",
+ "limits": [
+  "household_size and monthly_income_sar are reported by the household, not verified",
+  "no household-size field on the paper form of B03 and B11 before 2025-03-01",
+  "the online form and the call script offer sizes 1 to 6 only",
+  "branch exports are in more than one text encoding",
+  "a household that registered twice has two rows with one household_id"
+ ],
+ "classification": "Restricted"
+}
