@@ -1,0 +1,444 @@
+{
+  "$schema": "https://sdaiaacademy.github.io/engine/schemas/course.schema.json",
+  "engine": "1",
+  "id": "ds-202",
+  "code": "DS-202",
+  "version": "2027.1.0",
+  "lang": "en",
+  "title": {
+    "en": "Data Acquisition, Preparation and Quality",
+    "ar": "جمع البيانات وإعدادها وضمان جودتها"
+  },
+  "tagline": "REPLACE: one line under the title: what participants can do after the course",
+  "description": "Participants assemble an analysis dataset for a fictional food bank network from four sources: registrations with personal data, branch logs, a donations API and open population data. They record provenance, join with key and cardinality checks, clean Arabic and English text, dates and units, write validation rules that rerun on every build, and measure how missing data and measurement error move a headline estimate. Personal data are minimised and pseudonymised, and the dataset rebuilds from raw sources with one command.",
+  "track": "data-science",
+  "level": 200,
+  "badge": {
+    "name": "Data Science",
+    "level": "Assistant"
+  },
+  "audience": "Practitioners. Graduates and early-career analysts who have completed the FN courses or passed the placement test, and analysts moving into data science.",
+  "prerequisites": [
+    "FN-101 Python for Data and AI Work",
+    "FN-104 SQL and Data Wrangling",
+    "FN-106 Responsible Data and AI Practice in the Kingdom",
+    "Writes SQL joins and group-by queries without assistance"
+  ],
+  "site": {
+    "url": "https://sdaiaacademy.github.io/ds-202/",
+    "repo": "SDAIAAcademy/ds-202"
+  },
+  "outcomes": [
+    {
+      "id": "LO1",
+      "text": "Describe missing-data mechanisms and kinds of measurement error and the bias each can introduce, given six scenarios from the case",
+      "level": "Awareness",
+      "evidence": "mechanism and bias direction for each, at least five of six correct"
+    },
+    {
+      "id": "LO2",
+      "text": "Prepare a provenance record per source covering origin, owner, coverage, sharing basis, refresh date and limits, given the four sources and their documentation",
+      "level": "Applied",
+      "evidence": "a provenance file that passes a reviewer's checklist"
+    },
+    {
+      "id": "LO3",
+      "text": "Implement joins with key checks, cardinality tests and reconciliation counts so that no row is silently lost or duplicated, given tables with seeded duplicate, missing and mistyped keys",
+      "level": "Applied",
+      "evidence": "a join log of row counts per step and set-aside rows with reasons"
+    },
+    {
+      "id": "LO4",
+      "text": "Configure validation rules for types, ranges, uniqueness, completeness and cross-field consistency that run on every rebuild, given the joined table and its data dictionary",
+      "level": "Applied",
+      "evidence": "a rule suite that passes on the clean build and fails readably on a corrupted batch"
+    },
+    {
+      "id": "LO5",
+      "text": "Analyse how complete-case analysis, imputation and a sensitivity range change a headline estimate, given parcels per eligible household by district, with 18% of household sizes missing",
+      "level": "Applied",
+      "evidence": "a comparison table and a recommended estimate with its reason"
+    },
+    {
+      "id": "LO6",
+      "text": "Build a rebuildable analysis dataset from raw sources with personal data minimised and pseudonymised, given a question set by the food bank and the four raw sources",
+      "level": "Performance",
+      "evidence": "a repository that rebuilds with one command, with provenance, rules and quality report, defended live"
+    }
+  ],
+  "case_study": {
+    "name": "REPLACE: the name of the fictional organisation every lab works on",
+    "summary": "REPLACE: two sentences on the case study and its synthetic data"
+  },
+  "format": "intensive",
+  "format_note": "Intensive: 4 teaching days of four sessions and a capstone day, with guided pre-work and a tracked follow-up task",
+  "hours": {
+    "instruction": 6,
+    "lab": 7,
+    "guided_self_study": 6,
+    "assessment": 1,
+    "capstone": 6
+  },
+  "unit": "day",
+  "days": [
+    {
+      "id": "day1",
+      "kind": "day",
+      "title": "Find and document the sources",
+      "deck": "slides/day1.html",
+      "sessions": [
+        {
+          "title": "Start from the question, not the files",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO2"
+          ],
+          "lab": {
+            "id": "1.1",
+            "title": "List the variables the question needs and a source for each",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D1_1_list_variables_question.ipynb"
+          }
+        },
+        {
+          "title": "Files, APIs and databases",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO6"
+          ],
+          "lab": {
+            "id": "1.2",
+            "title": "Load logs, page through the donations API and query registrations in SQL",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D1_2_load_logs_page.ipynb"
+          }
+        },
+        {
+          "title": "Provenance and sharing basis",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO2"
+          ],
+          "lab": {
+            "id": "1.3",
+            "title": "Write provenance records for two sources, with sharing basis and gaps",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D1_3_write_provenance_records.ipynb"
+          }
+        },
+        {
+          "title": "Coverage and sampling frames",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO1"
+          ],
+          "lab": {
+            "id": "1.4",
+            "title": "Compare registrations with open population data; flag under-covered districts",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D1_4_compare_registrations_open.ipynb"
+          }
+        }
+      ]
+    },
+    {
+      "id": "day2",
+      "kind": "day",
+      "title": "Join and clean",
+      "deck": "slides/day2.html",
+      "sessions": [
+        {
+          "title": "Encodings and Arabic text",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO6"
+          ],
+          "lab": {
+            "id": "2.1",
+            "title": "Repair mixed encodings and normalise Arabic letters and digits in names",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D2_1_repair_mixed_encodings.ipynb"
+          }
+        },
+        {
+          "title": "Keys and cardinality",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO3"
+          ],
+          "lab": {
+            "id": "2.2",
+            "title": "Join logs to registrations and report rows that break one-to-many",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D2_2_join_logs_registrations.ipynb"
+          }
+        },
+        {
+          "title": "Matching without a clean key",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO3"
+          ],
+          "lab": {
+            "id": "2.3",
+            "title": "Match 300 records across branches; measure false matches on labelled pairs",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D2_3_match_300_records.ipynb"
+          }
+        },
+        {
+          "title": "Types, units and dates",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO6"
+          ],
+          "lab": {
+            "id": "2.4",
+            "title": "Standardise three date formats and two weight units, logging each change",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D2_4_standardise_three_date.ipynb"
+          }
+        }
+      ]
+    },
+    {
+      "id": "day3",
+      "kind": "day",
+      "title": "Missing data and measurement",
+      "deck": "slides/day3.html",
+      "sessions": [
+        {
+          "title": "Why data go missing",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO1"
+          ],
+          "lab": {
+            "id": "3.1",
+            "title": "Classify six missingness patterns by likely mechanism",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D3_1_classify_six_missingness.ipynb"
+          }
+        },
+        {
+          "title": "Imputation and its cost",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO5"
+          ],
+          "lab": {
+            "id": "3.2",
+            "title": "Estimate parcels per household with complete cases and two imputations",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D3_2_estimate_parcels_per.ipynb"
+          }
+        },
+        {
+          "title": "Sensitivity ranges",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO5"
+          ],
+          "lab": {
+            "id": "3.3",
+            "title": "Bound the estimate under best-case and worst-case assumptions",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D3_3_bound_estimate_under.ipynb"
+          }
+        },
+        {
+          "title": "Measurement error and proxies",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO1"
+          ],
+          "lab": {
+            "id": "3.4",
+            "title": "Simulate self-report error in household size and measure the shift",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D3_4_simulate_self_report.ipynb"
+          }
+        }
+      ]
+    },
+    {
+      "id": "day4",
+      "kind": "day",
+      "title": "Validate and protect",
+      "deck": "slides/day4.html",
+      "sessions": [
+        {
+          "title": "Quality dimensions as rules",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO4"
+          ],
+          "lab": {
+            "id": "4.1",
+            "title": "Write type, range, uniqueness and completeness rules for the joined table",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D4_1_write_type_range.ipynb"
+          }
+        },
+        {
+          "title": "Cross-field and cross-source checks",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO4"
+          ],
+          "lab": {
+            "id": "4.2",
+            "title": "Add three consistency rules and run them on a corrupted batch",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D4_2_add_three_consistency.ipynb"
+          }
+        },
+        {
+          "title": "Minimise and pseudonymise",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO6"
+          ],
+          "lab": {
+            "id": "4.3",
+            "title": "Replace national ID numbers with a keyed hash and attempt re-linkage",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D4_3_replace_national_id.ipynb"
+          }
+        },
+        {
+          "title": "A data-quality report",
+          "outcomes": [
+            "REPLACE: what a participant can do after this session"
+          ],
+          "lo": [
+            "LO6"
+          ],
+          "lab": {
+            "id": "4.4",
+            "title": "Draft the quality report and choose the capstone question",
+            "summary": "REPLACE: one line on what participants build and take away; then list the steps of the lab in course.json, their minutes adding up to 25",
+            "minutes": 25,
+            "href": "D4_4_draft_quality_report.ipynb"
+          }
+        }
+      ]
+    },
+    {
+      "id": "capstone",
+      "kind": "capstone",
+      "title": "Capstone project presentations",
+      "deck": "slides/capstone.html",
+      "subtitle": "REPLACE: the catalog gives 8 minutes for each presentation and nothing about questions; decide whether the questions are inside those minutes, set capstone.talk_minutes and capstone.qa_minutes in course.json and the timers of the now-presenting slide, and remove this line"
+    }
+  ],
+  "capstone": {
+    "summary": "A rebuildable dataset for one of three synthetic questions, in a public repository whose README reports row counts per step, rule results and the estimate's sensitivity to missing data; eight-minute defence with a rebuild from raw files",
+    "submission": "REPLACE: what participants submit and how: a public repository link, or a shared folder for a course without code",
+    "talk_minutes": 8,
+    "rubric": [
+      {
+        "criterion": "Provenance",
+        "weight": 15
+      },
+      {
+        "criterion": "Joins and reconciliation",
+        "weight": 25
+      },
+      {
+        "criterion": "Cleaning and validation",
+        "weight": 25
+      },
+      {
+        "criterion": "Missing data and sensitivity",
+        "weight": 20
+      },
+      {
+        "criterion": "Personal data and reproducibility",
+        "weight": 15
+      }
+    ]
+  },
+  "labs": {
+    "kind": "notebooks",
+    "base": "labs/"
+  },
+  "tools": [
+    {
+      "slot": "Analysis environment and notebooks",
+      "examples": [
+        "Python with uv and JupyterLab or marimo",
+        "R with Quarto"
+      ]
+    },
+    {
+      "slot": "Dataframes and analytical SQL engine",
+      "examples": [
+        "DuckDB",
+        "Polars",
+        "pandas"
+      ]
+    },
+    {
+      "slot": "Data validation rules",
+      "examples": [
+        "Pandera",
+        "Great Expectations",
+        "SQL assertions"
+      ]
+    },
+    {
+      "slot": "Record matching",
+      "examples": [
+        "Splink",
+        "RapidFuzz",
+        "rules written in SQL"
+      ]
+    }
+  ]
+}
