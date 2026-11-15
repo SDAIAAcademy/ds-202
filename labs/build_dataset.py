@@ -198,6 +198,7 @@ def joined_table(joined: pd.DataFrame) -> pd.DataFrame:
 # ---- rules -----------------------------------------------------------------------------------------------------
 
 DISTRICTS = [f"D{i:02d}" for i in range(1, 31)]
+ISO = r"^\d{4}-\d{2}-\d{2}$"
 
 
 def schema():
@@ -215,8 +216,8 @@ def schema():
                                            "validity: household_key is a 16-character pseudonym")]),
         "branch_id": pa.Column(str, [c(pa.Check.isin(G.BRANCHES), "validity: branch_id is one of the 14 branches")]),
         "district_id": pa.Column(str, [c(pa.Check.isin(DISTRICTS), "validity: district_id is one of the 30 districts")]),
-        "handout_date": pa.Column("datetime64[ns]"),
-        "registered_on": pa.Column("datetime64[ns]"),
+        "handout_date": pa.Column(str, [c(pa.Check.str_matches(ISO), "type: handout_date is a date written YYYY-MM-DD")]),
+        "registered_on": pa.Column(str, [c(pa.Check.str_matches(ISO), "type: registered_on is a date written YYYY-MM-DD")]),
         "parcels": pa.Column(int, [c(pa.Check.in_range(1, 3), "validity: parcels between 1 and 3")]),
         "weight_kg": pa.Column(float, [c(pa.Check.in_range(5, 50), "validity: weight_kg between 5 and 50")],
                                nullable=True),
@@ -253,7 +254,7 @@ def consistency(df: pd.DataFrame, donated: pd.DataFrame | None = None) -> pd.Dat
     rows = []
     bad = d[hd < ro]
     rows.append(("consistency: handout on or after registration", len(bad), ", ".join(bad["log_id"].head(3))))
-    per = w / n.where(n > 0)
+    per = w / n.where(n.between(1, 3))
     bad = d[per.notna() & ~per.between(*PER_PARCEL)]
     rows.append((f"consistency: {PER_PARCEL[0]:g} to {PER_PARCEL[1]:g} kg per parcel", len(bad),
                  ", ".join(f"{a} ({b:.1f} kg per parcel)" for a, b in zip(bad["log_id"].head(3), per[bad.index].head(3)))))

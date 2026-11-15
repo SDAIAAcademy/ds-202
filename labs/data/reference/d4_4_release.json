@@ -1,0 +1,37 @@
+[
+ {
+  "file": "handouts_q3.csv",
+  "rows": 73264,
+  "grain": "household",
+  "columns with identifiers": "none",
+  "decision": "leaves only under an agreement, generalised (Lab 4.3)"
+ },
+ {
+  "file": "households.csv",
+  "rows": 35665,
+  "grain": "household",
+  "columns with identifiers": "none",
+  "decision": "leaves only under an agreement, generalised (Lab 4.3)"
+ },
+ {
+  "file": "join_log.csv",
+  "rows": 14,
+  "grain": "aggregate",
+  "columns with identifiers": "none",
+  "decision": "may leave"
+ },
+ {
+  "file": "rule_results.csv",
+  "rows": 2,
+  "grain": "aggregate",
+  "columns with identifiers": "none",
+  "decision": "may leave"
+ },
+ {
+  "file": "set_aside.csv",
+  "rows": 811,
+  "grain": "household",
+  "columns with identifiers": "household_id",
+  "decision": "stays inside: direct identifiers"
+ }
+]

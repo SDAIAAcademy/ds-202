@@ -739,7 +739,7 @@
   ],
   "capstone": {
     "summary": "A rebuildable dataset for one of three synthetic questions, in a public repository whose README reports row counts per step, rule results and the estimate's sensitivity to missing data; eight-minute defence with a rebuild from raw files",
-    "submission": "A public GitHub repository link. The repository rebuilds the analysis dataset from the raw files of the capstone extract with one command, and holds the provenance file, the rule suite and the set-aside rows; its README reports row counts per step, rule results and the sensitivity of the estimate to missing data. No raw personal field is committed, synthetic or not. Then an eight-minute defence with a live rebuild, in which the assessor corrupts one input file and you show which rule fails and why, and four minutes of questions.",
+    "submission": "A public GitHub repository link. The repository rebuilds the analysis dataset from the raw files of the capstone extract with one command, and holds the provenance file, the rule suite and the set-aside rows (log id, branch and reason, without the household key as typed); its README reports row counts per step, rule results and the sensitivity of the estimate to missing data. No raw personal field is committed, synthetic or not. Then an eight-minute defence with a live rebuild, in which the assessor corrupts one input file and you show which rule fails and why, and four minutes of questions.",
     "talk_minutes": 8,
     "rubric": [
       {

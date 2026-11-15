@@ -1,0 +1,32 @@
+[
+ {
+  "rule": "type: handout_date is a date written YYYY-MM-DD",
+  "column": "handout_date",
+  "rows": 5,
+  "examples": "03/07/2026"
+ },
+ {
+  "rule": "validity: parcels between 1 and 3",
+  "column": "parcels",
+  "rows": 4,
+  "examples": "9"
+ },
+ {
+  "rule": "completeness: no value is missing",
+  "column": "household_key",
+  "rows": 3,
+  "examples": ""
+ },
+ {
+  "rule": "uniqueness: no value repeats",
+  "column": "log_id",
+  "rows": 2,
+  "examples": "B01-0007639"
+ },
+ {
+  "rule": "validity: district_id is one of the 30 districts",
+  "column": "district_id",
+  "rows": 2,
+  "examples": "D99"
+ }
+]
