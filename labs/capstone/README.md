@@ -10,7 +10,7 @@ Make the extract on your own machine (it is not committed, and you do not commit
 
 ```bash
 cd labs
-uv run python prepare_data.py --capstone     # writes labs/capstone/raw/, about one minute
+uv run python prepare_data.py --capstone     # writes labs/capstone/raw/ in a few seconds
 ```
 
 | Source | File | Rows |

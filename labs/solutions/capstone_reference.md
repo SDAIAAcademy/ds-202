@@ -21,7 +21,7 @@ These figures come from running the cleaning, joining and rule steps of `labs/bu
 - Household size is missing for 21.1% of the target population.
 - Question A, complete cases: 2.089 parcels per eligible household per month. A participant who reports only this figure has not done the missing-data work; within-group imputation and a range are expected, and the recommended figure should be higher than the complete-case one, with the reason.
 - Date layouts found by evidence: day first at three branches, month first at two, ISO at nine. The branches are not those of the course.
-- The generator prints its own summary when it runs; it knows the values that are blank in the extract. Use it to judge direction, not to mark to the third decimal.
+- `uv run python prepare_data.py --capstone --trainer` prints the generator's own summary (participants run it without `--trainer` and see volumes only); it knows the values that are blank in the extract. Use it to judge direction, not to mark to the third decimal.
 
 ## Corruptions to use in the defence
 

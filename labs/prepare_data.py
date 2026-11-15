@@ -2,10 +2,12 @@
 
     uv run python prepare_data.py             # rewrites data/raw/ and the generator's reference files
     uv run python prepare_data.py --capstone  # writes capstone/raw/: a second extract, other faults
+    uv run python prepare_data.py --capstone --trainer  # the same, and prints what only the generator knows
 
 Everything is synthetic and deterministic: the same seed gives the same bytes on every run.
 No row describes a real person, and no national ID number here is a real one.
-The planted problems are listed in solutions/answer_key.md, with the lab that finds each.
+The planted problems of the course data and their counts are in data/reference/truth_summary.json (key "config");
+the slide notes name the lab that finds each.
 """
 
 from __future__ import annotations
@@ -515,9 +517,15 @@ def build(capstone: bool = False) -> dict:
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--capstone", action="store_true", help="write capstone/raw/: the second extract")
+    ap.add_argument("--trainer", action="store_true",
+                    help="also print what only the generator knows (true values, faults by cause): for the assessor")
     a = ap.parse_args()
     t = build(a.capstone)
-    for k in ("households", "register_rows", "log_rows", "true_handouts", "gap_rows", "double_upload_rows",
-              "size_missing", "size_missing_by_cause", "eligible_households",
-              "parcels_per_eligible_household_per_month", "donations"):
+    keys = ["register_rows", "log_rows", "donations"]
+    if a.trainer or not a.capstone:
+        # The capstone participant sees volumes only: the true figure and the causes of the gaps are what they defend.
+        keys = ["households", "register_rows", "log_rows", "true_handouts", "gap_rows", "double_upload_rows",
+                "size_missing", "size_missing_by_cause", "eligible_households",
+                "parcels_per_eligible_household_per_month", "donations"]
+    for k in keys:
         print(f"{k:42s} {t[k]}")
