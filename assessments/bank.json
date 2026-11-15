@@ -3,164 +3,901 @@
   "version": 1,
   "questions": [
     {
-      "id": "q-example-1",
+      "id": "q-lo1-clinic-weights",
       "type": "single",
-      "prompt": "REPLACE: a practice question on LO1, as a short scenario",
+      "prompt": "A branch scale was away for repair for two weeks, and every handout of those two weeks has no weight. Parcels were counted as usual. Which description fits the missing weights?",
       "options": [
-        "REPLACE: a wrong option that a common misconception makes tempting",
-        "REPLACE: the right answer",
-        "REPLACE: a wrong option that a common misconception makes tempting",
-        "REPLACE: a wrong option that a common misconception makes tempting"
+        "Missing because of the weight itself: heavy handouts were not recorded",
+        "Missing at random given branch and date, both of which are recorded",
+        "Not missing: a blank weight means the handout weighed nothing",
+        "Missing completely at random across all branches and dates"
       ],
       "correct": [
         1
       ],
-      "explanation": "REPLACE: why the right answer is right, in one sentence",
+      "explanation": "The blanks are explained by two recorded fields, the branch and the date; within that branch and fortnight nothing about the weight decided whether it was recorded.",
       "misconceptions": [
-        "REPLACE: the misconception behind this option",
+        "Assumes every gap depends on the hidden value; here the cause is a known date range at one branch",
         "",
-        "REPLACE: the misconception behind this option",
-        "REPLACE: the misconception behind this option"
+        "Reads a blank as a zero, which would lower every average of weight",
+        "Ignores that the blanks sit in one branch and one fortnight, which the data show"
       ],
       "lo": [
         "LO1"
       ],
-      "day": "day1",
+      "day": "day3",
       "session": 1,
       "level": "apply",
       "pool": "practice",
       "weight": 1
     },
     {
-      "id": "q-example-2",
-      "type": "tf",
-      "prompt": "REPLACE: a statement on LO2 that is true",
+      "id": "q-lo1-dropdown",
+      "type": "single",
+      "prompt": "An online form offers household sizes 1 to 6. Larger households leave the field blank. An analyst computes the mean household size from the rows where it is recorded. What happens to that mean?",
       "options": [
-        "True",
-        "False"
+        "It is too low, because the blanks are the large households",
+        "It is unbiased, because 82% of the rows are still there",
+        "It is too high, because small households answer less often",
+        "It is unbiased but less precise, as with any missing data"
       ],
       "correct": [
         0
       ],
-      "explanation": "REPLACE: why the right answer is right, in one sentence",
+      "explanation": "The value itself decides whether it is missing (above 6 cannot be entered), so the recorded sizes are a selection of the small ones and their mean is too low.",
       "misconceptions": [
         "",
-        "REPLACE: the misconception behind this option"
+        "Believes a large share of observed rows guarantees a fair picture, whatever the reason for the blanks",
+        "Reverses the mechanism: the form stops the large households from answering, not the small ones",
+        "Treats every gap as completely at random, where only precision is lost"
+      ],
+      "lo": [
+        "LO1"
+      ],
+      "day": "day3",
+      "session": 1,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo1-over-report",
+      "type": "single",
+      "prompt": "Eligibility is income per member at most 1,000 SAR. An audit finds that a few households just above the line reported one or two members more than they have. What does this do to \"parcels per eligible household\"?",
+      "options": [
+        "Nothing: a few wrong sizes average out over thousands of households",
+        "It raises the figure, because larger households receive more parcels",
+        "It lowers the figure: households counted as eligible that receive almost nothing enter the denominator",
+        "It cannot be known without auditing every household"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "Over-reporting moves ineligible households into the denominator; they collect few parcels, so the average per eligible household falls.",
+      "misconceptions": [
+        "Expects errors to cancel, which holds for random error and not for error in one direction at a threshold",
+        "Follows the reported size to the parcels, although the branch desk hands out by the family card, not by the register",
+        "",
+        "Believes direction needs a census; the mechanism alone gives the direction, and a sample gives the size"
+      ],
+      "lo": [
+        "LO1"
+      ],
+      "day": "day3",
+      "session": 4,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo1-random-error",
+      "type": "single",
+      "prompt": "Clerks sometimes mistype a household size by one, up as often as down, for any household. Which statement is right?",
+      "options": [
+        "The mean size is roughly unchanged, but households near the eligibility line are misclassified in both directions",
+        "The mean size rises, because larger numbers have more digits to mistype",
+        "Nothing changes: symmetric errors cancel in every statistic",
+        "The data must be discarded: any error makes the estimate meaningless"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "Random error leaves averages about right but adds noise to any yes-or-no rule at a threshold, which usually weakens differences between groups.",
+      "misconceptions": [
+        "",
+        "Invents a direction for an error that is symmetric by description",
+        "Extends cancelling in a mean to a threshold rule, where each error can flip a household",
+        "Treats all error as fatal instead of asking how far it moves the result"
+      ],
+      "lo": [
+        "LO1"
+      ],
+      "day": "day3",
+      "session": 4,
+      "level": "understand",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo1-gap-days",
+      "type": "single",
+      "prompt": "One branch uploaded no log file for nine days in August. The households it serves show fewer parcels in the quarter than their neighbours. What is the right reading?",
+      "options": [
+        "Those households were under-served in August",
+        "Their figure is biased downwards by rows that are missing, and no field imputation repairs it",
+        "Impute the mean number of parcels for the blank cells of those days",
+        "The gap is completely at random, so only precision is lost"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "Whole rows are missing for a known branch and period: the count for its districts is too low, and the remedy is to ask the owner for the file or to report the gap beside the figure.",
+      "misconceptions": [
+        "Takes missing rows for missing service; the handouts may have happened and never reached a file",
+        "",
+        "Looks for blank cells to fill; there are none, because whole rows are absent",
+        "Ignores that the gap sits in one branch and so lowers the figure of its districts in particular"
+      ],
+      "lo": [
+        "LO1"
+      ],
+      "day": "day3",
+      "session": 1,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo2-refresh-date",
+      "type": "single",
+      "prompt": "An open table describes the year 2022, was published on 15 March 2023, and you downloaded it on 2 October 2026. Which date is the refresh date of your provenance record?",
+      "options": [
+        "2022, the year the data describe",
+        "15 March 2023, the day of publication",
+        "2 October 2026, the day your copy was taken",
+        "Today, since the file is still on the portal"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "The refresh date is the day your copy was taken; the reference year goes into coverage and the gap between them into limits.",
+      "misconceptions": [
+        "Confuses the reference period, which belongs in coverage, with the age of the copy",
+        "Takes the release date of the publisher for the day the copy was taken",
+        "",
+        "Assumes the copy follows the portal; a downloaded file does not update itself"
       ],
       "lo": [
         "LO2"
       ],
       "day": "day1",
-      "session": 1,
-      "level": "understand",
+      "session": 3,
+      "level": "apply",
       "pool": "practice",
       "weight": 1
     },
     {
-      "id": "q-example-3",
+      "id": "q-lo2-owner",
       "type": "single",
-      "prompt": "REPLACE: a practice question on LO3, as a short scenario",
+      "prompt": "Which owner field lets a stranger act on a provenance record a year from now?",
       "options": [
-        "REPLACE: a wrong option that a common misconception makes tempting",
-        "REPLACE: the right answer",
-        "REPLACE: a wrong option that a common misconception makes tempting",
-        "REPLACE: a wrong option that a common misconception makes tempting"
+        "\"IT\"",
+        "\"Widad\"",
+        "\"See the shared drive\"",
+        "\"Registration supervisor (Widad Al-Ghunaim); extracts approved by the data protection officer\""
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "An owner is a role that will still exist when the person has moved on, with the name of who holds it now and who approves access.",
+      "misconceptions": [
+        "Names a department that cannot answer what a column means",
+        "Uses a first name that means nothing to a reader outside the team",
+        "Points to a place, not to a person or role who answers for the data",
+        ""
+      ],
+      "lo": [
+        "LO2"
+      ],
+      "day": "day1",
+      "session": 3,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo2-purpose",
+      "type": "single",
+      "prompt": "You hold a register extract approved for \"service coverage analysis, Q3 2026\". A colleague asks you to use it to build a contact list for a fundraising campaign. What is the right step?",
+      "options": [
+        "Use it: the extract is already on your computer",
+        "Ask the data protection officer: the approval names another purpose",
+        "Use it after removing the national ID numbers",
+        "Refuse: an extract can never be used twice"
       ],
       "correct": [
         1
       ],
-      "explanation": "REPLACE: why the right answer is right, in one sentence",
+      "explanation": "The sharing basis names a purpose; a new purpose is a new decision by whoever approved the sharing, not by the analyst who holds the file.",
       "misconceptions": [
-        "REPLACE: the misconception behind this option",
+        "Treats possession as permission",
         "",
-        "REPLACE: the misconception behind this option",
-        "REPLACE: the misconception behind this option"
+        "Believes dropping one identifier changes the purpose the data were shared for",
+        "Turns a purpose limit into an absolute ban; a new approval may be given"
+      ],
+      "lo": [
+        "LO2"
+      ],
+      "day": "day1",
+      "session": 3,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo2-limits",
+      "type": "single",
+      "prompt": "Which line belongs in the limits field of the record of the branch logs?",
+      "options": [
+        "\"A week can be uploaded twice or be missing, and no file says so\"",
+        "\"The logs are in 14 files\"",
+        "\"Hazem Al-Sulaim uploads them weekly\"",
+        "\"The data are messy\""
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "A limit is a specific thing the data cannot be trusted for, stated so that the next analyst can test for it.",
+      "misconceptions": [
+        "",
+        "Describes the form of the extract, which belongs in origin",
+        "Names the owner and the routine, not what the data cannot be trusted for",
+        "States a mood, not a fact a reader can check or plan around"
+      ],
+      "lo": [
+        "LO2"
+      ],
+      "day": "day1",
+      "session": 3,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo2-coverage-frame",
+      "type": "single",
+      "prompt": "A district shows 118% coverage: more registered households than the 2022 survey estimates as low-income. What goes into the report?",
+      "options": [
+        "The register holds fabricated households in that district",
+        "The coverage is capped at 100% to keep the table tidy",
+        "The frame is a 2022 estimate and the district has grown; coverage ratios are approximate",
+        "The district is dropped from the analysis"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "A ratio above one tells you about the age and error of the frame, and that caveat applies to every district, not only to the one where it shows.",
+      "misconceptions": [
+        "Reads the ratio as a fact about the numerator when the denominator is the old estimate",
+        "Hides the evidence that the frame is out of date",
+        "",
+        "Removes real households because an outside estimate is imperfect"
+      ],
+      "lo": [
+        "LO2"
+      ],
+      "day": "day1",
+      "session": 4,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo3-fan-out",
+      "type": "single",
+      "prompt": "You join 209,620 log rows to the register on household_id with a left join and get 210,580 rows. No error was raised. What happened?",
+      "options": [
+        "Some log rows had no household in the register",
+        "The join found households that the logs had missed",
+        "Rounding in the row counter",
+        "Some household ids are in the register more than once, so their handouts were repeated"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "A left join returns more rows than its left table only when a key matches several rows on the right: the register is not one row per id.",
+      "misconceptions": [
+        "Expects unmatched rows to add rows; in a left join they stay one row each",
+        "Believes a join can discover records; it only repeats or matches the rows it is given",
+        "Treats a whole-row difference as noise",
+        ""
       ],
       "lo": [
         "LO3"
       ],
-      "day": "day1",
-      "session": 1,
+      "day": "day2",
+      "session": 2,
       "level": "apply",
       "pool": "practice",
       "weight": 1
     },
     {
-      "id": "q-example-4",
-      "type": "tf",
-      "prompt": "REPLACE: a statement on LO4 that is true",
+      "id": "q-lo3-validate",
+      "type": "single",
+      "prompt": "Which line makes the join itself fail when the register has a repeated household_id?",
       "options": [
-        "True",
-        "False"
+        "logs.merge(reg, on=\"household_id\", how=\"left\")",
+        "logs.merge(reg, on=\"household_id\", how=\"left\", validate=\"many_to_one\")",
+        "logs.merge(reg, on=\"household_id\", how=\"inner\")",
+        "logs.merge(reg, on=\"household_id\", how=\"left\").drop_duplicates()"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "validate=\"many_to_one\" checks that the key is unique in the right table and raises an error before any row is produced.",
+      "misconceptions": [
+        "Assumes a left join protects the row count; it does not check the right table",
+        "",
+        "Believes an inner join removes duplicates; it repeats them just the same",
+        "Removes exact copies afterwards, but the repeated rows differ in the register columns"
+      ],
+      "lo": [
+        "LO3"
+      ],
+      "day": "day2",
+      "session": 2,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo3-set-aside",
+      "type": "single",
+      "prompt": "After key repair, 421 log rows carry a household id that is not in the register. What do you do with them?",
+      "options": [
+        "Drop them silently: they cannot be analysed",
+        "Assign them to the household with the most similar id",
+        "Set them aside in a file with the reason, and count them in the join log",
+        "Keep them in the joined table with blank household fields"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "Rows in must equal rows out plus rows set aside; each set-aside row keeps its reason so the owner can repair the source.",
+      "misconceptions": [
+        "Loses rows without a trace, so the counts no longer add up",
+        "Invents a link; a wrong household then gains parcels it never received",
+        "",
+        "Lets rows without a household flow into every later average and group"
+      ],
+      "lo": [
+        "LO3"
+      ],
+      "day": "day2",
+      "session": 2,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo3-threshold",
+      "type": "single",
+      "prompt": "You match walk-in records to the register by name. At a low threshold you find more matches, and more of them are wrong. A false match gives one family the handouts of another. Which threshold do you choose?",
+      "options": [
+        "The lowest: more matches means more complete data",
+        "The one with the highest total number of matches on the labelled pairs",
+        "The one a colleague used on another dataset",
+        "One where false matches on labelled pairs are rare, accepting some missed matches for manual review"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "The two errors do not cost the same: a missed match can be reviewed by hand, a false match silently corrupts two households.",
+      "misconceptions": [
+        "Counts matches without asking whether they are right",
+        "Optimises volume, where the cost of a false match is what matters",
+        "Assumes a threshold transfers between datasets with different names and typing habits",
+        ""
+      ],
+      "lo": [
+        "LO3"
+      ],
+      "day": "day2",
+      "session": 3,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo3-key-repair",
+      "type": "single",
+      "prompt": "Household ids are \"H\" and six digits. Some log rows hold \"h482913\", \" H482913 \" or \"H-482913\". Which repair is safe?",
+      "options": [
+        "Strip spaces, upper-case and remove the hyphen, then check the result against the pattern",
+        "Replace each odd id by the nearest valid id in the register",
+        "Leave them: the join will ignore them",
+        "Delete the rows, since hand-typed ids cannot be trusted"
       ],
       "correct": [
         0
       ],
-      "explanation": "REPLACE: why the right answer is right, in one sentence",
+      "explanation": "A repair is safe when the rule cannot change which household is meant: case, spaces and a hyphen carry no information; \"nearest id\" does.",
       "misconceptions": [
         "",
-        "REPLACE: the misconception behind this option"
+        "Changes which household a row belongs to on the strength of similarity alone",
+        "Accepts losing rows that a rule can repair with certainty",
+        "Discards rows whose meaning is unambiguous"
+      ],
+      "lo": [
+        "LO3"
+      ],
+      "day": "day2",
+      "session": 2,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo4-dimension",
+      "type": "single",
+      "prompt": "A rule says \"log_id never repeats\". Which quality dimension does it test?",
+      "options": [
+        "Completeness",
+        "Validity",
+        "Uniqueness",
+        "Timeliness"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "Uniqueness rules say that a key identifies one row; a week uploaded twice breaks exactly this rule.",
+      "misconceptions": [
+        "Confuses \"every row is there once\" with \"no value is blank\"",
+        "Takes any rule about a column for a rule about its allowed values",
+        "",
+        "Picks a dimension that concerns when data arrive, not whether rows repeat"
       ],
       "lo": [
         "LO4"
       ],
-      "day": "day1",
+      "day": "day4",
       "session": 1,
       "level": "understand",
       "pool": "practice",
       "weight": 1
     },
     {
-      "id": "q-example-5",
+      "id": "q-lo4-readable",
       "type": "single",
-      "prompt": "REPLACE: a practice question on LO5, as a short scenario",
+      "prompt": "A rebuild stops with the message \"AssertionError\". Which message would let a branch supervisor fix the source?",
       "options": [
-        "REPLACE: a wrong option that a common misconception makes tempting",
-        "REPLACE: the right answer",
-        "REPLACE: a wrong option that a common misconception makes tempting",
-        "REPLACE: a wrong option that a common misconception makes tempting"
+        "\"Validation failed in 3 checks\"",
+        "\"Row 2,214 is invalid\"",
+        "\"B05: 303 handouts weigh 22 to 30 kg per parcel; the standard is 9 to 15. Was the weight entered in pounds?\"",
+        "\"weight_kg check returned False\""
       ],
       "correct": [
-        1
+        2
       ],
-      "explanation": "REPLACE: why the right answer is right, in one sentence",
+      "explanation": "A readable failure names the rule in plain words, the owner of the rows, how many rows and an example, so the person who can fix the source knows what to look at.",
       "misconceptions": [
-        "REPLACE: the misconception behind this option",
+        "Counts failures without saying where or what",
+        "Points to a row number of your table, which means nothing in the file of the branch",
         "",
-        "REPLACE: the misconception behind this option",
-        "REPLACE: the misconception behind this option"
+        "Names the column but not the branch, the values or the likely cause"
       ],
       "lo": [
-        "LO5"
+        "LO4"
       ],
-      "day": "day1",
-      "session": 1,
+      "day": "day4",
+      "session": 2,
       "level": "apply",
       "pool": "practice",
       "weight": 1
     },
     {
-      "id": "q-example-6",
-      "type": "tf",
-      "prompt": "REPLACE: a statement on LO6 that is true",
+      "id": "q-lo4-cross-field",
+      "type": "single",
+      "prompt": "Every column of a batch passes its own rule: dates are dates, parcels are 1 to 3, weights are 5 to 50. Yet 30 handouts are dated before the household registered. Which kind of rule catches them?",
       "options": [
-        "True",
-        "False"
+        "A stricter range on handout_date",
+        "A rule across two fields: handout_date on or after registered_on",
+        "A uniqueness rule on log_id",
+        "No rule can: the values are all valid"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "Some faults are invisible in any single column; consistency rules compare fields with each other, or one source with another.",
+      "misconceptions": [
+        "Tightens one column when the fault only exists between two",
+        "",
+        "Applies a rule about repeated rows to a fault of logic",
+        "Believes validity of each column is all a rule can express"
+      ],
+      "lo": [
+        "LO4"
+      ],
+      "day": "day4",
+      "session": 2,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo4-every-build",
+      "type": "single",
+      "prompt": "Why do the rules run on every rebuild and not once, when the dataset is first made?",
+      "options": [
+        "Because the sources change: a branch can change its export next month",
+        "Because rules slow the build, and a slow build is a careful one",
+        "Because the first run of a rule is unreliable",
+        "Because auditors count how many times rules were run"
       ],
       "correct": [
         0
       ],
-      "explanation": "REPLACE: why the right answer is right, in one sentence",
+      "explanation": "A rule protects the next build from a change nobody announced; a rule that ran once only describes the past.",
       "misconceptions": [
         "",
-        "REPLACE: the misconception behind this option"
+        "Mistakes cost for value",
+        "Believes repetition makes a deterministic check more accurate",
+        "Treats rules as paperwork rather than as protection of the next answer"
+      ],
+      "lo": [
+        "LO4"
+      ],
+      "day": "day4",
+      "session": 1,
+      "level": "understand",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo4-clean-pass",
+      "type": "single",
+      "prompt": "You wrote a rule \"weight_kg between 5 and 50\" and it reports 4,000 failures on a build you believe is clean. What do you check first?",
+      "options": [
+        "Delete the rule: it is clearly too strict",
+        "Widen the range until nothing fails",
+        "Set the rule to a warning and move on",
+        "The failing rows and their branches: a real fault and a wrong rule look the same until you read examples"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "A suite must pass on a clean build and fail on a corrupted one; when it fails, examples by owner tell you whether the data or the rule is wrong.",
+      "misconceptions": [
+        "Removes the alarm instead of finding out what it rang for",
+        "Fits the rule to the data, so it can never fail again",
+        "Keeps a rule nobody will read",
+        ""
+      ],
+      "lo": [
+        "LO4"
+      ],
+      "day": "day4",
+      "session": 1,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo5-complete-case",
+      "type": "single",
+      "prompt": "Household size is missing for 18% of households, mostly large ones, and large households receive more parcels per visit. You drop the rows with no size. What happens to \"parcels per eligible household\"?",
+      "options": [
+        "It is unchanged: dropping rows only shrinks the sample",
+        "It rises, because fewer households share the parcels",
+        "It falls, because the households that receive most were removed",
+        "It becomes undefined"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "Complete-case analysis assumes the dropped households are like the rest; here they are larger and receive more, so the average of those left is too low.",
+      "misconceptions": [
+        "Assumes the dropped households resemble the kept ones",
+        "Forgets that the parcels of the dropped households leave the numerator too",
+        "",
+        "Believes any missing value prevents an estimate"
+      ],
+      "lo": [
+        "LO5"
+      ],
+      "day": "day3",
+      "session": 2,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo5-median",
+      "type": "single",
+      "prompt": "You replace every missing household size by the median, 5. The missing households are mostly of size 7 or more. What is the main cost?",
+      "options": [
+        "Nothing: the median is robust",
+        "Large households are classified with a size of 5, so some truly eligible ones are counted as ineligible",
+        "The median changes each time the code runs",
+        "The dataset grows by 18%"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "A single value puts every missing household in the middle; a rule that depends on the size then misclassifies exactly the households the gap hides.",
+      "misconceptions": [
+        "Mistakes robustness to outliers for correctness of an imputed value",
+        "",
+        "Thinks a median is random",
+        "Confuses filling a field with adding rows"
+      ],
+      "lo": [
+        "LO5"
+      ],
+      "day": "day3",
+      "session": 2,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo5-conditional",
+      "type": "single",
+      "prompt": "Branches hand out 1, 2 or 3 parcels per visit according to the family card. Which imputation of a missing household size uses that?",
+      "options": [
+        "The overall mean size, 5.3",
+        "A size drawn at random between 1 and 14",
+        "Zero, to be conservative",
+        "The typical size of households that receive the same number of parcels per visit"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "An imputation should use what is observed and related to the missing value; parcels per visit carries information about the size.",
+      "misconceptions": [
+        "Ignores every observed fact about the household",
+        "Adds noise unrelated to the household",
+        "Uses an impossible value, and \"conservative\" has no direction here",
+        ""
+      ],
+      "lo": [
+        "LO5"
+      ],
+      "day": "day3",
+      "session": 2,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo5-range",
+      "type": "single",
+      "prompt": "Your best estimate is 2.06 parcels per eligible household per month. Under defensible assumptions about the missing sizes it ranges from 2.03 to 2.07, and the standard is 2.0. What do you report for the network as a whole?",
+      "options": [
+        "2.06, without the range: one number is clearer",
+        "\"About 2.06 (2.03 to 2.07 under different assumptions about missing sizes): at the standard\"",
+        "\"Unknown\", because 18% of sizes are missing",
+        "2.07, the most favourable value"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "When the whole range sits on one side of the decision line, say so and show the range; the reader sees both the estimate and how far it can move.",
+      "misconceptions": [
+        "Hides how much depends on an assumption",
+        "",
+        "Lets missing data veto a conclusion the whole range supports",
+        "Chooses the assumption by the answer it gives"
+      ],
+      "lo": [
+        "LO5"
+      ],
+      "day": "day3",
+      "session": 3,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo5-flip",
+      "type": "single",
+      "prompt": "A district is at 1.97 under one imputation and 2.02 under another; the standard is 2.0. How does it appear in the report?",
+      "options": [
+        "Below the standard: 1.97 is the cautious figure",
+        "At the standard: 2.02 rounds to 2",
+        "As \"cannot be classified with these data\", with both values",
+        "It is left out of the table"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "A district whose side of the line depends on the method is reported as undecided, with the values, so that nobody acts on an artefact of imputation.",
+      "misconceptions": [
+        "Picks one assumption and presents it as the finding",
+        "Picks the other assumption for the same reason",
+        "",
+        "Removes exactly the district where the uncertainty matters"
+      ],
+      "lo": [
+        "LO5"
+      ],
+      "day": "day3",
+      "session": 3,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo6-plain-hash",
+      "type": "single",
+      "prompt": "A colleague replaces national ID numbers by their SHA-256 hash and calls the table anonymous. Someone holds a list of 40,000 ID numbers of residents. What can they do?",
+      "options": [
+        "Nothing: a hash cannot be reversed",
+        "Hash their list and look each value up in the table",
+        "Only identify people whose number begins with the same digit",
+        "Decrypt the hashes with the SHA-256 key"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "A plain hash is the same for everyone who computes it; anyone with candidate identifiers can recompute and match them.",
+      "misconceptions": [
+        "Stops at \"one-way\" and misses that the same input always gives the same output",
+        "",
+        "Imagines a partial weakness where the match is exact",
+        "Thinks a plain hash has a key"
+      ],
+      "lo": [
+        "LO6"
+      ],
+      "day": "day4",
+      "session": 3,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo6-keyed",
+      "type": "single",
+      "prompt": "What makes a keyed hash (HMAC) hold where a plain hash fails?",
+      "options": [
+        "It is longer",
+        "It uses a newer algorithm",
+        "It cannot be recomputed without a key that is kept apart from the data",
+        "It changes every time it is computed"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "The pseudonym depends on a secret; whoever lacks the key cannot test candidates, and the key is the additional information that must be kept separately.",
+      "misconceptions": [
+        "Attributes safety to output length",
+        "Looks for safety in the algorithm rather than in the secret",
+        "",
+        "Confuses a keyed hash with a random token; a pseudonym must be stable to link records"
+      ],
+      "lo": [
+        "LO6"
+      ],
+      "day": "day4",
+      "session": 3,
+      "level": "understand",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo6-still-personal",
+      "type": "single",
+      "prompt": "A table holds a keyed pseudonym, the district, the exact registration date and the household size. Is it still personal data?",
+      "options": [
+        "No: there is no name and no ID number in it",
+        "No: a keyed hash is anonymisation",
+        "Only if the key is lost",
+        "Yes: pseudonymised data remain personal, and the other fields together can single a household out"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "Pseudonymised data can still be linked to a person with additional information, and a rare combination of ordinary fields can identify a household without any key.",
+      "misconceptions": [
+        "Equates personal data with direct identifiers",
+        "Confuses pseudonymisation with anonymisation",
+        "Reverses the role of the key: its existence is what keeps re-identification possible",
+        ""
+      ],
+      "lo": [
+        "LO6"
+      ],
+      "day": "day4",
+      "session": 3,
+      "level": "analyse",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo6-one-command",
+      "type": "single",
+      "prompt": "Which repository shows that a dataset is rebuildable?",
+      "options": [
+        "One that contains the final CSV and a notebook with saved outputs",
+        "One with a README describing each manual step in order",
+        "One whose single command turns the raw files into the dataset, its join log and its rule results",
+        "One with the raw personal data committed for convenience"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "Rebuildable means a command, not a description: the same raw files give the same dataset, with the counts and rule results produced by the run itself.",
+      "misconceptions": [
+        "Shows a result, not a way to produce it again",
+        "Relies on a person repeating steps exactly",
+        "",
+        "Publishes personal data in the name of reproducibility"
+      ],
+      "lo": [
+        "LO6"
+      ],
+      "day": "day4",
+      "session": 4,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo6-minimise",
+      "type": "single",
+      "prompt": "The question is \"parcels per eligible household per month, by district\". Which set of register fields do you request?",
+      "options": [
+        "Every field: unused columns can be dropped later",
+        "household_id, district_id, registered_on, status, household_size, monthly_income_sar",
+        "household_id and district_id only: everything else is personal",
+        "national_id, head_name and district_id, to be sure who is who"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "Each requested field has a step of the answer that needs it: the link, the group, the population and the eligibility rule; names and ID numbers have none.",
+      "misconceptions": [
+        "Collects first and justifies never",
+        "",
+        "Removes fields the answer cannot be computed without",
+        "Takes direct identifiers that no step of the answer uses"
       ],
       "lo": [
         "LO6"
       ],
       "day": "day1",
       "session": 1,
-      "level": "understand",
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-lo6-date-layout",
+      "type": "single",
+      "prompt": "A branch file holds dates such as 03/07/2026 and 11/04/2026. How do you decide whether the day or the month comes first?",
+      "options": [
+        "Let the library guess each value",
+        "Assume day first: it is the local habit",
+        "Look at all values of that branch: a first part above 12 anywhere settles it for the whole file",
+        "Drop every date whose two parts are both 12 or less"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "The layout is a property of the source: one unambiguous value in the file decides for all, and the decision is logged per branch.",
+      "misconceptions": [
+        "Accepts a per-value guess that can read one file both ways",
+        "Replaces evidence by habit; two branches use donated software with month first",
+        "",
+        "Discards over a third of the rows for want of looking at the others"
+      ],
+      "lo": [
+        "LO6"
+      ],
+      "day": "day2",
+      "session": 4,
+      "level": "analyse",
       "pool": "practice",
       "weight": 1
     }

@@ -39,7 +39,7 @@ Participants assemble an analysis dataset for a fictional food bank network from
 
 ## Case study
 
-**REPLACE: the name of the fictional organisation every lab works on.** REPLACE: two sentences on the case study and its synthetic data
+**Ghilal Food Bank Network.** Ghilal Food Bank Network (شبكة غِلال لبنوك الطعام) is a fictional network of 14 branches serving the 30 districts of a fictional city, Madinat Al-Sidr. Its programmes director asks how many parcels an eligible household received per month in each district in the third quarter of 2026; participants assemble the answer from 40,000 registrations with personal data, 210,000 branch log rows, a local donations API and an open district population table. All data is synthetic and generated with a fixed seed, with planted encoding faults, duplicate and mistyped keys, gaps, unit errors and missing household sizes that each lab finds.
 
 <!-- academy:labs -->
 ## Labs
@@ -70,7 +70,7 @@ Every lab is a notebook in `labs/`. Open it in Google Colab from the course page
 
 A rebuildable dataset for one of three synthetic questions, in a public repository whose README reports row counts per step, rule results and the estimate's sensitivity to missing data; eight-minute defence with a rebuild from raw files
 
-**Submission:** REPLACE: what participants submit and how: a public repository link, or a shared folder for a course without code
+**Submission:** A public GitHub repository link. The repository rebuilds the analysis dataset from the raw files of the capstone extract with one command, and holds the provenance file, the rule suite and the set-aside rows; its README reports row counts per step, rule results and the sensitivity of the estimate to missing data. No raw personal field is committed, synthetic or not. Then an eight-minute defence with a live rebuild, in which the assessor corrupts one input file and you show which rule fails and why, and four minutes of questions.
 
 ## Prerequisites
 
@@ -125,8 +125,8 @@ Each line is a capability; the examples are interchangeable.
 
 ### National references
 
-- Personal Data Protection Law and its implementing regulations: REPLACE: the address of the official text
-- PDPL guideline on destruction, anonymisation and pseudonymisation of personal data: REPLACE: the address of the official text
-- NDMO Data Classification Policy: REPLACE: the address of the official text
-- NDMO Data Sharing Policy: REPLACE: the address of the official text
-- NDMO Open Data Policy: REPLACE: the address of the official text
+- Personal Data Protection Law and its implementing regulations: https://sdaia.gov.sa/en/SDAIA/about/Documents/PersonalDataProtectionLaw.pdf and https://sdaia.gov.sa/en/SDAIA/about/Documents/ImplementingRegulationPersonalDataProtectionLaw.pdf
+- PDPL guideline on destruction, anonymisation and pseudonymisation of personal data: https://sdaia.gov.sa/Documents/PersonalDataDestructionAnonymizationAndEncryptionGuideline.pdf
+- NDMO Data Classification Policy: https://sdaia.gov.sa/en/SDAIA/about/Documents/DataClassificationPolicy.pdf
+- NDMO Data Sharing Policy: https://sdaia.gov.sa/en/SDAIA/about/Documents/DataSharingPolicyEN.pdf
+- NDMO Open Data Policy: https://sdaia.gov.sa/en/SDAIA/about/Documents/OpenDataPolicy.pdf

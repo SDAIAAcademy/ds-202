@@ -1,158 +1,491 @@
 <section class="slide title" id="title" data-auto="title">
-  <aside class="notes">REPLACE: welcome; introduce yourself; one question to the room that calibrates the pace; the rhythm of the day</aside>
+  <aside class="notes"><p>Welcome. Ask who has built a dataset that somebody else had to rebuild later, and what was missing when they tried. Keep two or three answers: they return on Day 4. The rhythm of every session is twenty to twenty-five minutes of concepts, a checkpoint, then a 25-minute lab. Check that the setup notebook ran for everyone: no key and no model is needed in this course. The pre-work quiz on joins and dataframes was AI-off; so is the first attempt at every join and rule this week.</p></aside>
 </section>
 
-<section class="slide" id="agenda" data-auto="agenda"></section>
+<section class="slide" id="agenda" data-auto="agenda">
+  <aside class="notes"><p>Day 1 opens no file until the question is taken apart. By the end of the day participants hold a variable list, a source inventory, a provenance file and a coverage table: the first four sections of the quality report they draft on Day 4.</p></aside>
+</section>
 
-<!-- Session 1 -->
-
+<!-- ======================= SESSION 1 ======================= -->
 <section class="slide section" id="s1" data-auto="section" data-session="1"></section>
 
-<section class="slide" id="s1-idea" data-lo="LO2">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
+<section class="slide" id="the-request" data-lo="LO6">
+  <div class="kicker">The case</div>
+  <h2>Ghilal Food Bank Network asks one question of four sources</h2>
+  <p class="lead">"In the third quarter of 2026, how many parcels did an eligible household receive per month in each district, and which districts are below our standard of two?"</p>
+  <div class="cols cols-4">
+    <div class="card c-teal"><h4>The register</h4><p class="small mb0">40,000 registrations with personal data. Widad Al-Ghunaim.</p></div>
+    <div class="card c-cyan"><h4>Branch logs</h4><p class="small mb0">210,000 handout rows in 14 files. Hazem Al-Sulaim.</p></div>
+    <div class="card c-purple"><h4>Donations API</h4><p class="small mb0">Every delivery of food to a branch. Talal Al-Wabil.</p></div>
+    <div class="card c-amber"><h4>Open district table</h4><p class="small mb0">Population and households, 2022. The municipality.</p></div>
   </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+  <aside class="notes"><p>The question is Sumayyah Al-Khudair's, the programmes director. Participants play Rimas Al-Sinani, the junior analyst; Ruqayyah Al-Marzouqi is the data protection officer who approves every extract. Say plainly that the organisation, the city of Madinat Al-Sidr and every record are synthetic, generated with a fixed seed, and that the records are treated as personal data from the first lab all the same: beneficiaries are a vulnerable group.</p></aside>
 </section>
 
-<section class="slide" id="s1-steps" data-lo="LO2">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="four-parts" data-lo="LO6">
+  <div class="kicker">Before any file</div>
+  <h2>A question fixes four things, and each one removes a way to be wrong</h2>
+  <table class="t small">
+    <tr><th>Part</th><th>In this question</th><th>If you leave it open</th></tr>
+    <tr><td><b>Unit</b></td><td>a household</td><td>you count handouts, and a household served twice counts twice</td></tr>
+    <tr><td><b>Population</b></td><td>active, eligible, registered before 1 July 2026</td><td>September registrations get one month and look under-served</td></tr>
+    <tr><td><b>Period</b></td><td>1 July to 30 September 2026</td><td>each branch reports its own "last quarter"</td></tr>
+    <tr><td><b>Groups</b></td><td>the district of the household</td><td>you group by branch, and a branch is not a district</td></tr>
+  </table>
+  <aside class="notes"><p>Step 1 of Lab 1.1. Ask the room for the unit before showing the table; many answer "a parcel" or "a handout". The population row is the one to dwell on: giving every household the same three months of exposure is a decision the analyst proposes and the director confirms, and it is written into the report.</p></aside>
+</section>
+
+<section class="slide" id="eligibility-rule" data-lo="LO5 LO6">
+  <div class="kicker">The rule of the network</div>
+  <h2>Eligibility is income per member, so household size decides who is counted</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Eligible: an active household whose monthly income per member is <b>at most 1,000 SAR</b></li>
+      <li>Income 6,000 SAR with 5 members: 1,200 per member, not eligible</li>
+      <li>The same income with 7 members: 857 per member, eligible</li>
+      <li>A household with no recorded size cannot be classified at all</li>
+    </ul>
+    <div class="card c-coral"><h4>Why this matters on Day 3</h4><p class="small mb0">Household size is blank for 18% of the population of the question. The denominator of the headline depends on a field that is often missing.</p></div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <aside class="notes"><p>The rule is the network's own and is fictional; do not present it as a national rule. The 18% is measured in Lab 3.1 (18.1% of the 35,665 households of the target population). The point for now: a field is "needed" when a step of the answer cannot be computed without it, even when it is personal and often missing.</p></aside>
+</section>
+
+<section class="slide" id="variables-first" data-lo="LO2 LO6">
+  <div class="kicker">Work backwards</div>
+  <h2>From the answer to variables, from variables to fields, and only then to files</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>1 · The answer</b>parcels per eligible household per month, by district</div>
+    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · Variables</b>parcels, date, eligibility, district, a link between the two</div>
+    <div class="arrow frag" data-frag="c">→</div><div class="step c-purple frag" data-frag="c"><b>3 · Fields</b>one source field for each variable</div>
+    <div class="arrow frag" data-frag="d">→</div><div class="step c-coral frag" data-frag="d"><b>4 · Files</b>request only those fields</div>
+  </div>
+  <div class="callout warn mt frag"><b>What goes wrong.</b> Starting from the files: every column looks useful, all of them are taken, and the question is bent to fit what happened to be there.</div>
+  <aside class="notes"><p>Press once per step. For step 2 ask which variables make the numerator (parcels, the date that puts them in the quarter), which decide the denominator (status, registration date, size, income) and which link the two sources (the household id on both sides).</p></aside>
+</section>
+
+<section class="slide" id="nine-fields" data-lo="LO6">
+  <div class="kicker">Lab 1.1, step 2</div>
+  <h2>The answer needs 9 of the 34 fields</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Role</th><th>Field</th><th>Source</th></tr>
+      <tr><td>numerator</td><td>parcels, handout_date</td><td>branch logs</td></tr>
+      <tr><td>link</td><td>household_id</td><td>logs and register</td></tr>
+      <tr><td>population</td><td>status, registered_on</td><td>register</td></tr>
+      <tr><td>eligibility</td><td>household_size, monthly_income_sar</td><td>register</td></tr>
+      <tr><td>groups</td><td>district_id</td><td>register</td></tr>
+    </table>
+    <div class="stack">
+      <div class="stat"><div class="big">9 of 34</div><div class="lbl">fields in the four sources that the headline needs</div></div>
+      <p class="small">Two more, from the open table, are justified by the coverage check of Session 4.</p>
+    </div>
+  </div>
+  <aside class="notes"><p>The catalogue is data/docs/field_catalogue.csv: 11 register fields, 8 log fields, 8 API fields, 7 open-table fields. The donations API gives nothing to the headline; it returns on Day 4 as a cross-source check. Not every source you were given is a source you need.</p></aside>
+</section>
+
+<section class="slide" id="not-taken" data-lo="LO6">
+  <div class="kicker">Minimisation, at the first step</div>
+  <h2>What the purpose does not need is not taken</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Field</th><th>Why it stays behind</th></tr>
+      <tr><td>national_id</td><td>household_id already links the sources</td></tr>
+      <tr><td>head_name</td><td>no step of the answer uses a name</td></tr>
+      <tr><td>phone</td><td>nobody is contacted</td></tr>
+      <tr><td>collected_by</td><td>does not change a count of parcels</td></tr>
+      <tr><td>note</td><td>free text can hold anything</td></tr>
+    </table>
+    <div class="callout tip"><b>The law, in one line.</b> The Personal Data Protection Law limits the content of personal data to the minimum necessary for the purpose. The cheapest moment to apply it is before the extract is requested.</div>
+  </div>
+  <aside class="notes"><p>Sources: Personal Data Protection Law, the article on the purpose and content of collection (read in the English text on sdaia.gov.sa). FN-106 covered the law; here it becomes a column list. Be honest about the labs: names and ID numbers are in the teaching extract because Day 2 teaches text repair and matching and Day 4 pseudonymisation. In the capstone repository no raw personal field is committed.</p></aside>
+</section>
+
+<section class="slide" id="gaps" data-lo="LO2">
+  <div class="kicker">Lab 1.1, step 4</div>
+  <h2>Three things the question needs are in no source</h2>
+  <div class="cols cols-3">
+    <div class="card c-coral"><h4>Households that never registered</h4><p class="small mb0">The register lists who came. Session 4 measures how many did not.</p></div>
+    <div class="card c-purple"><h4>Verified household sizes</h4><p class="small mb0">Sizes are reported by the household. An audit verified 600 of them.</p></div>
+    <div class="card c-amber"><h4>A frame for D29 and D30</h4><p class="small mb0">Two districts established after the open table was made.</p></div>
+  </div>
+  <div class="callout note mt"><b>Write gaps down on Day 1.</b> A gap named before the analysis is a limit. A gap found by a reader afterwards is an error.</div>
+  <aside class="notes"><p>Each gap has its session: coverage today, measurement error in Session 4 of Day 3, and the frame again today. The list goes into variables.json and from there into the quality report.</p></aside>
+</section>
+
+<section class="slide" id="check-question" data-lo="LO6">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which field do you ask for?</h2>
+  <div class="quiz" data-type="single" data-lo="LO6">
+    <p class="lead">Widad offers to add any register field to your extract. The headline is parcels per eligible household per month, by district. Which one do you ask her to include?</p>
+    <div class="opts">
+      <div class="opt" data-ok>household_size, because eligibility is income per member</div>
+      <div class="opt" data-why="Takes an identifier as a safer link, when household_id already joins the sources and the question names nobody">national_id, to be sure of linking the right household</div>
+      <div class="opt" data-why="Collects for a possible later use; the approval names one purpose and nobody is contacted in it">phone, in case a household must be called to confirm</div>
+      <div class="opt" data-why="Believes more columns make a safer dataset; every field taken must be justified by a step of the answer">every field, since unused columns can be dropped later</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> A field is needed when a step of the answer cannot be computed without it. Size is personal data and it is needed; the ID number is personal data and it is not.</div>
+  </div>
+  <aside class="notes"><p>Answer: A. If the room chooses "every field", ask who will remember to drop the columns, and what the data protection officer approved. Minimisation does not mean taking nothing personal: it means being able to name the step that uses each field.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-1-1" data-auto="lab" data-lab="1.1">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-off. There is little code here; the work is the reasoning, and the checks read the returned lists. Typical problems: weight and unit listed as needed (they are not, for a count of parcels: the check prints them as "beyond the core, to justify"); branch_id used for the groups. Everyone starts from the field catalogue, so no earlier lab is needed. Anyone who finishes early takes the stretch: the second question, on kilograms per member.</p></aside>
 </section>
 
-<!-- Session 2 -->
-
+<!-- ======================= SESSION 2 ======================= -->
 <section class="slide section" id="s2" data-auto="section" data-session="2"></section>
 
-<section class="slide" id="s2-idea" data-lo="LO6">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
+<section class="slide" id="three-doors" data-lo="LO6">
+  <div class="kicker">How data arrive</div>
+  <h2>Files, an API and a database fail in three different ways</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>Files</h4><p class="small mb0">Nothing describes them. Encoding, date layout and units are in nobody's head but the sender's. A file can come twice or not at all.</p></div>
+    <div class="card c-purple"><h4>An API</h4><p class="small mb0">Data come in pages, the service can be busy, and records change while you read. It usually states a total.</p></div>
+    <div class="card c-cyan"><h4>A database</h4><p class="small mb0">Types and keys are declared, but only the ones somebody declared. Your query decides what you see.</p></div>
   </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+  <p class="small mt">One habit covers all three: before reading a value, count what arrived against what the source says it sent.</p>
+  <aside class="notes"><p>In the labs the register is an in-memory DuckDB table loaded from the extract file, and the API is a small server started on the participant's own computer or Colab runtime by G.start_api(); nothing leaves the machine. Say so, so nobody looks for a network address.</p></aside>
 </section>
 
-<section class="slide" id="s2-steps" data-lo="LO6">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="text-first" data-lo="LO6">
+  <div class="kicker">Recap of FN-104, one step further</div>
+  <h2>Load every column as text first; decide types later, in steps you can count</h2>
+  <ul class="bullets">
+    <li>B01 reads as UTF-8. <b>B03 fails</b> at its first Arabic name: it is in Windows-1256</li>
+    <li>B08 opens, but begins with three extra bytes, <code>EF BB BF</code>: a byte order mark that a spreadsheet wrote</li>
+    <li>A loader that guesses types reads <code>03/07/2026</code> as March or as July, and does not say which</li>
+    <li>As text, nothing is lost: 14 files, <b>210,000 rows</b>, every repair still ahead and countable</li>
+  </ul>
+  <div class="callout warn mt"><b>What goes wrong.</b> The mark becomes part of the first column name, and <code>log_id</code> is "not found" in one file of fourteen.</div>
+  <aside class="notes"><p>Demonstrate: G.log_bytes("B03").decode("utf-8") raises UnicodeDecodeError at byte 0xcc; G.log_bytes("B08")[:6] shows the mark. FN-104 taught code pages on one file per encoding; here the encodings are spread over fourteen files and nobody says which is which. The codec utf-8-sig removes the mark. Sources: Python codecs documentation.</p></aside>
+</section>
+
+<section class="slide" id="paging" data-lo="LO6">
+  <div class="kicker">Reading an API</div>
+  <h2>Follow <code>next</code> until it is null, and expect a busy answer</h2>
+  <div class="cols cols-2">
+    <pre class="code" data-file="Lab 1.2 · fetch_all"><code class="language-python">records, url = [], "/v1/donations?page=1&amp;per_page=200"
+while url:
+    page = G.get_json(base + url)   # retries a 503
+    records += page["data"]
+    total, url = page["total"], page["next"]</code></pre>
+    <ul class="bullets small">
+      <li>The address of the next page comes from the answer; do not compute it</li>
+      <li>503 means "busy, ask again": wait, retry, give up after a few tries</li>
+      <li>Keep the <code>total</code> the service reports: it is its claim about itself</li>
+    </ul>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <aside class="notes"><p>The first request for page 5 answers 503 once; G.get_json waits and asks again, up to three times. Ask what a loop without the retry does: it stops with an error after 800 records, which is the good case. A loop that swallows the error and continues would silently skip a page.</p></aside>
+</section>
+
+<section class="slide" id="api-total" data-lo="LO3 LO6">
+  <div class="kicker">Measured in Lab 1.2</div>
+  <h2>The API sent 12 records more than its own total</h2>
+  <div class="cols cols-2">
+    <div class="stack">
+      <div class="stat"><div class="big">5,137 · 5,125</div><div class="lbl">records received, and the total the API reports</div></div>
+    </div>
+    <ul class="bullets">
+      <li>Donations kept arriving while the 26 pages were read</li>
+      <li>Four pages begin with records the page before ended with</li>
+      <li>12 donation ids arrive twice; distinct ids are exactly 5,125</li>
+      <li>The inventory records the distinct count <b>and</b> the 12 that were dropped</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From the Lab 1.2 solution run: 5,137 received, 12 ids repeated, 5,125 distinct, equal to the total. The duplicates would have added whole deliveries to four branches. The lesson is the comparison, not the cause: a count from the source that disagrees with yours is the cheapest test there is.</p></aside>
+</section>
+
+<section class="slide" id="register-sql" data-lo="LO3">
+  <div class="kicker">The register, in SQL</div>
+  <h2>40,000 rows describe 39,820 households</h2>
+  <div class="cols cols-2">
+    <pre class="code" data-file="Lab 1.2 · register_counts"><code class="language-sql">SELECT count(*),
+       count(DISTINCT household_id),
+       min(registered_on),
+       max(registered_on)
+FROM registrations;</code></pre>
+    <div class="stack">
+      <div class="stat"><div class="big">180</div><div class="lbl">household ids that are in the register twice</div></div>
+      <div class="card c-coral flat"><h4>Not an error, yet</h4><p class="small mb0">A household that registers again at another branch gets a second row. It becomes an error in the first join that assumes one row per id.</p></div>
+    </div>
+  </div>
+  <aside class="notes"><p>Run the query live. Registrations run from 2021-01-03 to 2026-09-28. Show three repeated ids with their two branches. Tomorrow's Lab 2.2 joins 210,000 log rows to this table; ask what happens to the handouts of those 180 households if nobody looks first.</p></aside>
+</section>
+
+<section class="slide" id="inventory" data-lo="LO2 LO6">
+  <div class="kicker">The source inventory</div>
+  <h2>Three sources reconcile; the largest has nothing to reconcile against</h2>
+  <table class="t small">
+    <tr><th>Source</th><th>Arrives as</th><th>Rows</th><th>The source says</th><th>Agrees</th></tr>
+    <tr><td>register</td><td>database extract</td><td>40,000</td><td>40,000 registrations</td><td>yes</td></tr>
+    <tr class="hl"><td>branch logs</td><td>14 files</td><td>210,000</td><td>nothing</td><td>unknown</td></tr>
+    <tr><td>donations</td><td>API, 26 pages</td><td>5,125</td><td>total = 5,125</td><td>yes</td></tr>
+    <tr><td>open district table</td><td>one file</td><td>28</td><td>28 districts of 2022</td><td>yes</td></tr>
+  </table>
+  <div class="callout warn mt"><b>What goes wrong.</b> A week uploaded twice and a week never uploaded both pass this table. The logs hold one of each.</div>
+  <aside class="notes"><p>The table is the output of Lab 1.2, step 4. The logs' silence about themselves is a limit that goes into their provenance record in the next session. The week uploaded twice is found in Lab 2.2 (380 rows at B02), the missing days in Lab 3.1 (B12, nine days of August).</p></aside>
+</section>
+
+<section class="slide" id="check-total" data-lo="LO3">
+  <div class="kicker">Checkpoint</div>
+  <h2>Your count and the count of the source disagree</h2>
+  <div class="quiz" data-type="single" data-lo="LO3">
+    <p class="lead">You paged through an API and hold 5,137 records. The API reports a total of 5,125. What goes into the source inventory?</p>
+    <div class="opts">
+      <div class="opt" data-why="Trusts the larger number as the more complete one, without asking where 12 extra records came from">5,137: it is what actually arrived</div>
+      <div class="opt" data-why="Copies the claim of the source without checking that the records held can produce it">5,125: the API knows its own data</div>
+      <div class="opt" data-ok>5,125 distinct ids, and a line that 12 repeats were dropped</div>
+      <div class="opt" data-why="Treats a difference of 0.2% as noise, when each record is a whole delivery of food">Either: twelve records cannot change the analysis</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The inventory has to explain the difference, not hide it: what arrived, what was dropped and why, and that the result equals the total the source reports.</div>
+  </div>
+  <aside class="notes"><p>Answer: C. B gives the same number and is still wrong: writing 5,125 without knowing that the distinct ids make exactly that number is luck. Ask what they would do if the distinct count had been 5,119: go back to the owner, Talal, before any analysis.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-1-2" data-auto="lab" data-lab="1.2">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-off for the first attempt at each loader. Typical problems: pd.read_csv without dtype=str, which turns blank household ids into NaN and weights into numbers; decoding B08 as plain utf-8 and keeping the mark; a paging loop that builds the next address itself and never ends. The API runs on the participant's machine; if a port is refused on a locked-down laptop, use Colab. If read_branch is not finished the next cells use G.logs_raw(), so everybody reaches the inventory. The last cell stops the API.</p></aside>
 </section>
 
-<!-- Session 3 -->
-
+<!-- ======================= SESSION 3 ======================= -->
 <section class="slide section" id="s3" data-auto="section" data-session="3"></section>
 
-<section class="slide" id="s3-idea" data-lo="LO2">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
+<section class="slide" id="why-provenance" data-lo="LO2">
+  <div class="kicker">A year from now</div>
+  <h2>Somebody will ask where a number came from, and you will not be in the room</h2>
   <div class="cols cols-2">
     <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
+      <li>Which extract was this, and from which day?</li>
+      <li>Who can say what a column means?</li>
+      <li>Were we allowed to use it for this?</li>
+      <li>What is it known not to cover?</li>
     </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
+    <div class="card c-teal"><h4>A provenance record</h4><p class="small mb0">One short record per source, kept in the repository beside the code, changed in the same commit as the extract it describes.</p></div>
   </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+  <aside class="notes"><p>Return to the answers from the opening question of the day. Provenance here is deliberately modest: a file with one record per source, not a lineage system. The idea of a short standard document that travels with a dataset is the one behind "Datasheets for Datasets". Sources: Gebru and others, Datasheets for Datasets.</p></aside>
 </section>
 
-<section class="slide" id="s3-steps" data-lo="LO2">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="six-fields" data-lo="LO2">
+  <div class="kicker">The record</div>
+  <h2>Six fields, and what a reviewer needs to read in each</h2>
+  <table class="t small">
+    <tr><th>Field</th><th>A reviewer needs</th></tr>
+    <tr><td><b>origin</b></td><td>the system, and how the extract was made</td></tr>
+    <tr><td><b>owner</b></td><td>the person to ask, by role</td></tr>
+    <tr><td><b>coverage</b></td><td>which units, which period, and who is not in it</td></tr>
+    <tr><td><b>sharing basis</b></td><td>the consent, agreement or approval, and its purpose</td></tr>
+    <tr><td><b>refresh date</b></td><td>the day your copy was taken</td></tr>
+    <tr><td><b>limits</b></td><td>what the data cannot be trusted for</td></tr>
+  </table>
+  <p class="small mt-s">The labs add a seventh key, the classification level of the source.</p>
+  <aside class="notes"><p>These six are the fields of outcome LO2. The test of each field is whether a stranger could act on it: "Hazem" is not an owner, "Hazem Al-Sulaim, branch operations lead" is. The reviewer checklist of Lab 1.3 checks form (a full phrase, a real date, at least two limits); a trainer checks substance.</p></aside>
+</section>
+
+<section class="slide" id="sharing-basis" data-lo="LO2">
+  <div class="kicker">On what basis</div>
+  <h2>Holding an extract is not permission to use it for the next question</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>The register extract came under approval DS-2026-041, for <b>service coverage analysis, Q3 2026</b></li>
+      <li>The approval names a purpose, the people who may see the data, and that identified records go no further</li>
+      <li>A new question next year is a new request to the data protection officer</li>
+    </ul>
+    <div class="card c-purple"><h4>In the Data Sharing Policy</h4><p class="small mb0">Among its principles: sharing serves a legitimate purpose, and access is authorised on a need-to-know and least-privilege basis.</p></div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <aside class="notes"><p>The approval number is fictional. The policy is written for government entities; Ghilal is a charity that adopts its principles as its own procedure, and the slide should be presented that way. Sources: Data Sharing Policy (National Data Management Office), the principles "Legitimate Purpose" and "Authorized Access", read in the English text.</p></aside>
+</section>
+
+<section class="slide" id="classification" data-lo="LO2">
+  <div class="kicker">The seventh key</div>
+  <h2>Three of the four sources are Restricted; one is Public</h2>
+  <table class="t small">
+    <tr><th>Source</th><th>Level</th><th>Because</th></tr>
+    <tr><td>register</td><td>Restricted</td><td>personal data of beneficiaries</td></tr>
+    <tr><td>branch logs</td><td>Restricted</td><td>household ids and names of collectors</td></tr>
+    <tr><td>donations API</td><td>Restricted</td><td>internal operations, no donor names</td></tr>
+    <tr class="hl"><td>open district table</td><td>Public</td><td>published under an open licence</td></tr>
+  </table>
+  <p class="small mt-s">The national policy has four levels: Top Secret, Secret, Restricted and Public. Anything joined to a Restricted source is at least Restricted.</p>
+  <aside class="notes"><p>FN-106 taught the levels; this is the recap. The last sentence is the practical one: the joined table that carries a district name from the public table is not public. Day 4 returns to which outputs may leave the analysis environment. Sources: Data Classification Policy (National Data Management Office).</p></aside>
+</section>
+
+<section class="slide" id="three-dates" data-lo="LO2">
+  <div class="kicker">Open data has provenance too</div>
+  <h2>The open table has three dates, and only one is the refresh date</h2>
+  <div class="cols cols-3">
+    <div class="card c-coral"><h4>2022</h4><p class="small mb0">The year the rows describe. It belongs in <b>coverage</b>.</p></div>
+    <div class="card c-purple"><h4>15 March 2023</h4><p class="small mb0">The day it was published. It identifies the release, in <b>origin</b>.</p></div>
+    <div class="card c-teal"><h4>2 October 2026</h4><p class="small mb0">The day our copy was downloaded: the <b>refresh date</b>.</p></div>
+  </div>
+  <div class="callout tip mt"><b>And the gap between them is a limit.</b> A table about 2022 used in 2026 describes a city that has since grown, unevenly.</div>
+  <aside class="notes"><p>The publisher, the "Open Data Portal of Madinat Al-Sidr Municipality", is fictional. A licence that allows free reuse with attribution is its sharing basis. The Open Data Policy lists licensing and being up to date among its principles; a user of open data still has to record which release was used. Sources: Open Data Policy (National Data Management Office).</p></aside>
+</section>
+
+<section class="slide" id="weak-record" data-lo="LO2">
+  <div class="kicker">Lab 1.3, step 3</div>
+  <h2>A record written in a hurry fails eight checks</h2>
+  <div class="cols cols-2">
+    <div class="card c-coral"><h4>The draft</h4><p class="small mb0">origin: "files" · owner: "Hazem" · coverage: "this year" · sharing basis: "internal" · refresh date: "October" · limits: "messy" · classification: "Internal"</p></div>
+    <div class="card c-teal"><h4>Repaired from the source note</h4><p class="small mb0">One row per handout, 1 January to 30 September 2026, all 14 branches. Copy of 2026-10-03. Four limits, among them: a week can be uploaded twice or be missing, and no file says so.</p></div>
+  </div>
+  <p class="small mt">"Internal" is not one of the four levels. "This year" will be false in January.</p>
+  <aside class="notes"><p>G.review_provenance returns the eight complaints: four fields that are not a full phrase, a coverage with no year, a refresh date that is not a date, fewer than two limits, a level that does not exist. The checklist cannot tell whether a limit is true; that is why the lab makes participants repair the record from the note and not from imagination.</p></aside>
+</section>
+
+<section class="slide" id="limits-feed-later" data-lo="LO2 LO1">
+  <div class="kicker">Why limits earn their place</div>
+  <h2>A limit written on Day 1 is an explanation on Day 3</h2>
+  <ul class="bullets">
+    <li>"The online form and the call script offer sizes 1 to 6 only": why sizes are missing for large households</li>
+    <li>"No size field on the paper form of B03 and B11 before March 2025": why they are missing at two branches</li>
+    <li>"Sizes are reported, not verified": why an audit was needed</li>
+    <li>"A week can be missing, and no file says so": why a district can look under-served</li>
+  </ul>
+  <aside class="notes"><p>Each line is a planted problem that a named lab finds: Lab 3.1 for the first two and the last, Lab 3.4 for the third. Ask participants to keep the register note open tomorrow and on Day 3. A limit nobody wrote down is rediscovered, at ten times the cost, by whoever analyses the data next.</p></aside>
+</section>
+
+<section class="slide" id="check-provenance" data-lo="LO2">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which coverage line passes a reviewer?</h2>
+  <div class="quiz" data-type="single" data-lo="LO2">
+    <p class="lead">You are writing the coverage field of the register record. Which line lets a stranger decide what the data can answer?</p>
+    <div class="opts">
+      <div class="opt" data-why="Describes the system and not the copy: the reader cannot tell which period the extract holds">All households registered with the network</div>
+      <div class="opt" data-ok>Registrations 2021-01-03 to 2026-09-28; households that never registered are absent</div>
+      <div class="opt" data-why="Confuses the size of the file with what it covers: a row count says nothing about who is missing">40,000 rows, 11 columns, 4.4 MB</div>
+      <div class="opt" data-why="States the refresh date in the coverage field: the day of the copy is not the period it covers">Extract taken on 2026-10-04 from the register</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Coverage says which units and which period, and names who is not in it. The absent households are the most important part of the line.</div>
+  </div>
+  <aside class="notes"><p>Answer: B. D is a correct sentence in the wrong field. If someone defends A, ask which year "all" refers to and whether a household registered tomorrow is covered.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-1-3" data-auto="lab" data-lab="1.3">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-off: the source notes are short and reading them is the task. Typical problems: the reference year 2022 written as the refresh date of the open table; a sharing basis without the approval, which the checklist rejects for anything that is not Public; one long limit instead of a list. The records of the logs and the API are supplied in data/reference/provenance_supplied.json, so step 4 never depends on step 3. provenance.json is the evidence of LO2: look at two or three while they work.</p></aside>
 </section>
 
-<!-- Session 4 -->
-
+<!-- ======================= SESSION 4 ======================= -->
 <section class="slide section" id="s4" data-auto="section" data-session="4"></section>
 
-<section class="slide" id="s4-idea" data-lo="LO1">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
+<section class="slide" id="frame-vs-register" data-lo="LO1 LO2">
+  <div class="kicker">Three populations</div>
+  <h2>The question is about households in need; the register lists households that came</h2>
+  <div class="flow">
+    <div class="step c-coral"><b>In need</b>every low-income household of the city. Nobody has this list.</div>
+    <div class="arrow">→</div><div class="step c-purple"><b>The frame</b>a 2022 survey estimate of low-income households, by district</div>
+    <div class="arrow">→</div><div class="step c-teal"><b>The register</b>households that registered, by district</div>
   </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+  <div class="callout note mt"><b>Coverage</b> is the register divided by the frame. It says how much of the population of interest the data can speak for.</div>
+  <aside class="notes"><p>A sampling frame is the list a study can reach; the gap between the frame and the population is coverage error. Here even the frame is an estimate. The headline will describe eligible registered households; this session measures how far that is from households in need, district by district.</p></aside>
 </section>
 
-<section class="slide" id="s4-steps" data-lo="LO1">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="outer-join" data-lo="LO3">
+  <div class="kicker">Lab 1.4, step 2</div>
+  <h2>A join against an outside list has three outcomes; an inner join shows one</h2>
+  <div class="cols cols-3">
+    <div class="card c-teal"><h4>In both · 28</h4><p class="small mb0">Districts with a registered count and a frame.</p></div>
+    <div class="card c-coral"><h4>Register only · 2</h4><p class="small mb0">D29 and D30: 2,523 registered households, no row in the frame.</p></div>
+    <div class="card c-purple"><h4>Frame only · 0</h4><p class="small mb0">No district of the frame is without registrations.</p></div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <p class="small mt">With an inner join the table has 28 tidy rows, and 2,523 households leave the analysis without a message.</p>
+  <aside class="notes"><p>From the Lab 1.4 run: 37,333 active registered households in 30 districts; D29 has 1,039 and D30 has 1,484. The lab uses a full outer join with an indicator column and validate="one_to_one". Tomorrow's rule, "no row silently lost", starts here: the rows that do not match are the finding.</p></aside>
+</section>
+
+<section class="slide" id="coverage-numbers" data-lo="LO1">
+  <div class="kicker">Measured in Lab 1.4</div>
+  <h2>In four districts the register reaches about a third of the households in need</h2>
+  <div class="bars">
+    <div class="row"><span>D07 Al-Mahjar</span><div class="bar c-coral" style="--w:31%"></div><span class="val">0.31</span></div>
+    <div class="row"><span>D22 Al-Jabal</span><div class="bar c-coral" style="--w:34%"></div><span class="val">0.34</span></div>
+    <div class="row"><span>D26 Wadi Al-Sidr</span><div class="bar c-coral" style="--w:34%"></div><span class="val">0.34</span></div>
+    <div class="row"><span>D15 Al-Sahil</span><div class="bar c-coral" style="--w:36%"></div><span class="val">0.36</span></div>
+    <div class="row"><span>23 other districts</span><div class="bar c-teal" style="--w:80%"></div><span class="val">0.71 to 0.90</span></div>
+    <div class="row"><span>D03 Al-Waha</span><div class="bar c-purple" style="--w:100%"></div><span class="val">1.18</span></div>
+  </div>
+  <aside class="notes"><p>Coverage = active registered households divided by low_income_households_est. The four under-covered districts are flagged below 0.50. Ask what parcels per registered household can say about D07: something about 606 households, and nothing about the roughly 1,360 that the frame expects and the register does not hold.</p></aside>
+</section>
+
+<section class="slide" id="over-100" data-lo="LO1 LO2">
+  <div class="kicker">A ratio above 1</div>
+  <h2>Coverage of 118% says the frame is old, not that the register is wrong</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>D03: 1,113 registered households against an estimate of 940</li>
+      <li>The frame describes 2022; the district has grown since</li>
+      <li>The estimate is from a survey, with no published margin of error</li>
+      <li>"Low income" in the survey is not the eligibility rule of the network</li>
+    </ul>
+    <div class="callout warn"><b>What goes wrong.</b> Reading the ratio as a fact about the register: "178 fabricated households". The denominator is the uncertain part.</div>
+  </div>
+  <aside class="notes"><p>All three limits were written into the provenance record of the open table in Lab 1.3. Coverage ratios are approximate in every district, not only in the one where the approximation happens to show. Report them to one decimal less than you computed.</p></aside>
+</section>
+
+<section class="slide" id="missing-units" data-lo="LO1">
+  <div class="kicker">A first kind of missing data</div>
+  <h2>Under-coverage is whole households missing, and not at random</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Missing <b>values</b>: the household is there, a field is blank. Day 3, Sessions 1 to 3</li>
+      <li>Missing <b>units</b>: the household is not in the data at all</li>
+      <li>Households far from a branch register less; they are also the ones served least</li>
+      <li>The headline is therefore too kind to exactly the districts it is meant to find</li>
+    </ul>
+    <div class="card c-coral"><h4>No repair, only a report</h4><p class="small mb0">No imputation of a field brings back a household that was never listed. The coverage table goes beside the headline.</p></div>
+  </div>
+  <aside class="notes"><p>This is the first of the scenarios of LO1: the mechanism (absence related to the outcome itself) and the direction of bias (the figure for under-covered districts is too high as a description of households in need). Day 3 gives the vocabulary; today participants meet the thing itself.</p></aside>
+</section>
+
+<section class="slide" id="coverage-note" data-lo="LO2">
+  <div class="kicker">Lab 1.4, step 4</div>
+  <h2>Three sentences go under the headline</h2>
+  <ul class="bullets">
+    <li>The figure describes registered households only; in D07, D15, D22 and D26 fewer than half of the estimated low-income households are registered</li>
+    <li>For D29 and D30 the share of households in need that are registered is unknown: the frame has no row</li>
+    <li>The frame is a 2022 survey estimate; coverage ratios are approximate</li>
+  </ul>
+  <div class="callout warn mt"><b>And two that must not.</b> "Low coverage means low need." "Coverage above 100% shows fabricated households."</div>
+  <aside class="notes"><p>The catalog entry asks that coverage gaps do not hide under-served districts: this note is how. It is written once, on Day 1, and reused in the quality report of Lab 4.4.</p></aside>
+</section>
+
+<section class="slide" id="check-coverage" data-lo="LO1">
+  <div class="kicker">Checkpoint</div>
+  <h2>A district that looks well served</h2>
+  <div class="quiz" data-type="single" data-lo="LO1">
+    <p class="lead">District D22 shows a healthy number of parcels per registered household, and its coverage is 0.34. What may the report say about D22?</p>
+    <div class="opts">
+      <div class="opt" data-why="Lets the registered third stand for everyone, when two thirds of the estimated households are in no file">D22 is well served and needs no attention</div>
+      <div class="opt" data-why="Corrects the figure with a frame that is itself a rough 2022 estimate, and presents the product as a measurement">Its true figure is the reported one multiplied by 0.34</div>
+      <div class="opt" data-why="Discards a real finding about real households because the data do not answer a larger question">Nothing: with such coverage the district must be dropped</div>
+      <div class="opt" data-ok>Its registered households are served; most households in need are not registered</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The data speak for the households they contain. The coverage ratio says how many they do not contain, and that sentence sits beside the figure.</div>
+  </div>
+  <aside class="notes"><p>Answer: D. B is tempting to quantitative people: it turns two uncertain numbers into one that looks exact. Report the figure and the coverage side by side and let the director see both.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-1-4" data-auto="lab" data-lab="1.4">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-off for the first attempt. Typical problems: count(*) instead of count(DISTINCT household_id), which adds the 180 repeated ids; an inner join, which loses D29 and D30 (the check names them); a ratio computed the wrong way round. The lab starts from G.registry(), so it needs nothing from the earlier labs of the day. The flags must come out as four under-covered, one above 100%, two without a frame.</p></aside>
 </section>
 
+<!-- ======================= CLOSING ======================= -->
 <section class="slide" id="wrap-up">
   <div class="kicker">Day 1 · wrap-up</div>
   <h2>Three things to keep</h2>
   <div class="cols cols-3">
-    <div class="card c-teal"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
-    <div class="card c-coral"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
-    <div class="card c-purple"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
+    <div class="card c-teal"><h4>The question chooses the fields</h4><p class="small mb0">Unit, population, period, groups. Nine fields of 34; five identifying fields stay behind.</p></div>
+    <div class="card c-purple"><h4>Count before you read</h4><p class="small mb0">What arrived against what the source says: 5,125 of 5,125, 40,000 rows for 39,820 households, and logs that say nothing.</p></div>
+    <div class="card c-coral"><h4>Write down what a source cannot do</h4><p class="small mb0">Six fields per source, and a coverage table that keeps four districts from looking well served.</p></div>
   </div>
+  <aside class="notes"><p>Ask each participant for the limit they would have missed. Collect provenance.json from two volunteers and read one field of each aloud: is it something a stranger could act on?</p></aside>
 </section>
 
-<section class="slide dark" id="next" data-label="Next">
-  <div class="kicker">Next</div>
-  <h2>Day 2: Join and clean</h2>
-  <p class="lead">REPLACE: what participants prepare before then; unfinished labs can be finished at home</p>
-  <aside class="notes">REPLACE: accounts, installs or reading participants need before the next unit</aside>
+<section class="slide dark" id="next" data-label="Day 2">
+  <div class="kicker">Next · Day 2</div>
+  <h2>Join and clean: every repair counted</h2>
+  <ul class="bullets">
+    <li>One register file in three states of encoding, and names that must match</li>
+    <li>210,000 log rows joined to the register without losing or adding a row</li>
+    <li>300 walk-in records with no key at all</li>
+    <li>Three date layouts and two weight units that no file declares</li>
+  </ul>
+  <aside class="notes"><p>Nothing to prepare. Tomorrow's labs each start from the raw files, not from today's outputs. Remind participants that the first attempt at each join is AI-off; a hint-only tutor is allowed for regular expressions.</p></aside>
 </section>
