@@ -49,7 +49,7 @@ import build_dataset as B   # the reference build: one command, raw files in, ar
 #
 # In a terminal the command is `uv run python build_dataset.py`. Here the same function runs in the notebook.
 # It reads only `data/raw/`, and writes `artifacts/build/`: the two tables, the log of row counts per step, the
-# rows set aside with their reason, the rule results and a skeleton of the report. It takes about 20 seconds.
+# rows set aside with their reason, the rule results and a skeleton of the report. It takes under a minute (20 to 40 seconds on a laptop).
 
 # %%
 r = B.build()

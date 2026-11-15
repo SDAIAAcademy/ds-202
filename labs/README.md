@@ -4,7 +4,7 @@ Hands-on notebooks for the SDAIA Academy course **DS-202 Data Acquisition, Prepa
 
 All data is **synthetic**: every name, phone number and ID number was drawn at random by `prepare_data.py` and belongs to nobody. Treat it as personal data all the same; that is the point of the course.
 
-**No lab calls a model.** There is no key, no account and nothing to download beyond the Python packages. A laptop CPU or a Colab CPU runtime is enough; the longest cell of the course runs for about 20 seconds.
+**No lab calls a model.** There is no key, no account and nothing to download beyond the Python packages. A laptop CPU or a Colab CPU runtime is enough; the longest cell of the course, the reference build, runs for under a minute.
 
 ## Quick start
 

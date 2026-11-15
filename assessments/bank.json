@@ -295,7 +295,7 @@
     {
       "id": "q-lo3-fan-out",
       "type": "single",
-      "prompt": "You join 209,620 log rows to the register on household_id with a left join and get 210,580 rows. No error was raised. What happened?",
+      "prompt": "You join 209,620 log rows to the register on household_id with a left join and get 210,585 rows. No error was raised. What happened?",
       "options": [
         "Some log rows had no household in the register",
         "The join found households that the logs had missed",
