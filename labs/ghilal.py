@@ -246,3 +246,14 @@ def review_provenance(rec: dict) -> list[str]:
     elif rec["classification"] != "Public" and not re.search("approval|agreement|consent", str(rec["sharing_basis"]), re.I):
         bad.append("sharing_basis: data that are not public need the approval, agreement or consent that lets you use them")
     return bad
+
+
+# ---- Day 3 ------------------------------------------------------------------------------------------------------
+
+def impute_within_groups(h):
+    """Household sizes with each blank replaced by the median recorded size of households that usually receive
+    the same number of parcels per handout (0 when a household has no handout at all). The reference step of
+    Lab 3.2; Labs 3.3 and 3.4 start from it."""
+    group = h["usual_parcels"].fillna(0).astype(int)
+    med = h["household_size"].groupby(group).median().round().astype(int)
+    return h["household_size"].fillna(group.map(med)).astype(int)

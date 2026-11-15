@@ -473,7 +473,7 @@
       "options": [
         "\"Validation failed in 3 checks\"",
         "\"Row 2,214 is invalid\"",
-        "\"B05: 303 handouts weigh 22 to 30 kg per parcel; the standard is 9 to 15. Was the weight entered in pounds?\"",
+        "\"B05: 303 handouts weigh 21 to 32 kg per parcel; the standard is 9 to 15. Was the weight entered in pounds?\"",
         "\"weight_kg check returned False\""
       ],
       "correct": [
@@ -672,10 +672,10 @@
     {
       "id": "q-lo5-range",
       "type": "single",
-      "prompt": "Your best estimate is 2.06 parcels per eligible household per month. Under defensible assumptions about the missing sizes it ranges from 2.03 to 2.07, and the standard is 2.0. What do you report for the network as a whole?",
+      "prompt": "Your best estimate is 2.06 parcels per eligible household per month. Under defensible assumptions about the missing sizes it ranges from 2.02 to 2.07, and the standard is 2.0. What do you report for the network as a whole?",
       "options": [
         "2.06, without the range: one number is clearer",
-        "\"About 2.06 (2.03 to 2.07 under different assumptions about missing sizes): at the standard\"",
+        "\"About 2.06 (2.02 to 2.07 under different assumptions about missing sizes): at or above the standard\"",
         "\"Unknown\", because 18% of sizes are missing",
         "2.07, the most favourable value"
       ],

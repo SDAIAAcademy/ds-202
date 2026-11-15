@@ -1,0 +1,14 @@
+[
+ {
+  "size_missing": false,
+  "audited": 289,
+  "mean_size": 5.26,
+  "share_7_plus": 0.25
+ },
+ {
+  "size_missing": true,
+  "audited": 290,
+  "mean_size": 7.21,
+  "share_7_plus": 0.68
+ }
+]

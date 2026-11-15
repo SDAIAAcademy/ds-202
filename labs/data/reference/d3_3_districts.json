@@ -1,0 +1,182 @@
+[
+ {
+  "district_id": "D01",
+  "low": 2.076,
+  "high": 2.088,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D02",
+  "low": 2.117,
+  "high": 2.146,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D03",
+  "low": 2.168,
+  "high": 2.197,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D04",
+  "low": 2.051,
+  "high": 2.074,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D05",
+  "low": 2.123,
+  "high": 2.323,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D06",
+  "low": 2.052,
+  "high": 2.237,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D07",
+  "low": 1.382,
+  "high": 1.412,
+  "verdict": "below"
+ },
+ {
+  "district_id": "D08",
+  "low": 2.007,
+  "high": 2.023,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D09",
+  "low": 1.983,
+  "high": 2.014,
+  "verdict": "depends on the assumption"
+ },
+ {
+  "district_id": "D10",
+  "low": 2.218,
+  "high": 2.251,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D11",
+  "low": 1.71,
+  "high": 1.749,
+  "verdict": "below"
+ },
+ {
+  "district_id": "D12",
+  "low": 2.051,
+  "high": 2.091,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D13",
+  "low": 2.091,
+  "high": 2.123,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D14",
+  "low": 2.139,
+  "high": 2.175,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D15",
+  "low": 1.483,
+  "high": 1.499,
+  "verdict": "below"
+ },
+ {
+  "district_id": "D16",
+  "low": 2.239,
+  "high": 2.267,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D17",
+  "low": 1.977,
+  "high": 2.013,
+  "verdict": "depends on the assumption"
+ },
+ {
+  "district_id": "D18",
+  "low": 2.157,
+  "high": 2.186,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D19",
+  "low": 1.749,
+  "high": 1.776,
+  "verdict": "below"
+ },
+ {
+  "district_id": "D20",
+  "low": 2.087,
+  "high": 2.128,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D21",
+  "low": 2.049,
+  "high": 2.254,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D22",
+  "low": 1.342,
+  "high": 1.447,
+  "verdict": "below"
+ },
+ {
+  "district_id": "D23",
+  "low": 1.96,
+  "high": 1.991,
+  "verdict": "below"
+ },
+ {
+  "district_id": "D24",
+  "low": 1.995,
+  "high": 2.021,
+  "verdict": "depends on the assumption"
+ },
+ {
+  "district_id": "D25",
+  "low": 2.296,
+  "high": 2.325,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D26",
+  "low": 1.429,
+  "high": 1.458,
+  "verdict": "below"
+ },
+ {
+  "district_id": "D27",
+  "low": 2.229,
+  "high": 2.271,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D28",
+  "low": 2.214,
+  "high": 2.249,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D29",
+  "low": 2.284,
+  "high": 2.318,
+  "verdict": "at or above"
+ },
+ {
+  "district_id": "D30",
+  "low": 2.182,
+  "high": 2.224,
+  "verdict": "at or above"
+ }
+]

@@ -1,158 +1,496 @@
 <section class="slide title" id="title" data-auto="title">
-  <aside class="notes">REPLACE: welcome; introduce yourself; one question to the room that calibrates the pace; the rhythm of the day</aside>
+  <aside class="notes"><p>Days 1 and 2 dealt with what is in the files. Today is about what is not: values that are blank, rows that never arrived, and values that are recorded and wrong. No new tool is needed, only a household table and arithmetic. Every lab starts from the supplied table data/reference/household_q3.csv.gz, so yesterday's results are not required. This course gives ranges that follow from stated assumptions; intervals from sampling are the subject of DS-201.</p></aside>
+</section>
+
+<section class="slide" id="review-day-2" data-lo="LO3">
+  <div class="kicker">Review of Day 2</div>
+  <h2>Rows that could not be joined</h2>
+  <div class="quiz" data-type="single" data-lo="LO3">
+    <p class="lead">After key repair, 732 log rows have no household: 421 carry an id that is not in the register and 311 are blank. What happens to them?</p>
+    <div class="opts">
+      <div class="opt" data-why="Lets an inner join remove them without a trace, so the join log no longer adds up">They drop out in the join; no action is needed</div>
+      <div class="opt" data-why="Invents a link from similarity; a wrong household gains parcels it never received">Each gets the most similar id in the register</div>
+      <div class="opt" data-ok>They go to a set-aside file with a reason, and the join log counts them</div>
+      <div class="opt" data-why="Keeps rows without a household in the table, where they enter totals but no district">They stay in the joined table with blank household fields</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Rows in equal rows out plus rows set aside: 210,000 = 380 + 732 + 208,888. A set-aside row keeps its reason so the branch can repair the key.</div>
+  </div>
+  <aside class="notes"><p>Answer: C. The 732 handouts happened. Today's theme begins here: these are missing data that you created, visibly, with a count. The rest of the day is about missing data nobody counted.</p></aside>
 </section>
 
 <section class="slide" id="agenda" data-auto="agenda"></section>
 
-<!-- Session 1 -->
-
+<!-- ======================= SESSION 1 ======================= -->
 <section class="slide section" id="s1" data-auto="section" data-session="1"></section>
 
-<section class="slide" id="s1-idea" data-lo="LO1">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
+<section class="slide" id="why-before-what" data-lo="LO1">
+  <div class="kicker">The first question</div>
+  <h2>Ask why a value is missing before deciding what to do about it</h2>
   <div class="cols cols-2">
     <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
+      <li>Household size is blank for <b>18.1%</b> of the 35,665 households of the question</li>
+      <li>Without a size, a household cannot be classified as eligible or not</li>
+      <li>Dropping them, filling them, or reporting a range: each is right under one reason for the blank and wrong under another</li>
     </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
+    <div class="card c-teal"><h4>Where reasons come from</h4><p class="small mb0">From the people who produced the data, the source note, and data from outside. Rarely from the column itself.</p></div>
   </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+  <aside class="notes"><p>6,461 households have no recorded size. The catalog entry speaks of 18% of household sizes missing: 18.0% of all 39,820 households, 18.1% of the target population. Ask the room for reasons a size might be blank before showing the three mechanisms; they usually produce all three in their own words.</p></aside>
 </section>
 
-<section class="slide" id="s1-steps" data-lo="LO1">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="three-mechanisms" data-lo="LO1">
+  <div class="kicker">Three mechanisms</div>
+  <h2>A blank can depend on nothing, on what you see, or on the value itself</h2>
+  <table class="t small">
+    <tr><th>Mechanism</th><th>The blank depends on</th><th>Dropping the rows</th></tr>
+    <tr><td><b>MCAR</b> · completely at random</td><td>nothing</td><td>loses precision, adds no bias</td></tr>
+    <tr><td><b>MAR</b> · at random given what is recorded</td><td>fields you can see: a branch, a date</td><td>biased, unless you work within those fields</td></tr>
+    <tr><td><b>MNAR</b> · not at random</td><td>the missing value itself</td><td>biased, and the recorded data cannot show by how much</td></tr>
+  </table>
+  <p class="small mt-s">The names are Rubin's (1976). They describe the relation between a blank and the data, not a property of a column: one column can hold all three.</p>
+  <aside class="notes"><p>Keep the definitions short and use the case for everything else. The third column is what matters for an analyst. Sources: Rubin, Inference and missing data, Biometrika 1976; van Buuren, Flexible Imputation of Missing Data, chapter 1.</p></aside>
+</section>
+
+<section class="slide" id="two-patterns" data-lo="LO1">
+  <div class="kicker">Measured in Lab 3.1</div>
+  <h2>One column, two patterns: a paper form and a list that stops at 6</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Group</th><th>Size missing</th></tr>
+      <tr><td>registered at a branch</td><td>8.2%</td></tr>
+      <tr class="hl"><td>registered by phone</td><td>35.7%</td></tr>
+      <tr class="hl"><td>registered online</td><td>34.4%</td></tr>
+      <tr><td>B03, at the desk, before March 2025</td><td>43.4%</td></tr>
+      <tr><td>B03, at the desk, from March 2025</td><td>4.1%</td></tr>
+    </table>
+    <ul class="bullets small">
+      <li>The source note of Day 1 holds both reasons: the old paper form of B03 and B11 had no size field; the online form and the call script offer sizes 1 to 6</li>
+      <li>A missing rate that differs between groups rules out MCAR. It does not tell MAR from MNAR</li>
+    </ul>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <aside class="notes"><p>Run the two tables live with missing_rate. Then the tell in the recorded sizes: 33.7% of sizes recorded at a branch are 7 or more, against 7.9% online and 6.8% by phone. Large households are not rarer on the phone; they are not recorded.</p></aside>
+</section>
+
+<section class="slide" id="audit-evidence" data-lo="LO1">
+  <div class="kicker">Data from outside</div>
+  <h2>The audit shows what the register cannot: blank sizes are large sizes</h2>
+  <div class="cols cols-2">
+    <div class="stack">
+      <div class="stat"><div class="big">7.2 · 5.3</div><div class="lbl">verified members on average: households with a blank size, and households with a recorded one</div></div>
+    </div>
+    <ul class="bullets">
+      <li>600 home visits in September 2026; the size was verified</li>
+      <li>Of the households with a blank size, 68% have 7 members or more; of the others, 25%</li>
+      <li>The value itself decided whether it was recorded: <b>MNAR</b></li>
+      <li>No table of the register alone could have shown this</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From the Lab 3.1 run: 290 audited households with a blank size average 7.21 verified members, 289 with a recorded size average 5.26. The stretch makes the last bullet concrete: two columns with the same missing rate, one blank at random and one blank for large values, cannot be told apart from their recorded rows.</p></aside>
+</section>
+
+<section class="slide" id="rows-not-cells" data-lo="LO1">
+  <div class="kicker">Missing data is not only blank cells</div>
+  <h2>B12 sent no rows for nine days of August</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>10 to 18 August 2026: not one log row from B12, and rows on every other day of nine months</li>
+      <li>No blank cell marks it. You find it only by counting rows per branch per day</li>
+      <li>The households of its districts show fewer parcels than they received</li>
+      <li>There is no field to impute: the remedy is to ask Hazem for the file, or to report the gap</li>
+    </ul>
+    <div class="card c-coral"><h4>A blank with a known cause</h4><p class="small mb0">734 weights at B09 are blank from 4 to 17 May: the scale was away. Cause and dates are recorded, so it is MAR. Parcels were counted as usual.</p></div>
+  </div>
+  <aside class="notes"><p>The B12 gap is the "week that never arrived" of the Day 1 inventory. Its cost becomes visible in Session 3: one district served by B12 looks below the standard under every assumption about sizes, and is not.</p></aside>
+</section>
+
+<section class="slide" id="six-scenarios" data-lo="LO1">
+  <div class="kicker">Lab 3.1, step 4 · the evidence of LO1</div>
+  <h2>Six gaps: the mechanism, and where it pushes a number</h2>
+  <table class="t small">
+    <tr><th>Gap</th><th>Mechanism</th><th>A statistic from the recorded data</th></tr>
+    <tr><td>phone blank, about 3% everywhere</td><td>MCAR</td><td>mean size: unbiased</td></tr>
+    <tr><td>size blank on the old form of B03, B11</td><td>MAR</td><td>eligible households there: too low</td></tr>
+    <tr><td>size blank for large households</td><td>MNAR</td><td>mean size: too low</td></tr>
+    <tr><td>weight blank at B09 in May</td><td>MAR</td><td>kilograms of B09 in May: too low</td></tr>
+    <tr><td>nine days of B12 without rows</td><td>MAR</td><td>parcels in its districts: too low</td></tr>
+    <tr><td>donor type null for anonymous individuals</td><td>MNAR</td><td>share of retailers: too high</td></tr>
+  </table>
+  <aside class="notes"><p>This is the key of Lab 3.1; LO1 asks for five of six with mechanism and direction. Do not show the slide before the lab ends: come back to it for the debrief. Debate is welcome on scenario 5: it is MAR in the sense that the cause is a recorded branch and period, and it differs in kind because rows, not values, are missing.</p></aside>
+</section>
+
+<section class="slide" id="check-mechanism" data-lo="LO1">
+  <div class="kicker">Checkpoint</div>
+  <h2>Name the mechanism</h2>
+  <div class="quiz" data-type="single" data-lo="LO1">
+    <p class="lead">An online form offers household sizes 1 to 6; larger households leave the field blank. You compute the mean household size from the recorded values. Which line is right?</p>
+    <div class="opts">
+      <div class="opt" data-why="Stops at the visible pattern (the channel) and misses that within the channel the value decides">MAR, since it depends on the channel; the mean is unbiased</div>
+      <div class="opt" data-ok>MNAR, since the value decides; the mean is too low</div>
+      <div class="opt" data-why="Believes any gap that a form causes is random with respect to the data">MCAR, since a form is not a person; the mean is unbiased</div>
+      <div class="opt" data-why="Gets the mechanism and reverses the direction: the large values are the ones removed">MNAR, since the value decides; the mean is too high</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Above 6 the size cannot be entered: whether it is blank depends on the size itself. The recorded sizes are a selection of the small ones.</div>
+  </div>
+  <aside class="notes"><p>Answer: B. Option A is the instructive mistake: the channel is recorded and the missing rate does depend on it, but conditioning on the channel does not make the blanks random. Within the online channel, it is still the large households that are blank.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-3-1" data-auto="lab" data-lab="3.1">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-off: the classification is the outcome. Typical problems: calling every pattern that varies by group "MAR"; giving the direction for the headline instead of for the statistic named in the table; expecting blank cells for the B12 gap. Parsing the dates of 210,000 log rows takes a few seconds. The lab starts from G.households_q3() and the raw logs. Note who scores fewer than five of six: that is the LO1 evidence.</p></aside>
 </section>
 
-<!-- Session 2 -->
-
+<!-- ======================= SESSION 2 ======================= -->
 <section class="slide section" id="s2" data-auto="section" data-session="2"></section>
 
-<section class="slide" id="s2-idea" data-lo="LO5">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
+<section class="slide" id="no-neutral-option" data-lo="LO5">
+  <div class="kicker">There is no neutral option</div>
+  <h2>Every way of handling a blank is an assumption about the households behind it</h2>
+  <div class="cols cols-3">
+    <div class="card c-coral"><h4>Complete cases</h4><p class="small mb0">Drop the rows. Assumes the dropped households are like the kept ones.</p></div>
+    <div class="card c-purple"><h4>One value for all</h4><p class="small mb0">Fill with the median. Assumes every blank household is typical.</p></div>
+    <div class="card c-teal"><h4>A value from similar households</h4><p class="small mb0">Fill from a group. Assumes that within the group, blank and recorded households are alike.</p></div>
   </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+  <p class="small mt">Lab 3.2 computes the headline all three ways, on the same 35,665 households.</p>
+  <aside class="notes"><p>"I did not impute, I only dropped the rows" is the sentence to defuse. Dropping is the strongest assumption of the three here, because Lab 3.1 showed the dropped households are larger. Sources: van Buuren, Flexible Imputation of Missing Data, sections on listwise deletion and single imputation.</p></aside>
 </section>
 
-<section class="slide" id="s2-steps" data-lo="LO5">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="complete-case" data-lo="LO5">
+  <div class="kicker">Lab 3.2, step 1</div>
+  <h2>Complete cases: 1.985, from the households that were easy to record</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>29,204 households take part; 6,461 do not</li>
+      <li>The 6,461 are larger, more often eligible, and receive 2 or 3 parcels per visit</li>
+      <li>Remove them, and the average of the eligible households that remain is too low</li>
+      <li>1.985 is below the standard of 2: the network "fails"</li>
+    </ul>
+    <div class="callout warn"><b>What goes wrong.</b> The code runs, no value was changed, and the result is reported as "the data". The assumption was never written down.</div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <aside class="notes"><p>The estimate: among households with a known size and income per member at most 1,000 SAR, parcels in the quarter divided by households, divided by three months. Most libraries drop rows with missing values silently in a group-by or a model; complete-case analysis is the default nobody chose.</p></aside>
+</section>
+
+<section class="slide" id="median-cost" data-lo="LO5">
+  <div class="kicker">Lab 3.2, step 2</div>
+  <h2>The median gives every blank household five members</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Estimate: <b>2.003</b>. Everybody is classified; nobody is dropped</li>
+      <li>But most blank households have 7 members or more</li>
+      <li>Income 6,000 SAR, 7 members in reality: 857 per member, eligible. With the imputed 5: 1,200, "not eligible"</li>
+      <li>Their parcels leave the numerator with them</li>
+    </ul>
+    <div class="card c-purple"><h4>And the spread shrinks</h4><p class="small mb0">6,461 households at exactly one size: the distribution of sizes gets a spike that was never there.</p></div>
+  </div>
+  <aside class="notes"><p>The worked household is the same one as on Day 1, eligibility slide. Single-value imputation is acceptable for a field that feeds nothing downstream; it is poor exactly when a rule or a comparison depends on the field.</p></aside>
+</section>
+
+<section class="slide" id="within-groups" data-lo="LO5">
+  <div class="kicker">Lab 3.2, step 3</div>
+  <h2>Use a recorded field that carries information about the missing one</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Usual parcels per handout</th><th>Households</th><th>Median recorded size</th></tr>
+      <tr><td>never collected</td><td>6,162</td><td>4</td></tr>
+      <tr><td>1</td><td>7,571</td><td>3</td></tr>
+      <tr><td>2</td><td>12,574</td><td>6</td></tr>
+      <tr><td>3</td><td>2,897</td><td>10</td></tr>
+    </table>
+    <ul class="bullets small">
+      <li>The desk hands out 1, 2 or 3 parcels by the family card: the log knows something the register lost</li>
+      <li>Each blank gets the median of its group: 3,218 households get 6, and 1,694 get 10</li>
+      <li>Estimate: <b>2.060</b></li>
+    </ul>
+  </div>
+  <aside class="notes"><p>The counts are households with a recorded size per group. Yes, this uses the outcome (parcels) to fill a predictor (size), and that is right: an imputation should use everything related to the missing value. The stretch replaces the group median by a randomly drawn donor of the same group, twenty times: the estimate stays between 2.050 and 2.054.</p></aside>
+</section>
+
+<section class="slide" id="three-estimates" data-lo="LO5">
+  <div class="kicker">The comparison table of LO5</div>
+  <h2>Three methods, three answers, and a different list of districts each time</h2>
+  <table class="t small">
+    <tr><th>Method</th><th>Estimate</th><th>Districts below the standard of 2</th></tr>
+    <tr><td>complete case</td><td>1.985</td><td>13</td></tr>
+    <tr><td>median imputed</td><td>2.003</td><td>11</td></tr>
+    <tr class="hl"><td>imputed within groups</td><td>2.060</td><td>7</td></tr>
+  </table>
+  <div class="callout warn mt"><b>Six districts change side.</b> D04, D08, D09, D12, D17 and D24 are below the standard by one method and above it by another. A director who acts on the first table sends help to the wrong places.</div>
+  <aside class="notes"><p>From the Lab 3.2 run. The overall difference, 0.075, looks small. Its effect on the decision is not: the list of districts to act on nearly halves. This is why the outcome asks for the estimate by district.</p></aside>
+</section>
+
+<section class="slide" id="synthetic-reveal" data-lo="LO5">
+  <div class="kicker">What only synthetic data can show</div>
+  <h2>With no size missing, the estimate would have been 2.062</h2>
+  <div class="bars">
+    <div class="row"><span>complete case</span><div class="bar c-coral" style="--w:100%"></div><span class="val">−0.077</span></div>
+    <div class="row"><span>median imputed</span><div class="bar c-purple" style="--w:77%"></div><span class="val">−0.059</span></div>
+    <div class="row"><span>imputed within groups</span><div class="bar c-teal" style="--w:3%"></div><span class="val">−0.002</span></div>
+  </div>
+  <p class="small mt">Distance from the value that complete data would have given. The generator knows the size every household would have reported; in real work this cell does not exist.</p>
+  <aside class="notes"><p>The reveal is in the last cell of Lab 3.2 and reads data/reference/sealed_sizes.csv.gz. Be careful with the lesson: imputation within groups is not always right. It was right here because the group field was strongly related to the missing value. In real work you cannot check, which is why the next session replaces "the answer" by "a range".</p></aside>
+</section>
+
+<section class="slide" id="check-imputation" data-lo="LO5">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which estimate do you put first?</h2>
+  <div class="quiz" data-type="single" data-lo="LO5">
+    <p class="lead">Sizes are blank mostly for large households, and branches hand out more parcels per visit to large households. Three estimates are on your desk. Which one do you present first, and why?</p>
+    <div class="opts">
+      <div class="opt" data-why="Believes leaving the data untouched means making no assumption">Complete case: it changes no value</div>
+      <div class="opt" data-why="Chooses by simplicity; one size for all misclassifies exactly the large households">Median: simple and easy to explain</div>
+      <div class="opt" data-why="Averages three answers as if their errors were unrelated; two of them err in the same direction">The mean of the three, to be fair to each</div>
+      <div class="opt" data-ok>Within groups: it uses a recorded field related to the size</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> A method earns first place by its assumption, not by its result: within a parcels group, blank and recorded households are plausibly alike. The other estimates stay in the table.</div>
+  </div>
+  <aside class="notes"><p>Answer: D. The table still shows all three: outcome LO5 asks for a comparison table and a recommended estimate with its reason. If someone chooses by "the one closest to 2.062", remind them that 2.062 is not available outside this room.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-3-2" data-auto="lab" data-lab="3.2">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-off for the first attempt at each estimate. Typical problems: dividing by the count of all households instead of eligible ones; a comparison with a blank size that silently counts as "not eligible" (which is the complete-case estimate again, under another name); forgetting the division by three months; a group median computed on all rows including blanks. If estimate is not finished the next cells use G.estimate. The last cells reveal the complete-data value: ask the room to guess the order first.</p></aside>
 </section>
 
-<!-- Session 3 -->
-
+<!-- ======================= SESSION 3 ======================= -->
 <section class="slide section" id="s3" data-auto="section" data-session="3"></section>
 
-<section class="slide" id="s3-idea" data-lo="LO5">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
+<section class="slide" id="answerable-question" data-lo="LO5">
+  <div class="kicker">Change the question</div>
+  <h2>"Which estimate is right?" cannot be answered. "How far can it move?" can</h2>
+  <div class="flow">
+    <div class="step c-coral"><b>1 · Logical bounds</b>assume nothing about the blank households</div>
+    <div class="arrow">→</div><div class="step c-purple"><b>2 · A plausible range</b>assumptions you can defend, stated</div>
+    <div class="arrow">→</div><div class="step c-teal"><b>3 · A recommendation</b>one estimate, its range, its reason</div>
   </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+  <div class="callout note mt"><b>A sensitivity analysis</b> varies what you assumed and reports what happens to the conclusion. It does not make the missing data less missing.</div>
+  <aside class="notes"><p>The range of this session comes from assumptions, not from sampling: it would not shrink with more households, only with more knowledge about the blank ones. Intervals for sampling variation are DS-201. Sources: van Buuren, Flexible Imputation of Missing Data, on sensitivity analysis.</p></aside>
 </section>
 
-<section class="slide" id="s3-steps" data-lo="LO5">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="logical-bounds" data-lo="LO5">
+  <div class="kicker">Lab 3.3, step 1</div>
+  <h2>Whatever the 6,461 households are, the estimate lies between 1.775 and 2.133</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Each blank household is eligible or not; you do not know which</li>
+      <li><b>Lowest:</b> exactly those that collected few parcels are eligible</li>
+      <li><b>Highest:</b> exactly those that collected many are eligible</li>
+      <li>No assumption about sizes can leave this interval</li>
+    </ul>
+    <div class="card c-coral"><h4>Honest, and too wide</h4><p class="small mb0">The bounds straddle the standard of 2. They take "every blank household that collected nothing is eligible" as seriously as anything else.</p></div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <aside class="notes"><p>The recipe in the lab: sort the blank households by parcels, add them to the eligible group one at a time, track the running average, keep the minimum (and, sorted the other way, the maximum). These are worst-case bounds in the spirit of partial identification. Their use is to show the reader what the missing field could do at worst, before any assumption is spent.</p></aside>
+</section>
+
+<section class="slide" id="plausible-range" data-lo="LO5">
+  <div class="kicker">Lab 3.3, step 2</div>
+  <h2>Shift the imputed sizes: the estimate stays between 2.02 and 2.07</h2>
+  <table class="t small">
+    <tr><th>Scenario for the blank households</th><th>Estimate</th></tr>
+    <tr><td>imputed size − 1</td><td>2.073</td></tr>
+    <tr class="hl"><td>imputed within groups</td><td>2.060</td></tr>
+    <tr><td>imputed size + 1</td><td>2.039</td></tr>
+    <tr><td>imputed size + 2</td><td>2.020</td></tr>
+    <tr><td>phone and online blanks are at least 7</td><td>2.040</td></tr>
+  </table>
+  <p class="small mt-s">Recorded sizes never change. Only the guess is varied, by amounts the audit makes believable: blank households were about two members larger.</p>
+  <aside class="notes"><p>From the Lab 3.3 run. The estimate falls as imputed sizes grow: more blank households become eligible, and among them are households that collected little. The whole plausible range sits at or above 2: for the network as a whole, the conclusion does not depend on the assumption. For districts it can.</p></aside>
+</section>
+
+<section class="slide" id="district-verdicts" data-lo="LO5">
+  <div class="kicker">Lab 3.3, step 3</div>
+  <h2>Seven districts are below the standard under every scenario; three depend on it</h2>
+  <div class="cols cols-3">
+    <div class="card c-coral"><h4>Below · 7</h4><p class="small mb0">D07, D15, D22, D26 at 1.3 to 1.5. D11 and D19 near 1.75. D23 at 1.96 to 1.99.</p></div>
+    <div class="card c-purple"><h4>Depends · 3</h4><p class="small mb0">D09, D17, D24: between 1.98 and 2.02. Reported as "cannot be classified with these data".</p></div>
+    <div class="card c-teal"><h4>At or above · 20</h4><p class="small mb0">Above the standard whichever scenario is taken.</p></div>
+  </div>
+  <div class="callout tip mt"><b>Three verdicts, not two.</b> "Depends on the assumption" is a finding. It tells the director where one more audit would change a decision.</div>
+  <aside class="notes"><p>From the Lab 3.3 run. The four districts at 1.3 to 1.5 are the four under-covered districts of Day 1: the households that did register there are also served least.</p></aside>
+</section>
+
+<section class="slide" id="what-range-misses" data-lo="LO1 LO5">
+  <div class="kicker">The limit of a sensitivity range</div>
+  <h2>D23 is "below" under every assumption about sizes, and is not below</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>D23 and D24 are served by branch B12</li>
+      <li>B12 sent no rows for 10 to 18 August: handouts happened and are in no file</li>
+      <li>The range varied household sizes. It never varied the missing rows</li>
+      <li>The generator's own count puts D23 at 2.25 parcels per eligible household</li>
+    </ul>
+    <div class="callout warn"><b>What goes wrong.</b> A range covers the assumption you varied and nothing else. "Robust to missing sizes" is not "robust".</div>
+  </div>
+  <aside class="notes"><p>This slide is the reason Lab 3.1 came first. The value 2.25 is from data/reference/truth_summary.json, which only the generator can know: it uses true sizes and the handouts that never reached a file. The report line for D23 and D24: "figures understated by an upload gap at B12, 10 to 18 August; request the file before acting".</p></aside>
+</section>
+
+<section class="slide" id="recommendation" data-lo="LO5">
+  <div class="kicker">Lab 3.3, step 4</div>
+  <h2>A recommendation has four parts</h2>
+  <div class="cols cols-2">
+    <div class="card c-teal"><h4>The paragraph</h4><p class="small mb0">About 2.06 parcels per eligible household per month (2.02 to 2.07 under different assumptions about the 18% of households with no recorded size). Seven districts are below the standard under every assumption; for three the answer depends on it. We recommend filling blank sizes from similar households, because blank sizes are mostly large households.</p></div>
+    <ul class="bullets small">
+      <li><b>An estimate</b>, not a list of three</li>
+      <li><b>Its range</b>, and what was varied</li>
+      <li><b>What holds across the range</b>, and what does not</li>
+      <li><b>The reason</b> for the method, in terms the director can check</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>This paragraph and the comparison table of Lab 3.2 are the evidence of LO5. The three rejected options in the lab are each a real habit: one number without a range, bounds without an estimate, and the most favourable value.</p></aside>
+</section>
+
+<section class="slide" id="check-range" data-lo="LO5">
+  <div class="kicker">Checkpoint</div>
+  <h2>What do you report for the district?</h2>
+  <div class="quiz" data-type="single" data-lo="LO5">
+    <p class="lead">District D17 comes out at 1.98 under one scenario for the blank sizes and at 2.01 under another. The standard is 2. What does the report say about D17?</p>
+    <div class="opts">
+      <div class="opt" data-ok>It cannot be classified with these data; both values are shown</div>
+      <div class="opt" data-why="Presents one assumption as the finding because it is the cautious-looking one">Below the standard: 1.98 is the safe figure</div>
+      <div class="opt" data-why="Averages two scenarios as if they were two measurements of the same thing">At the standard: the midpoint is 2.0</div>
+      <div class="opt" data-why="Removes from the table exactly the district where the uncertainty matters">It is left out until sizes are complete</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> When the side of the line depends on the assumption, the honest verdict is "undecided", with the values. Acting on one of them is acting on an artefact of the imputation.</div>
+  </div>
+  <aside class="notes"><p>Answer: A. Ask what would settle D17: verified sizes for its blank households, which is a small, targeted audit. A good sensitivity analysis ends with the cheapest piece of data that would remove the uncertainty.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-3-3" data-auto="lab" data-lab="3.3">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-off for the first attempt. The bounds are the hard step: let pairs work on the recipe for five minutes before hinting (sort, cumulative sum, running average). Typical problems: bounds computed by setting all blank sizes to 1 or to 14, which are not bounds of the estimate; shifting recorded sizes as well as imputed ones; a verdict column with only two values. The lab starts from G.households_q3() and G.impute_within_groups, so it does not depend on Lab 3.2.</p></aside>
 </section>
 
-<!-- Session 4 -->
-
+<!-- ======================= SESSION 4 ======================= -->
 <section class="slide section" id="s4" data-auto="section" data-session="4"></section>
 
-<section class="slide" id="s4-idea" data-lo="LO1">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
+<section class="slide" id="recorded-and-wrong" data-lo="LO1">
+  <div class="kicker">The other half of data quality</div>
+  <h2>A value can be present, valid, and wrong</h2>
   <div class="cols cols-2">
     <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
+      <li>Household size is <b>reported by the household</b> at registration and is not verified</li>
+      <li>It passes every rule: an integer between 1 and 20</li>
+      <li>No validation suite can see that 7 should have been 5</li>
+      <li>Only a second measurement can: here, 289 audited households with a recorded size</li>
     </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
+    <div class="card c-purple"><h4>Two kinds of error</h4><p class="small mb0"><b>Random:</b> up as often as down, for anybody.<br><b>Systematic:</b> in one direction, or for one kind of household.</p></div>
   </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+  <aside class="notes"><p>Tomorrow's rules test validity; today's point is that validity is not accuracy. Self-reported quantities with a consequence attached (eligibility, a benefit, a fee) are where systematic error is most likely.</p></aside>
 </section>
 
-<section class="slide" id="s4-steps" data-lo="LO1">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="audit-error" data-lo="LO1">
+  <div class="kicker">Measured in Lab 3.4</div>
+  <h2>92% of recorded sizes are exact, and the mean error is almost zero</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Recorded − verified</th><th>Households</th></tr>
+      <tr><td>−1</td><td>18</td></tr>
+      <tr><td>0</td><td>266</td></tr>
+      <tr><td>+1</td><td>2</td></tr>
+      <tr><td>+2</td><td>3</td></tr>
+    </table>
+    <ul class="bullets small">
+      <li>Mean error −0.035 members: a reviewer would call the column reliable</li>
+      <li>18 households under-report by one: a birth or a returning member not yet registered</li>
+      <li>5 over-report. Look at <b>who</b> they are before looking at how many</li>
+    </ul>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <aside class="notes"><p>From the Lab 3.4 run on the 289 audited households with a recorded size. Ask the room whether they would sign off the column on this table. Most would, and that is the trap of the next slide.</p></aside>
+</section>
+
+<section class="slide" id="error-at-threshold" data-lo="LO1">
+  <div class="kicker">Where the error sits</div>
+  <h2>All five over-reporters are just above the eligibility line</h2>
+  <table class="t small">
+    <tr><th>Reported</th><th>Verified</th><th>Income, SAR</th><th>Per verified member</th></tr>
+    <tr><td>7</td><td>5</td><td>5,250</td><td>1,050</td></tr>
+    <tr><td>9</td><td>8</td><td>8,150</td><td>1,019</td></tr>
+    <tr><td>4</td><td>3</td><td>3,100</td><td>1,033</td></tr>
+    <tr><td>4</td><td>2</td><td>2,450</td><td>1,225</td></tr>
+    <tr><td>9</td><td>7</td><td>8,400</td><td>1,200</td></tr>
+  </table>
+  <p class="small mt-s">With the verified size none is eligible; with the reported size all five are. A small error, placed exactly where the rule decides.</p>
+  <aside class="notes"><p>Handle this with care in the room: the households are synthetic, and the point is the design of the measurement, not the morals of applicants. A rule with a sharp line and a self-reported input invites this error everywhere; the remedy is verification at the point of decision, which the branch desk already does with the family card.</p></aside>
+</section>
+
+<section class="slide" id="two-simulations" data-lo="LO1">
+  <div class="kicker">Lab 3.4, steps 2 and 3</div>
+  <h2>Random error in 8% of sizes moves the headline less than over-reporting in 2.6%</h2>
+  <div class="bars">
+    <div class="row"><span>random ±1, 8.0% of households</span><div class="bar c-teal" style="--w:6%"></div><span class="val">−0.006</span></div>
+    <div class="row"><span>over-report, 1.4%</span><div class="bar c-purple" style="--w:26%"></div><span class="val">−0.028</span></div>
+    <div class="row"><span>over-report, 2.6%</span><div class="bar c-coral" style="--w:51%"></div><span class="val">−0.055</span></div>
+    <div class="row"><span>over-report, 5.2%</span><div class="bar c-coral" style="--w:100%"></div><span class="val">−0.107</span></div>
+  </div>
+  <p class="small mt">Shift of the headline from 2.060, averaged over 200 simulated registers. Over-reporters enter the denominator as eligible and collect almost nothing: the desk hands out by the family card.</p>
+  <aside class="notes"><p>From the Lab 3.4 run (GH_QUICK=1 uses 20 runs). The over-reporting model: a household with income per member between 1,000 and 1,350 SAR adds one or two members with probability 0.1, 0.2 or 0.4. Random error moves households across the line in both directions and mostly cancels; error in one direction does not.</p></aside>
+</section>
+
+<section class="slide" id="measurement-reveal" data-lo="LO1 LO5">
+  <div class="kicker">What only synthetic data can show</div>
+  <h2>The recorded sizes already contain the error: the headline is about 0.07 too low</h2>
+  <div class="cols cols-2">
+    <div class="stack">
+      <div class="stat"><div class="big">2.062 → 2.131</div><div class="lbl">the estimate with every size as reported, and with every size as it truly is</div></div>
+    </div>
+    <ul class="bullets">
+      <li>The direction was predictable from the audit; the size needed the simulation</li>
+      <li>Missing sizes cost up to 0.077; mis-reported sizes cost 0.069</li>
+      <li>Only the first had a column of blanks to warn you</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>From the last cells of Lab 3.4, using the generator's sealed sizes. In the quality report this becomes a limit with a direction: "sizes are self-reported; an audit of 289 found over-reporting concentrated just above the eligibility line; the headline is likely understated by a few hundredths".</p></aside>
+</section>
+
+<section class="slide" id="proxies" data-lo="LO1">
+  <div class="kicker">Proxies</div>
+  <h2>A proxy measures what it measures, not what you wish it measured</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Parcels per handout are set by the desk from the family card: a proxy for the verified size band</li>
+      <li>It disagrees with the recorded size for 1.5% of households that collected: a list for review</li>
+      <li>It is silent about households that never collected</li>
+      <li>323 households are eligible by the register and never collected in nine months</li>
+    </ul>
+    <div class="callout warn"><b>What goes wrong.</b> Defining "eligible" as "collected regularly". Every eligible household that was not served leaves the denominator, and every district looks well served.</div>
+  </div>
+  <aside class="notes"><p>The 323 are two groups the proxy cannot separate: households that over-reported and were turned away at the desk, and under-served households, who are the reason for the whole analysis. Use a proxy to flag records for review; do not let it redefine the question.</p></aside>
+</section>
+
+<section class="slide" id="check-direction" data-lo="LO1">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which way does the headline move?</h2>
+  <div class="quiz" data-type="single" data-lo="LO1">
+    <p class="lead">A few households just above the income line report one or two members more than they have, and so count as eligible. Branch desks hand out parcels by the family card. What happens to "parcels per eligible household"?</p>
+    <div class="opts">
+      <div class="opt" data-why="Expects a few errors among thousands to average out, as random errors would">Nothing measurable: the errors are too few</div>
+      <div class="opt" data-why="Follows the reported size to the parcels, although handouts follow the family card">It rises: larger households receive more parcels</div>
+      <div class="opt" data-ok>It falls: they enter the denominator and collect almost nothing</div>
+      <div class="opt" data-why="Believes direction cannot be reasoned from the mechanism without a full audit">It cannot be said without verifying every household</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The error is in one direction and at the threshold: it adds households to the eligible group that the desk does not serve, so the average per eligible household goes down.</div>
+  </div>
+  <aside class="notes"><p>Answer: C. This is the measurement-error scenario of LO1: the kind of error (systematic, self-report) and the direction of the bias (downwards). Ask what would reverse the direction: if desks handed out by the register instead of the family card, over-reporters would collect more, and the bias would be in the cost, not in the headline.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-3-4" data-auto="lab" data-lab="3.4">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>AI-off for the first attempt. Typical problems: comparing recorded with verified for households whose size is blank; a random-error function that can produce a size of zero; applying over-reporting to everybody. The simulations run 200 times on a laptop CPU in well under a minute; GH_QUICK=1 runs 20. The seed is fixed, so the shift table is the same for everyone. The lab starts from G.households_q3() and the audit file.</p></aside>
 </section>
 
+<!-- ======================= CLOSING ======================= -->
 <section class="slide" id="wrap-up">
   <div class="kicker">Day 3 · wrap-up</div>
   <h2>Three things to keep</h2>
   <div class="cols cols-3">
-    <div class="card c-teal"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
-    <div class="card c-coral"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
-    <div class="card c-purple"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
+    <div class="card c-teal"><h4>Why, before what</h4><p class="small mb0">The reason for a blank comes from the source note and from outside data, and it decides which remedy is honest.</p></div>
+    <div class="card c-purple"><h4>An estimate, a range, a reason</h4><p class="small mb0">2.06, between 2.02 and 2.07; seven districts below under every assumption, three undecided.</p></div>
+    <div class="card c-coral"><h4>A range covers what you varied</h4><p class="small mb0">Not the nine days of B12, and not sizes that were recorded wrong.</p></div>
   </div>
+  <aside class="notes"><p>Ask each participant which of today's four findings they would put first in a one-page note to Sumayyah. There is no single right answer; the reasons are worth hearing.</p></aside>
 </section>
 
-<section class="slide dark" id="next" data-label="Next">
-  <div class="kicker">Next</div>
-  <h2>Day 4: Validate and protect</h2>
-  <p class="lead">REPLACE: what participants prepare before then; unfinished labs can be finished at home</p>
-  <aside class="notes">REPLACE: accounts, installs or reading participants need before the next unit</aside>
+<section class="slide dark" id="next" data-label="Day 4">
+  <div class="kicker">Next · Day 4</div>
+  <h2>Validate and protect, then choose your capstone question</h2>
+  <ul class="bullets">
+    <li>Rules that run on every rebuild, and a batch that breaks them</li>
+    <li>ID numbers replaced by a keyed hash, and an attempt to link them back</li>
+    <li>The quality report, written from the outputs of one command</li>
+    <li>Three capstone questions on a second extract with other faults</li>
+  </ul>
+  <aside class="notes"><p>Nothing to prepare. Day 4 starts from the supplied joined table. Tell participants that the capstone brief is handed out in the last session tomorrow and that the capstone repository must never contain a raw personal field, synthetic or not.</p></aside>
 </section>

@@ -1,0 +1,26 @@
+[
+ {
+  "error model": "random error, 8% of households",
+  "share of sizes changed": 0.08,
+  "estimate": 2.054,
+  "shift": -0.006
+ },
+ {
+  "error model": "over-reporting near the line, q = 0.1",
+  "share of sizes changed": 0.014,
+  "estimate": 2.032,
+  "shift": -0.028
+ },
+ {
+  "error model": "over-reporting near the line, q = 0.2",
+  "share of sizes changed": 0.026,
+  "estimate": 2.005,
+  "shift": -0.055
+ },
+ {
+  "error model": "over-reporting near the line, q = 0.4",
+  "share of sizes changed": 0.052,
+  "estimate": 1.953,
+  "shift": -0.107
+ }
+]
