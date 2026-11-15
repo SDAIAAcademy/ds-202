@@ -1,0 +1,242 @@
+[
+ {
+  "district_id": "D01",
+  "district_name_en": "Al-Nuzha",
+  "registered": 1131,
+  "low_income_households_est": 1290.0,
+  "coverage": 0.88,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D02",
+  "district_name_en": "Al-Rawda",
+  "registered": 877,
+  "low_income_households_est": 1160.0,
+  "coverage": 0.76,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D03",
+  "district_name_en": "Al-Waha",
+  "registered": 1113,
+  "low_income_households_est": 940.0,
+  "coverage": 1.18,
+  "flag": "over 100%"
+ },
+ {
+  "district_id": "D04",
+  "district_name_en": "Al-Salam",
+  "registered": 1751,
+  "low_income_households_est": 2460.0,
+  "coverage": 0.71,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D05",
+  "district_name_en": "Al-Faisaliyah",
+  "registered": 1670,
+  "low_income_households_est": 1890.0,
+  "coverage": 0.88,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D06",
+  "district_name_en": "Al-Khalidiyah",
+  "registered": 1714,
+  "low_income_households_est": 1980.0,
+  "coverage": 0.87,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D07",
+  "district_name_en": "Al-Mahjar",
+  "registered": 606,
+  "low_income_households_est": 1970.0,
+  "coverage": 0.31,
+  "flag": "under-covered"
+ },
+ {
+  "district_id": "D08",
+  "district_name_en": "Al-Rabwa",
+  "registered": 840,
+  "low_income_households_est": 1000.0,
+  "coverage": 0.84,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D09",
+  "district_name_en": "Al-Safa",
+  "registered": 1530,
+  "low_income_households_est": 2140.0,
+  "coverage": 0.71,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D10",
+  "district_name_en": "Al-Marwa",
+  "registered": 1860,
+  "low_income_households_est": 2270.0,
+  "coverage": 0.82,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D11",
+  "district_name_en": "Al-Naseem",
+  "registered": 1533,
+  "low_income_households_est": 1990.0,
+  "coverage": 0.77,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D12",
+  "district_name_en": "Al-Aziziyah",
+  "registered": 1267,
+  "low_income_households_est": 1470.0,
+  "coverage": 0.86,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D13",
+  "district_name_en": "Al-Badiyah",
+  "registered": 931,
+  "low_income_households_est": 1120.0,
+  "coverage": 0.83,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D14",
+  "district_name_en": "Al-Shifa",
+  "registered": 1192,
+  "low_income_households_est": 1600.0,
+  "coverage": 0.74,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D15",
+  "district_name_en": "Al-Sahil",
+  "registered": 997,
+  "low_income_households_est": 2760.0,
+  "coverage": 0.36,
+  "flag": "under-covered"
+ },
+ {
+  "district_id": "D16",
+  "district_name_en": "Al-Yarmouk",
+  "registered": 826,
+  "low_income_households_est": 930.0,
+  "coverage": 0.89,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D17",
+  "district_name_en": "Al-Andalus",
+  "registered": 1673,
+  "low_income_households_est": 2050.0,
+  "coverage": 0.82,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D18",
+  "district_name_en": "Al-Zahra",
+  "registered": 930,
+  "low_income_households_est": 1310.0,
+  "coverage": 0.71,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D19",
+  "district_name_en": "Al-Mansoura",
+  "registered": 1007,
+  "low_income_households_est": 1120.0,
+  "coverage": 0.9,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D20",
+  "district_name_en": "Al-Wurud",
+  "registered": 1264,
+  "low_income_households_est": 1410.0,
+  "coverage": 0.9,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D21",
+  "district_name_en": "Al-Basateen",
+  "registered": 1159,
+  "low_income_households_est": 1300.0,
+  "coverage": 0.89,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D22",
+  "district_name_en": "Al-Jabal",
+  "registered": 874,
+  "low_income_households_est": 2580.0,
+  "coverage": 0.34,
+  "flag": "under-covered"
+ },
+ {
+  "district_id": "D23",
+  "district_name_en": "Al-Fayha",
+  "registered": 1474,
+  "low_income_households_est": 1630.0,
+  "coverage": 0.9,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D24",
+  "district_name_en": "Al-Sinaiyah",
+  "registered": 1122,
+  "low_income_households_est": 1250.0,
+  "coverage": 0.9,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D25",
+  "district_name_en": "Al-Hamra",
+  "registered": 1585,
+  "low_income_households_est": 1850.0,
+  "coverage": 0.86,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D26",
+  "district_name_en": "Wadi Al-Sidr",
+  "registered": 1017,
+  "low_income_households_est": 2990.0,
+  "coverage": 0.34,
+  "flag": "under-covered"
+ },
+ {
+  "district_id": "D27",
+  "district_name_en": "Al-Murooj",
+  "registered": 1459,
+  "low_income_households_est": 1920.0,
+  "coverage": 0.76,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D28",
+  "district_name_en": "Al-Qadisiyah",
+  "registered": 1408,
+  "low_income_households_est": 1720.0,
+  "coverage": 0.82,
+  "flag": "ok"
+ },
+ {
+  "district_id": "D29",
+  "district_name_en": NaN,
+  "registered": 1039,
+  "low_income_households_est": NaN,
+  "coverage": NaN,
+  "flag": "no frame"
+ },
+ {
+  "district_id": "D30",
+  "district_name_en": NaN,
+  "registered": 1484,
+  "low_income_households_est": NaN,
+  "coverage": NaN,
+  "flag": "no frame"
+ }
+]

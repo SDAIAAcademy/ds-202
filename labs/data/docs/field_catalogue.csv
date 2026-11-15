@@ -1,0 +1,35 @@
+source,field,description,personal
+register,household_id,id of the household in the register,indirect identifier
+register,national_id,national ID number of the head of household,direct identifier
+register,head_name,name of the head of household,direct identifier
+register,phone,mobile number,direct identifier
+register,district_id,district of residence,no
+register,branch_id,branch where the registration was entered,no
+register,channel,"how the household registered: branch, phone or online",no
+register,registered_on,date of registration,indirect identifier
+register,household_size,members of the household as reported,indirect identifier
+register,monthly_income_sar,monthly household income as reported,sensitive
+register,status,active or closed,no
+branch_logs,log_id,id of the handout at the branch,no
+branch_logs,household_id,the household that received the handout,indirect identifier
+branch_logs,handout_date,day of the handout,no
+branch_logs,parcels,number of parcels handed out,no
+branch_logs,weight,total weight of the handout,no
+branch_logs,unit,unit of the weight,no
+branch_logs,collected_by,name of the person who collected,direct identifier
+branch_logs,note,free text typed at the desk,may hold personal data
+donations_api,donation_id,id of the delivery,no
+donations_api,received_at,time of arrival,no
+donations_api,branch_id,receiving branch,no
+donations_api,donor_type,"individual, retailer, farm or corporate",no
+donations_api,category,kind of food,no
+donations_api,weight,weight of the delivery,no
+donations_api,unit,unit of the weight,no
+donations_api,est_value_sar,estimated value,no
+open_population,district_id,district,no
+open_population,district_name_en,district name in English,no
+open_population,district_name_ar,district name in Arabic,no
+open_population,population,residents in 2022,no
+open_population,households,households in 2022,no
+open_population,low_income_households_est,survey estimate of low-income households in 2022,no
+open_population,reference_year,year the row describes,no

@@ -64,7 +64,7 @@ def cfg(capstone: bool, rng: random.Random) -> dict:
         return dict(n_reg=40000, n_dup=180, n_logs=210000, months=list(range(1, 10)), cp1256=["B03", "B11"],
                     bom=["B08"], mojibake="B06", indic="B09", dmy=["B03", "B08", "B10", "B11"], mdy=["B05", "B13"],
                     lb=["B05", "B13"], lb_as_kg="B13", grams="B09", no_weight="B09", gap="B12", double="B02",
-                    hyphen="B10", old_form=["B03", "B07", "B11"], low=["D07", "D15", "D22", "D26"], over="D03",
+                    hyphen="B10", old_form=["B03", "B11"], low=["D07", "D15", "D22", "D26"], over="D03",
                     size_missing=0.18, topup=0.27)
     s = b[:]
     rng.shuffle(s)
@@ -172,7 +172,7 @@ def build(capstone: bool = False) -> dict:
         size = rng.choices(range(1, 15), weights=SIZE_P)[0]
         income = int(round(math.exp(rng.gauss(math.log(4200) + 0.035 * (size - 5), 0.55)) / 50) * 50)
         rep = size                                     # the size the household reported at registration
-        if abs(income / size - THRESHOLD_SAR) < 350 and income / size > THRESHOLD_SAR and rng.random() < .45:
+        if abs(income / size - THRESHOLD_SAR) < 350 and income / size > THRESHOLD_SAR and rng.random() < .20:
             rep = size + rng.choice([1, 1, 2])         # just above the line: some report a larger household
         elif rng.random() < .04 and size > 1:
             rep = size - 1                             # a birth or a returning member not yet reported
@@ -196,10 +196,10 @@ def build(capstone: bool = False) -> dict:
 
     # ---- which household sizes are blank in the register: three mechanisms, an exact share in total
     for h in H:
-        if h["b"] in C["old_form"] and h["reg"] < old_cut and rng.random() < .70:
+        if h["b"] in C["old_form"] and h["reg"] < old_cut and rng.random() < .40:
             h["miss"] = "old_form"                     # the old paper form had no field for it
-        elif h["ch"] == "online" and h["rep"] >= 8 and rng.random() < .85:
-            h["miss"] = "dropdown"                     # the online form's list stopped at 7
+        elif h["ch"] in ("online", "phone") and h["rep"] >= 7 and rng.random() < .85:
+            h["miss"] = "dropdown"                     # the online form and the call script stop at 6
     target = round(C["size_missing"] * n_h)
     rest = [h for h in H if not h["miss"]]
     for h in rng.sample(rest, target - sum(1 for h in H if h["miss"])):
@@ -404,6 +404,10 @@ def build(capstone: bool = False) -> dict:
 
     if capstone:
         return truth
+
+    sealed = "household_id,size_as_reported,size_true\n" + "".join(
+        f"{h['id']},{h['rep']},{h['size']}\n" for h in sorted(H, key=lambda h: h["id"]))
+    gz_write(LABS / "data" / "reference" / "sealed_sizes.csv.gz", sealed.encode())
 
     ref = LABS / "data" / "reference"
     ref.mkdir(parents=True, exist_ok=True)
