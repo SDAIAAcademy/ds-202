@@ -473,7 +473,7 @@
       "options": [
         "\"Validation failed in 3 checks\"",
         "\"Row 2,214 is invalid\"",
-        "\"B05: 303 handouts weigh 21 to 32 kg per parcel; the standard is 9 to 15. Was the weight entered in pounds?\"",
+        "\"B05: 377 handouts weigh 21 to 32 kg per parcel; the standard is 9 to 15. Was the weight entered in pounds?\"",
         "\"weight_kg check returned False\""
       ],
       "correct": [

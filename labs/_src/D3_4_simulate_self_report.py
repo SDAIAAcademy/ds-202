@@ -235,6 +235,15 @@ except NotImplementedError:
     print("✱ Stretch not attempted")
 
 # %% [markdown]
+# ## Verification note
+#
+# The last step of every lab: what this run verified, and what the lab did not verify. The cell writes
+# `artifacts/D3_4/verification.md`. Read the last line and add one of your own.
+
+# %%
+note = G.verification_note("D3_4", "the real rate of over-reporting: the simulation shows direction and size under assumed rates, and the audit sample is small")
+
+# %% [markdown]
 # ## Checkpoint
 #
 # 1. The mean reporting error is almost zero. Why does the headline still move?

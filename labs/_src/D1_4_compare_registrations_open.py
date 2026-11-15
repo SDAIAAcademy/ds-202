@@ -200,6 +200,15 @@ except NotImplementedError:
     print("✱ Stretch not attempted")
 
 # %% [markdown]
+# ## Verification note
+#
+# The last step of every lab: what this run verified, and what the lab did not verify. The cell writes
+# `artifacts/D1_4/verification.md`. Read the last line and add one of your own.
+
+# %%
+note = G.verification_note("D1_4", "need today: the open table describes 2022 and estimates need, so coverage is an indication; districts D29 and D30 have no frame at all")
+
+# %% [markdown]
 # ## Checkpoint
 #
 # 1. Why a full outer join here, when Day 2 will insist on a join that loses nothing?

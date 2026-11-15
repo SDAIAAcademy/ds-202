@@ -212,6 +212,15 @@ except NotImplementedError:
     print("✱ Stretch not attempted")
 
 # %% [markdown]
+# ## Verification note
+#
+# The last step of every lab: what this run verified, and what the lab did not verify. The cell writes
+# `artifacts/D4_2/verification.md`. Read the last line and add one of your own.
+
+# %%
+note = G.verification_note("D4_2", "faults that keep every relation plausible, such as a handout recorded for another household of the same branch")
+
+# %% [markdown]
 # ## Checkpoint
 #
 # 1. Why did the range rule on `weight_kg` catch only part of the B05 rows?

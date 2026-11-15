@@ -1,15 +1,16 @@
 <section class="slide title" id="title" data-auto="title">
-  <aside class="notes">Today is theirs: keep your own talking to the opening and the closing. Confirm the running order and the demo setup (screen sharing, accounts, a recorded backup) first.</aside>
+  <aside class="notes"><p>Today is theirs: keep your own talking to the opening and the closing. Confirm the running order and the setup first: each participant shares a screen with a terminal in a fresh clone of the repository and the capstone extract in place. Have the corruption scripts of labs/solutions/capstone_reference.md ready, one per participant.</p></aside>
 </section>
 
 <section class="slide" id="agenda" data-label="Agenda">
   <div class="kicker">Capstone</div>
   <h2>How the presentations run</h2>
   <div class="agenda">
-    <div class="item now"><div><b>Expectations and final prep</b><small>the rubric, a last rehearsal, then the first presentations</small></div></div>
-    <div class="item"><div><b>Presentations</b><small>each one timed, with questions after it</small></div></div>
-    <div class="item"><div><b>Review and closing</b><small>peer feedback, the trainer's review, what next</small></div></div>
+    <div class="item now"><div><b>Expectations and final prep</b><small>the rubric, a rebuild from a fresh clone, then the first defences</small></div></div>
+    <div class="item"><div><b>Defences</b><small>eight minutes each with a live rebuild and one corrupted input, then four minutes of questions</small></div></div>
+    <div class="item"><div><b>Exit check, review and closing</b><small>the supervised check, the trainer's review, the follow-up task</small></div></div>
   </div>
+  <aside class="notes"><p>Twelve minutes per participant with the change-over. The exit check is supervised and AI-off; it is held after the last defence. The follow-up task (labs/follow_up.md) is explained in the closing.</p></aside>
 </section>
 
 <section class="slide" id="rubric" data-label="The rubric">
@@ -22,53 +23,55 @@
     <div class="row"><span>Missing data and sensitivity</span><div class="bar c-purple" style="--w:80%"></div><span class="val">20%</span></div>
     <div class="row"><span>Personal data and reproducibility</span><div class="bar c-amber" style="--w:60%"></div><span class="val">15%</span></div>
   </div>
-  <div class="callout tip mt"><b>Show results from at least two measured runs.</b> A claim without a number is a plan, not a result.</div>
-  <aside class="notes">Walk through each criterion with one example of what full marks look like.</aside>
+  <div class="callout tip mt"><b>Every claim has a count.</b> Rows in, rows out, rows set aside; rules run, rules failed; an estimate with its range.</div>
+  <aside class="notes"><p>Walk through each criterion with the full-marks line of the brief (labs/capstone/README.md). The repository is scored on this rubric; the live defence is scored separately on whether the rebuild runs, the corrupted input is caught by a named rule, and the participant can explain any rule pointed at.</p></aside>
 </section>
 
 <section class="slide" id="format" data-label="Format">
   <div class="kicker">Format</div>
-  <h2>8 minutes for each presentation</h2>
+  <h2>Eight minutes of defence, then four minutes of questions</h2>
   <div class="cols cols-3">
-    <div class="card c-teal"><h4>1 · The problem</h4><p class="small mb0">Who, what, why now. One slide.</p></div>
-    <div class="card c-cyan"><h4>2 · What you built</h4><p class="small mb0">Design, decisions, trade-offs. Then the live demo.</p></div>
-    <div class="card c-coral"><h4>3 · What you measured</h4><p class="small mb0">Baseline, improvement, failures found, what comes next.</p></div>
+    <div class="card c-teal"><h4>1 · The question</h4><p class="small mb0">Which question, which population, which sources. One minute, no slides needed.</p></div>
+    <div class="card c-cyan"><h4>2 · The rebuild</h4><p class="small mb0">One command on the raw files. Then the assessor corrupts one input file: rebuild, and show which rule fails and why.</p></div>
+    <div class="card c-coral"><h4>3 · The answer and its limits</h4><p class="small mb0">The estimate with its range, and the one limit that matters most to the person who asked.</p></div>
   </div>
-  <div class="callout note mt"><b>Peer feedback.</b> After each talk, everyone writes one strength, one question and one suggestion.</div>
+  <div class="callout note mt"><b>Peer feedback.</b> After each defence, everyone writes one strength, one question and one suggestion.</div>
+  <aside class="notes"><p>The corruption is applied by the assessor to a raw file in the participant's working folder, by a short script, while the participant watches. A build that stops with a traceback has detected the fault and not reported it; a build that finishes with every rule green has missed it. Restore the file afterwards.</p></aside>
 </section>
 
 <section class="slide order" id="running-order" data-label="Running order">
   <div class="kicker">Running order</div>
   <h2>Who presents when</h2>
   <table class="t small">
-    <tr><th>#</th><th>Presenter</th><th>Project</th></tr>
-    <tr><td>1</td><td><input placeholder="name"></td><td><input placeholder="Project"></td></tr>
-    <tr><td>2</td><td><input placeholder="name"></td><td><input placeholder="Project"></td></tr>
-    <tr><td>3</td><td><input placeholder="name"></td><td><input placeholder="Project"></td></tr>
-    <tr><td>4</td><td><input placeholder="name"></td><td><input placeholder="Project"></td></tr>
-    <tr><td>5</td><td><input placeholder="name"></td><td><input placeholder="Project"></td></tr>
-    <tr><td>6</td><td><input placeholder="name"></td><td><input placeholder="Project"></td></tr>
-    <tr><td>7</td><td><input placeholder="name"></td><td><input placeholder="Project"></td></tr>
-    <tr><td>8</td><td><input placeholder="name"></td><td><input placeholder="Project"></td></tr>
+    <tr><th>#</th><th>Presenter</th><th>Question</th></tr>
+    <tr><td>1</td><td><input placeholder="name"></td><td><input placeholder="Question A, B or C"></td></tr>
+    <tr><td>2</td><td><input placeholder="name"></td><td><input placeholder="Question A, B or C"></td></tr>
+    <tr><td>3</td><td><input placeholder="name"></td><td><input placeholder="Question A, B or C"></td></tr>
+    <tr><td>4</td><td><input placeholder="name"></td><td><input placeholder="Question A, B or C"></td></tr>
+    <tr><td>5</td><td><input placeholder="name"></td><td><input placeholder="Question A, B or C"></td></tr>
+    <tr><td>6</td><td><input placeholder="name"></td><td><input placeholder="Question A, B or C"></td></tr>
+    <tr><td>7</td><td><input placeholder="name"></td><td><input placeholder="Question A, B or C"></td></tr>
+    <tr><td>8</td><td><input placeholder="name"></td><td><input placeholder="Question A, B or C"></td></tr>
   </table>
-  <aside class="notes">Type the names in at the start; the fields can be edited live and are not saved, so keep the list in your notes too.</aside>
+  <aside class="notes"><p>Type the names and the question letter (A, B or C) in at the start, from the capstone_choice.json files collected in Lab 4.4. The fields can be edited live and are not saved, so keep the list in your notes too.</p></aside>
 </section>
 
 <section class="slide dark" id="final-prep" data-label="Before the first presentation">
   <div class="kicker">Before the first presentation</div>
   <h1>Final prep · 20 minutes</h1>
   <div class="timer" data-minutes="20"></div>
-  <p class="lead">Rehearse once, record a backup, try the demo on this screen.</p>
-  <aside class="notes">Press T to start the timer. Breaks are not slides: press B when the room needs one.</aside>
+  <p class="lead">Clone your repository into a new folder, run your one command there, and search the clone for a raw personal field.</p>
+  <aside class="notes"><p>Press T to start the timer. Breaks are not slides: press B when the room needs one. A participant whose fresh clone does not rebuild fixes that now; it is the most common reason for a failed defence.</p></aside>
 </section>
 
 <section class="slide dark presenting" id="now-presenting" data-label="Now presenting">
   <div class="kicker center">Now presenting</div>
   <div class="center"><input placeholder="Presenter · project"></div>
   <div class="timers mt">
-    <div><h3>Talk and demo</h3><div class="timer" data-minutes="8"></div></div>
+    <div><h3>Defence and rebuild</h3><div class="timer" data-minutes="8"></div></div>
+    <div><h3>Questions</h3><div class="timer" data-minutes="4"></div></div>
   </div>
-  <aside class="notes">Type the presenter's name and press T to start the timer. Reuse this slide for every presenter.</aside>
+  <aside class="notes"><p>Type the presenter's name and press T to start the timer. Reuse this slide for every presenter. Apply the corruption at about minute three, after the first rebuild has finished.</p></aside>
 </section>
 
 <section class="slide" id="review" data-label="Trainer review">
@@ -79,20 +82,23 @@
     <div class="card c-coral"><h4>Common gaps</h4><p class="small mb0">What most projects would fix next.</p></div>
     <div class="card c-purple"><h4>One surprise</h4><p class="small mb0">Something nobody expected.</p></div>
   </div>
-  <aside class="notes">Fill these in from your scoring notes during the last break. Name projects for strengths; keep gaps anonymous.</aside>
+  <aside class="notes"><p>Fill these in from your scoring notes during the last break. Name repositories for strengths; keep gaps anonymous. Typical gaps to look for: a join without a cardinality test, a complete-case figure reported as the answer, a key of the pseudonyms inside the repository.</p></aside>
 </section>
 
 <section class="slide" id="what-next" data-label="After the course">
   <div class="kicker">After the course</div>
   <h2>Keep going</h2>
   <ul class="bullets">
-    <li><b>Your project stays yours:</b> keep it reproducible and add the next improvement you named today</li>
-    <li><b>Next Academy course:</b> REPLACE: the course that follows this one</li>
+    <li><b>The follow-up task:</b> a provenance file and a rule suite for one dataset from your work, or one open dataset. The brief is <code>labs/follow_up.md</code></li>
+    <li><b>Your repository stays yours:</b> keep it rebuildable, and add the rule for the fault the assessor found today</li>
+    <li><b>Next in the Data Science stream:</b> the other DS-200 courses prepare for the same DS Assistant badge; your trainer has the current schedule</li>
   </ul>
+  <aside class="notes"><p>Set the date for the follow-up task and say where it is handed in. It is complete when the five checks of the brief are met; it carries no marks. Name the next course from the current Academy schedule.</p></aside>
 </section>
 
 <section class="slide dark" id="thanks" data-label="Thank you">
   <div class="kicker">SDAIA Academy</div>
   <h1>Thank you</h1>
   <p class="lead">Data Acquisition, Preparation and Quality</p>
+  <aside class="notes"><p>Thank the participants. Remind them that the repositories are public: a last search for a raw personal field before they share the link is worth two minutes.</p></aside>
 </section>

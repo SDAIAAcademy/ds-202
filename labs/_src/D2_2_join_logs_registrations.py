@@ -213,6 +213,15 @@ except NotImplementedError:
     print("✱ Stretch not attempted")
 
 # %% [markdown]
+# ## Verification note
+#
+# The last step of every lab: what this run verified, and what the lab did not verify. The cell writes
+# `artifacts/D2_2/verification.md`. Read the last line and add one of your own.
+
+# %%
+note = G.verification_note("D2_2", "that a handout joined to a household was collected by that household: the key matched, nothing more")
+
+# %% [markdown]
 # ## Checkpoint
 #
 # 1. Why is turning the letter O into 0 allowed, and choosing the most similar id from the register not?

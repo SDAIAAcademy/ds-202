@@ -220,6 +220,15 @@ except NotImplementedError:
     print("✱ Stretch not attempted")
 
 # %% [markdown]
+# ## Verification note
+#
+# The last step of every lab: what this run verified, and what the lab did not verify. The cell writes
+# `artifacts/D3_3/verification.md`. Read the last line and add one of your own.
+
+# %%
+note = G.verification_note("D3_3", "anything that was not varied: the nine days of B12 without rows and sizes recorded wrong are outside the range")
+
+# %% [markdown]
 # ## Checkpoint
 #
 # 1. The logical bounds straddle the standard. Are they useless?

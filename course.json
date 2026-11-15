@@ -22,7 +22,8 @@
     "FN-101 Python for Data and AI Work",
     "FN-104 SQL and Data Wrangling",
     "FN-106 Responsible Data and AI Practice in the Kingdom",
-    "Writes SQL joins and group-by queries without assistance"
+    "Writes SQL joins and group-by queries without assistance",
+    "Setup: a laptop CPU with uv, or Google Colab. No key, account or model is needed. Run 00_setup_check and the two-hour pre-work notebook before Day 1; see labs/README.md."
   ],
   "site": {
     "url": "https://sdaiaacademy.github.io/ds-202/",
@@ -734,7 +735,7 @@
       "kind": "capstone",
       "title": "Capstone project presentations",
       "deck": "slides/capstone.html",
-      "subtitle": "REPLACE: the catalog gives 8 minutes for each presentation and nothing about questions; decide whether the questions are inside those minutes, set capstone.talk_minutes and capstone.qa_minutes in course.json and the timers of the now-presenting slide, and remove this line"
+      "subtitle": "Each participant rebuilds a dataset from raw files, live, and defends it: eight minutes, then four minutes of questions"
     }
   ],
   "capstone": {

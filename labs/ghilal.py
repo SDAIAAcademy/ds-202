@@ -50,9 +50,25 @@ def ensure_data():
         prepare_data.build()
 
 
+_checks: list = []
+
+
 def check(ok, message: str) -> bool:
+    _checks.append((bool(ok), message))
     print(("✅ " if ok else "❌ ") + message)
     return bool(ok)
+
+
+def verification_note(lab: str, not_verified: str) -> str:
+    """The last step of every lab: what this run verified (its check lines) and what the lab did not verify.
+    Written to artifacts/<lab>/verification.md and printed."""
+    lines = [f"# Verification note · Lab {lab[1]}.{lab[3]}", "", "Verified in this run:"]
+    lines += [f"- [{'x' if ok else ' '}] {m}" for ok, m in _checks] or ["- nothing was checked"]
+    lines += ["", f"Not verified by this lab: {not_verified}."]
+    text = "\n".join(lines) + "\n"
+    (lab_dir(lab) / "verification.md").write_text(text, encoding="utf-8", newline="\n")
+    print(text)
+    return text
 
 
 def reference(name: str):
@@ -171,7 +187,7 @@ def sealed():
 def joined_q3():
     """Day 4's reference state: one row per Q3 handout joined to its household, keys pseudonymised."""
     import pandas as pd
-    return pd.read_csv(REF / "joined_q3.csv.gz", dtype={"household_key": str})
+    return pd.read_csv(REF / "joined_q3.csv.gz", dtype={"household_key": str, "household_size": "Int64", "eligible": "Int64"})
 
 
 def estimate(df, size, by=None):

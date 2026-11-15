@@ -213,6 +213,15 @@ except NotImplementedError:
     print("✱ Stretch not attempted")
 
 # %% [markdown]
+# ## Verification note
+#
+# The last step of every lab: what this run verified, and what the lab did not verify. The cell writes
+# `artifacts/D1_2/verification.md`. Read the last line and add one of your own.
+
+# %%
+note = G.verification_note("D1_2", "whether the values are right: only row counts and keys were reconciled, and the logs state no total of their own to compare with")
+
+# %% [markdown]
 # ## Checkpoint
 #
 # 1. Why load every log column as text first?

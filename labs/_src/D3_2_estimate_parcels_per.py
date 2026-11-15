@@ -213,6 +213,15 @@ except NotImplementedError:
     print("✱ Stretch not attempted")
 
 # %% [markdown]
+# ## Verification note
+#
+# The last step of every lab: what this run verified, and what the lab did not verify. The cell writes
+# `artifacts/D3_2/verification.md`. Read the last line and add one of your own.
+
+# %%
+note = G.verification_note("D3_2", "which method is closest in real work: here the generator could tell; a real register cannot")
+
+# %% [markdown]
 # ## Checkpoint
 #
 # 1. Complete-case analysis changes no value. Why is it still an assumption?

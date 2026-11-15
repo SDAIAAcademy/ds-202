@@ -239,6 +239,15 @@ except NotImplementedError:
     print("✱ Stretch not attempted")
 
 # %% [markdown]
+# ## Verification note
+#
+# The last step of every lab: what this run verified, and what the lab did not verify. The cell writes
+# `artifacts/D4_1/verification.md`. Read the last line and add one of your own.
+
+# %%
+note = G.verification_note("D4_1", "whether valid values are true, and anything that needs two fields or two sources (Lab 4.2)")
+
+# %% [markdown]
 # ## Checkpoint
 #
 # 1. Why keep the dates as text with a pattern, and not let the suite convert them?

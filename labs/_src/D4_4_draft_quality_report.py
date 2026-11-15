@@ -317,6 +317,15 @@ except NotImplementedError:
     print("✱ Stretch not attempted")
 
 # %% [markdown]
+# ## Verification note
+#
+# The last step of every lab: what this run verified, and what the lab did not verify. The cell writes
+# `artifacts/D4_4/verification.md`. Read the last line and add one of your own.
+
+# %%
+note = G.verification_note("D4_4", "that the list of limits is complete: the report holds what four days found, not what nobody looked for")
+
+# %% [markdown]
 # ## Checkpoint
 #
 # 1. Why is every number of the report read from the build, and none typed?

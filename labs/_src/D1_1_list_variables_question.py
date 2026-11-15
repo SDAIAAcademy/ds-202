@@ -192,6 +192,15 @@ except NotImplementedError:
     print("✱ Stretch not attempted")
 
 # %% [markdown]
+# ## Verification note
+#
+# The last step of every lab: what this run verified, and what the lab did not verify. The cell writes
+# `artifacts/D1_1/verification.md`. Read the last line and add one of your own.
+
+# %%
+note = G.verification_note("D1_1", "whether the fields exist and hold what their names promise: nothing was loaded yet")
+
+# %% [markdown]
 # ## Checkpoint
 #
 # 1. Why is the population "registered before the quarter began" and not "every active household"?

@@ -247,6 +247,15 @@ except NotImplementedError:
     print("✱ Stretch not attempted")
 
 # %% [markdown]
+# ## Verification note
+#
+# The last step of every lab: what this run verified, and what the lab did not verify. The cell writes
+# `artifacts/D4_3/verification.md`. Read the last line and add one of your own.
+
+# %%
+note = G.verification_note("D4_3", "re-linkage by somebody who holds other data about the households: uniqueness on three fields is a first measure, not a guarantee")
+
+# %% [markdown]
 # ## Checkpoint
 #
 # 1. "A hash cannot be reversed." True, and beside the point. Why?

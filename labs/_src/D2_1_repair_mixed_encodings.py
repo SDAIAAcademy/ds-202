@@ -221,6 +221,15 @@ except NotImplementedError:
     print("✱ Stretch not attempted")
 
 # %% [markdown]
+# ## Verification note
+#
+# The last step of every lab: what this run verified, and what the lab did not verify. The cell writes
+# `artifacts/D2_1/verification.md`. Read the last line and add one of your own.
+
+# %%
+note = G.verification_note("D2_1", "that every repaired name is the name the person gave: the rules restore bytes and letters, not spelling mistakes made at the desk")
+
+# %% [markdown]
 # ## Checkpoint
 #
 # 1. Why not read the whole file as Windows-1256, which raises no error?

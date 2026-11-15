@@ -217,6 +217,15 @@ except NotImplementedError:
     print("✱ Stretch not attempted")
 
 # %% [markdown]
+# ## Verification note
+#
+# The last step of every lab: what this run verified, and what the lab did not verify. The cell writes
+# `artifacts/D1_3/verification.md`. Read the last line and add one of your own.
+
+# %%
+note = G.verification_note("D1_3", "the claims of the records themselves: they rest on the source notes and on what the owners said, and none was tested against the data")
+
+# %% [markdown]
 # ## Checkpoint
 #
 # 1. The open table is public. Why does it need a record at all?

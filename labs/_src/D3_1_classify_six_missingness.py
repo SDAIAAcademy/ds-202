@@ -152,7 +152,8 @@ try:
     gaps = {b: empty_days(logs, b) for b in G.BRANCHES}
 except NotImplementedError:
     days = pd.date_range("2026-01-01", "2026-09-30")
-    gaps = {b: [d for d in days if d not in set(logs.loc[logs.branch_id == b, "date"])] for b in G.BRANCHES}
+    seen = {b: set(logs.loc[logs.branch_id == b, "date"]) for b in G.BRANCHES}
+    gaps = {b: [d for d in days if d not in seen[b]] for b in G.BRANCHES}
 gaps = {b: v for b, v in gaps.items() if v}
 print({b: (str(v[0].date()), str(v[-1].date()), len(v)) for b, v in gaps.items()})
 G.check(list(gaps) == ["B12"] and len(gaps["B12"]) == 9, "one branch, B12, has nine days in August with no row at all")
@@ -196,9 +197,12 @@ try:
 except NotImplementedError:
     mine = {}
 right = sum(mine.get(k) == v for k, v in KEY.items())
-for k, v in KEY.items():
-    print(k, "✅" if mine.get(k) == v else "❌", mine.get(k, "not answered"))
-G.check(right >= 5, f"{right} of 6 scenarios with the right mechanism and direction (LO1 asks for five)")
+if not mine:
+    print("Not answered yet: fill classify() and run this cell again.")
+else:
+    for k, v in KEY.items():
+        print(k, "✅" if mine.get(k) == v else "❌", mine.get(k, "not answered"))
+    G.check(right >= 5, f"{right} of 6 scenarios with the right mechanism and direction (LO1 asks for five)")
 phone_blank = G.registry_text().assign(blank=lambda d: d.phone == "").groupby("branch_id").blank.mean()
 print(f"\nscenario 1, evidence: phone blank {phone_blank.min():.1%} to {phone_blank.max():.1%} across the 14 branches")
 
@@ -232,6 +236,15 @@ try:
     print(two_worlds().to_string(index=False))
 except NotImplementedError:
     print("✱ Stretch not attempted")
+
+# %% [markdown]
+# ## Verification note
+#
+# The last step of every lab: what this run verified, and what the lab did not verify. The cell writes
+# `artifacts/D3_1/verification.md`. Read the last line and add one of your own.
+
+# %%
+note = G.verification_note("D3_1", "the mechanism for households outside the audit: it is argued from 600 visits and the source note")
 
 # %% [markdown]
 # ## Checkpoint

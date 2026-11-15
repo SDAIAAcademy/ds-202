@@ -70,7 +70,9 @@ Every lab is a notebook in `labs/`. Open it in Google Colab from the course page
 
 A rebuildable dataset for one of three synthetic questions, in a public repository whose README reports row counts per step, rule results and the estimate's sensitivity to missing data; eight-minute defence with a rebuild from raw files
 
-**Submission:** A public GitHub repository link. The repository rebuilds the analysis dataset from the raw files of the capstone extract with one command, and holds the provenance file, the rule suite and the set-aside rows; its README reports row counts per step, rule results and the sensitivity of the estimate to missing data. No raw personal field is committed, synthetic or not. Then an eight-minute defence with a live rebuild, in which the assessor corrupts one input file and you show which rule fails and why, and four minutes of questions.
+**Submission:** A public GitHub repository link. The repository rebuilds the analysis dataset from the raw files of the capstone extract with one command, and holds the provenance file, the rule suite and the set-aside rows (log id, branch and reason, without the household key as typed); its README reports row counts per step, rule results and the sensitivity of the estimate to missing data. No raw personal field is committed, synthetic or not. Then an eight-minute defence with a live rebuild, in which the assessor corrupts one input file and you show which rule fails and why, and four minutes of questions.
+
+The brief, the three questions and the rubric are in [`labs/capstone/README.md`](labs/capstone/README.md). The capstone extract is a second, smaller set of raw files with its faults in other places; each participant generates it with `uv run python prepare_data.py --capstone`.
 
 ## Prerequisites
 
@@ -78,6 +80,19 @@ A rebuildable dataset for one of three synthetic questions, in a public reposito
 - FN-104 SQL and Data Wrangling
 - FN-106 Responsible Data and AI Practice in the Kingdom
 - Writes SQL joins and group-by queries without assistance
+- Setup: a laptop CPU with uv, or Google Colab. No key, account or model is needed. Run 00_setup_check and the two-hour pre-work notebook before Day 1; see labs/README.md.
+
+## Before and after the teaching days
+
+- **Pre-work, about two hours:** [`labs/00_prework.ipynb`](labs/00_prework.ipynb), eight exercises on joins and dataframes with checks. A supervised, AI-off entry quiz at the start of Day 1 asks what the pre-work practises. Run [`labs/00_setup_check.ipynb`](labs/00_setup_check.ipynb) first.
+- **Follow-up task:** a provenance file and a rule suite for one dataset from the participant's work, or one open dataset. The brief and the five checks it is reviewed against are in [`labs/follow_up.md`](labs/follow_up.md).
+
+## Assessment and AI use
+
+- A supervised entry quiz and exit check, AI-off. Their items are not in this repository; [`assessments/bank.json`](assessments/bank.json) holds practice questions for every outcome.
+- The capstone repository, scored on the rubric of the brief, and the live defence with a rebuild from raw files.
+- In the labs: AI-off for the first attempt at each join and rule; an AI-tutor, hinting only, for regular expressions and rule syntax. In the capstone, AI assistance is allowed in full, but no personal data, synthetic or real, goes to an external assistant, and every rule is defended live.
+- No lab calls a model. Everything runs on a laptop CPU or a Colab CPU runtime, without a key or an account.
 
 <!-- academy:tools -->
 ## Tools
@@ -122,11 +137,3 @@ Each line is a capability; the examples are interchangeable.
 - [Python documentation: hmac](https://docs.python.org/3/library/hmac.html)
 - [RFC 2104: HMAC, Keyed-Hashing for Message Authentication](https://datatracker.ietf.org/doc/html/rfc2104)
 <!-- /academy:sources -->
-
-### National references
-
-- Personal Data Protection Law and its implementing regulations: https://sdaia.gov.sa/en/SDAIA/about/Documents/PersonalDataProtectionLaw.pdf and https://sdaia.gov.sa/en/SDAIA/about/Documents/ImplementingRegulationPersonalDataProtectionLaw.pdf
-- PDPL guideline on destruction, anonymisation and pseudonymisation of personal data: https://sdaia.gov.sa/Documents/PersonalDataDestructionAnonymizationAndEncryptionGuideline.pdf
-- NDMO Data Classification Policy: https://sdaia.gov.sa/en/SDAIA/about/Documents/DataClassificationPolicy.pdf
-- NDMO Data Sharing Policy: https://sdaia.gov.sa/en/SDAIA/about/Documents/DataSharingPolicyEN.pdf
-- NDMO Open Data Policy: https://sdaia.gov.sa/en/SDAIA/about/Documents/OpenDataPolicy.pdf
