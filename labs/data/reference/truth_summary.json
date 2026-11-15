@@ -1,0 +1,120 @@
+{
+ "note": "What the generator knows and the sources do not: the true household sizes and the handouts that never reached a log file.",
+ "households": 39820,
+ "register_rows": 40000,
+ "log_rows": 210000,
+ "true_handouts": 213130,
+ "gap_rows": 546,
+ "double_upload_rows": 403,
+ "size_missing": 7168,
+ "size_missing_by_cause": {
+  "old_form": 4105,
+  "dropdown": 694,
+  "random": 2369
+ },
+ "eligible_households": 21580,
+ "parcels_per_eligible_household_per_month": 2.1628,
+ "by_district": {
+  "D01": 2.1861,
+  "D02": 2.1734,
+  "D03": 2.38,
+  "D04": 2.1594,
+  "D05": 2.3364,
+  "D06": 2.2447,
+  "D07": 1.5521,
+  "D08": 2.2027,
+  "D09": 2.1637,
+  "D10": 2.2829,
+  "D11": 1.8576,
+  "D12": 2.1322,
+  "D13": 2.2511,
+  "D14": 2.2552,
+  "D15": 1.5476,
+  "D16": 2.3205,
+  "D17": 2.1287,
+  "D18": 2.252,
+  "D19": 1.8773,
+  "D20": 2.2736,
+  "D21": 2.2311,
+  "D22": 1.5118,
+  "D23": 2.2035,
+  "D24": 2.3746,
+  "D25": 2.3714,
+  "D26": 1.4293,
+  "D27": 2.3146,
+  "D28": 2.4017,
+  "D29": 2.3592,
+  "D30": 2.2871
+ },
+ "donations": 5360,
+ "config": {
+  "n_reg": 40000,
+  "n_dup": 180,
+  "n_logs": 210000,
+  "months": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "cp1256": [
+   "B03",
+   "B11"
+  ],
+  "bom": [
+   "B08"
+  ],
+  "mojibake": "B06",
+  "indic": "B09",
+  "dmy": [
+   "B03",
+   "B08",
+   "B10",
+   "B11"
+  ],
+  "mdy": [
+   "B05",
+   "B13"
+  ],
+  "lb": [
+   "B05",
+   "B13"
+  ],
+  "lb_as_kg": "B13",
+  "grams": "B09",
+  "no_weight": "B09",
+  "gap": "B12",
+  "double": "B02",
+  "hyphen": "B10",
+  "old_form": [
+   "B03",
+   "B07",
+   "B11"
+  ],
+  "low": [
+   "D07",
+   "D15",
+   "D22",
+   "D26"
+  ],
+  "over": "D03",
+  "size_missing": 0.18,
+  "topup": 0.27
+ },
+ "batch_rows": 4215,
+ "batch_planted": {
+  "parcels out of range": 40,
+  "handout before registration": 30,
+  "household_key blank": 60,
+  "handout_date not ISO": 15,
+  "district not in the list": 20,
+  "household_size out of range": 12,
+  "weight in pounds at B05": 397,
+  "log_id repeated": 25
+ }
+}
