@@ -904,22 +904,22 @@
     {
       "id": "q-lo3-paging-proof",
       "type": "single",
-      "prompt": "A cursor API states a total of 3,120 records. Every request sent the cursor that the answer before returned, and the last answer's next cursor is null. You received 3,132 records; 12 ids arrived twice. What do you record in the source inventory?",
+      "prompt": "A cursor API states no total. You made 12 requests; each sent the cursor that the answer before returned, the last answer's next cursor is null, and the 4,410 records received have 4,410 distinct ids. What does the source inventory say?",
       "options": [
-        "Complete once the 12 repeated ids are dropped and the drop is recorded",
-        "Incomplete, since more records arrived than the service says it holds",
-        "Complete as received, since the last next cursor is null",
-        "Unknown until the owner confirms every one of the 3,132 records by hand"
+        "Complete beyond doubt, since the chain is unbroken and ends in a null cursor",
+        "Incomplete, since a source that states no total can never be read in full",
+        "Complete as far as the chain shows; one count from elsewhere would prove it",
+        "Unknown until every record is compared by hand with the source system itself"
       ],
       "correct": [
-        0
+        2
       ],
-      "explanation": "The chain is unbroken and reaches its end, and the 3,120 distinct ids equal the stated total. The repeats are dropped and written down, so the difference between 3,132 and 3,120 is explained.",
+      "explanation": "Three checks pass: the chain, the end and the keys. The fourth, the count, needs a figure from somewhere else, such as a count endpoint or a daily summary from the owner, so the inventory states what was proved and what is still open.",
       "misconceptions": [
+        "Takes three checks for four: a chain can be unbroken and still start after records the service never served",
+        "Believes completeness needs a stated total, when a count from a second route can stand in for it",
         "",
-        "Reads extra rows as a sign of a broken chain; repeats come from records arriving while you page",
-        "Takes the end check for the whole proof and keeps 12 records twice",
-        "Asks for a manual check when the four checks already prove the retrieval complete"
+        "Asks for a manual comparison when one independent count would settle the question"
       ],
       "lo": [
         "LO3"
@@ -938,7 +938,7 @@
         "400 Bad Request: the query string has a field the API does not know",
         "401 Unauthorized: the access token expired during the night",
         "404 Not Found: the endpoint was renamed in a new version",
-        "429 Too Many Requests, with a header asking to wait 30 seconds"
+        "429 Too Many Requests: the service asks the job to wait 30 seconds"
       ],
       "correct": [
         3

@@ -17,8 +17,9 @@ import random
 # ---- 1 · Paging with a cursor, and the proof that the retrieval is complete ----------------------------------
 
 def cursor_paging(total=2_346, per=500, lost_request=4):
-    """A cursor API of `total` stock movements, read by a client whose retry after a timeout on request
-    `lost_request` sent the cursor it had received one page later. Returns the paging log and the four proofs."""
+    """A cursor API of `total` stock movements. Request `lost_request` timed out after the service had answered;
+    the client kept that answer's next cursor and dropped its records, so the request after it skips one page.
+    Returns the paging log and the four proofs."""
     ids = [f"M{i:06d}" for i in range(1, total + 1)]
     pages = [ids[i:i + per] for i in range(0, total, per)]
     cursors = [None] + [f"c{k}" for k in range(1, len(pages))]          # cursor that asks for page k
@@ -35,12 +36,6 @@ def cursor_paging(total=2_346, per=500, lost_request=4):
     return dict(per_page=per, total_reported=total, pages_expected=len(pages), log=log, received=received,
                 distinct=received, missing=total - received, chain_breaks=breaks,
                 last_next_null=log[-1]["next_cursor"] == "null")
-
-
-def offset_shift(per=200, arrivals=3):
-    """Offset paging on a live table sorted newest first: `arrivals` new rows push the next page down."""
-    return dict(per_page=per, arrivals=arrivals, repeated_on_next_page=arrivals,
-                note="with oldest-first order the same arrivals are read at the end; with newest-first they repeat rows")
 
 
 # ---- 2 · Retry with bounded backoff, then an alert ------------------------------------------------------------
@@ -119,6 +114,7 @@ def nonresponse(seed=2026, n=1200, subsample=4):
     two_phase = (sum(h["lasted"] for h in r1) + w2 * sum(h["lasted"] for h in r2)) / n
     return dict(sampled=n, phase1_responded=len(r1), phase1_rate=round(len(r1) / n, 3),
                 nonrespondents=len(nr), phase2_subsample=len(sub), phase2_responded=len(r2),
+                phase2_still_missing=len(sub) - len(r2),
                 phase2_weight=round(w2, 2),
                 lasted_phase1=sum(h["lasted"] for h in r1), lasted_phase2=sum(h["lasted"] for h in r2),
                 classes={("far" if k else "near"): dict(sampled=v["sampled"], responded=v["responded"],
@@ -148,11 +144,12 @@ def linking_question():
                 spread_a=round(max(a) - min(a), 2), spread_b=round(max(b) - min(b), 2))
 
 
-def paging_question():
-    """The practice question on paging: 3,132 records received over an unbroken cursor chain, 12 repeated."""
-    received, repeated, total = 3_132, 12, 3_120
-    return dict(received=received, distinct=received - repeated, total=total,
-                complete=received - repeated == total)
+def paging_question(per=400, received=4_410):
+    """The practice question on paging: a cursor source that states no total. 12 requests, an unbroken chain,
+    the last next cursor null, every id once. The chain proves the end was reached; nothing proves the count."""
+    requests = -(-received // per)
+    return dict(per_page=per, requests=requests, received=received, distinct=received, total_stated=None,
+                checks_passed=["chain", "end", "keys"], check_open="count from a second route")
 
 
 # ---- 5 · A changed question, an overlap period, and when not to link -----------------------------------------
@@ -180,12 +177,14 @@ def instrument_change(seed=7):
     by_channel = {"desk": dict(old=0.334, new=0.301), "phone": dict(old=0.296, new=0.168)}
     for c in by_channel.values():
         c["ratio"] = round(c["new"] / c["old"], 2)
+    # what a chart without the overlap would show: the last old month, then the first new month
+    apparent_drop = round(old["2025-12"] - new["2026-01"], 3)
     return dict(old=old, new=new, overlap=overlap, ratios=ratios, factor=factor, linked=linked,
-                by_channel=by_channel)
+                apparent_drop_dec_to_jan=apparent_drop, by_channel=by_channel)
 
 
 if __name__ == "__main__":
-    print(json.dumps(dict(cursor_paging=cursor_paging(), offset_shift=offset_shift(), retry=retry_log(),
+    print(json.dumps(dict(cursor_paging=cursor_paging(), retry=retry_log(),
                           master_record=master_record(), nonresponse=nonresponse(),
                           nonresponse_question=nonresponse_question(), instrument_change=instrument_change(),
                           linking_question=linking_question(), paging_question=paging_question()),

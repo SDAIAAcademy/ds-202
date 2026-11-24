@@ -143,8 +143,7 @@
     <div class="card c-purple"><h4>An API</h4><p class="small mb0">Data come in pages, the service can be busy, and records change while you read. It usually states a total.</p></div>
     <div class="card c-cyan"><h4>A database</h4><p class="small mb0">Types and keys are declared, but only the ones somebody declared. Your query decides what you see.</p></div>
   </div>
-  <p class="small mt">One habit covers all three: before reading a value, count what arrived against what the source says it sent.</p>
-  <aside class="notes"><p>In the labs the register is an in-memory DuckDB table loaded from the extract file, and the API is a small server started on the participant's own computer or Colab runtime by G.start_api(); nothing leaves the machine. Say so, so nobody looks for a network address.</p></aside>
+  <aside class="notes"><p>One habit covers all three: before reading a value, count what arrived against what the source says it sent. In the labs the register is an in-memory DuckDB table loaded from the extract file, and the API is a small server started on the participant's own computer or Colab runtime by G.start_api(); nothing leaves the machine. Say so, so nobody looks for a network address.</p></aside>
 </section>
 
 <section class="slide" id="text-first" data-lo="LO6">
@@ -153,11 +152,10 @@
   <ul class="bullets">
     <li>B01 reads as UTF-8. <b>B03 fails</b> at its first Arabic name: it is in Windows-1256</li>
     <li>B08 opens, but begins with three extra bytes, <code>EF BB BF</code>: a byte order mark that a spreadsheet wrote</li>
-    <li>A loader that guesses types reads <code>03/07/2026</code> as March or as July, and does not say which</li>
     <li>As text, nothing is lost: 14 files, <b>210,000 rows</b>, every repair still ahead and countable</li>
   </ul>
   <div class="callout warn mt"><b>What goes wrong.</b> The mark becomes part of the first column name, and <code>log_id</code> is "not found" in one file of fourteen.</div>
-  <aside class="notes"><p>Demonstrate: G.log_bytes("B03").decode("utf-8") raises UnicodeDecodeError at byte 0xcc; G.log_bytes("B08")[:6] shows the mark. FN-104 taught code pages on one file per encoding; here the encodings are spread over fourteen files and nobody says which is which. The codec utf-8-sig removes the mark. Sources: Python codecs documentation.</p></aside>
+  <aside class="notes"><p>Demonstrate: G.log_bytes("B03").decode("utf-8") raises UnicodeDecodeError at byte 0xcc; G.log_bytes("B08")[:6] shows the mark. FN-104 taught code pages on one file per encoding; here the encodings are spread over fourteen files and nobody says which is which. The codec utf-8-sig removes the mark. A loader that guesses types reads 03/07/2026 as March or as July without saying which: Day 2 returns to it. Sources: Python codecs documentation.</p></aside>
 </section>
 
 <section class="slide" id="paging" data-lo="LO6">
@@ -187,8 +185,7 @@ while url:
     </div>
     <ul class="bullets">
       <li>Donations kept arriving while the 26 pages were read</li>
-      <li>Four pages begin with records the page before ended with</li>
-      <li>12 donation ids arrive twice; distinct ids are exactly 5,125</li>
+      <li>Four pages begin with records the page before ended with: 12 ids arrive twice; distinct ids are exactly 5,125</li>
       <li>The inventory records the distinct count <b>and</b> the 12 that were dropped</li>
     </ul>
   </div>
@@ -210,7 +207,7 @@ while url:
       <li><b>Count:</b> distinct ids equal the total the source states, or a count from a second route</li>
     </ol>
   </div>
-  <aside class="notes"><p>About two minutes. The 12 repeats of the donations API came from page numbers on a live source. The four checks are what "complete" means for any paged source, whatever the paging style. When a source states no total, the fourth check needs another route: a count endpoint, a daily summary from the owner, or yesterday's count plus today's arrivals. Without one, the inventory says "complete as far as the chain shows" and no more.</p></aside>
+  <aside class="notes"><p>About two minutes. The donations API of the lab pages by number on a live source, and its 12 repeats are the kind of fault page numbers allow. The four checks are what "complete" means for any paged source, whatever the paging style. When a source states no total, the fourth check needs another route: a count endpoint, a daily summary from the owner, or yesterday's count plus today's arrivals. Without one, the inventory says "complete as far as the chain shows" and no more.</p></aside>
 </section>
 
 <section class="slide" id="paging-log" data-lo="LO3 LO6">
@@ -224,7 +221,7 @@ while url:
     <tr class="hl"><td>4</td><td>c4</td><td>346 (2,001 to 2,346)</td><td>null</td></tr>
   </table>
   <div class="callout warn mt frag"><b>No.</b> The end check passes and the keys are unique, but request 4 sent <code>c4</code> where the answer before returned <code>c3</code>. Ids 1,501 to 2,000 were never asked for: 1,846 received of 2,346.</div>
-  <aside class="notes"><p>A parallel example, not the donations API of the lab: a warehouse stock-movements API of the network, read with cursors. Give the room a minute with the four checks before the reveal. The cause was a retry after a timeout that resent the cursor of a later page; the next slide is about retries. Figures from labs/_tools/practice_figures.py (cursor_paging).</p></aside>
+  <aside class="notes"><p>A parallel example, not the donations API of the lab: a warehouse stock-movements API of the network, read with cursors. Give the room a minute with the four checks before the reveal. The cause: request 4 timed out after the service had answered for <code>c3</code>; the client kept the next cursor of that answer, <code>c4</code>, and dropped its records. The next slide is about retries. Figures from labs/_tools/practice_figures.py (cursor_paging).</p></aside>
 </section>
 
 <section class="slide" id="retry-backoff" data-lo="LO6">
@@ -252,8 +249,8 @@ while url:
   <div class="kicker">When retries run out</div>
   <h2>A failed ingestion stops the build and tells a person; it never continues with what it has</h2>
   <div class="cols cols-2">
-    <div class="card c-coral"><h4>What goes wrong</h4><p class="small mb0">The loop catches the last error, logs "warning" and moves on. The build finishes green with a page missing, and the paging log of the previous slide is what nobody reads.</p></div>
-    <div class="card c-teal"><h4>The alert</h4><p class="small mb0">Source, request and cursor, attempts and the last answer, the time of the last good extract, and the owner to call: Talal for the donations API. The build keeps yesterday's extract and says so.</p></div>
+    <div class="card c-coral"><h4>What goes wrong</h4><p class="small mb0">The loop catches the last error, logs "warning" and moves on. The build finishes green with a page missing, and the paging log that would show it is what nobody reads.</p></div>
+    <div class="card c-teal"><h4>The alert</h4><p class="small mb0">Source, request and cursor, attempts and the last answer, the time of the last good extract, and the owner to call, by role. The build keeps yesterday's extract and says so.</p></div>
   </div>
   <aside class="notes"><p>The decision is binary: either the extract is complete by the four checks, or the run fails loudly. A partial extract labelled as complete is the worst outcome, because every later count reconciles against the wrong number. An alert goes to a person who can act, by role, and is written to a file the run keeps, so the next run can see that the last one failed.</p></aside>
 </section>

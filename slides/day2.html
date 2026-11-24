@@ -241,8 +241,7 @@
   <h2>300 handouts were written on paper, with a name and no id</h2>
   <div class="cols cols-2">
     <ul class="bullets">
-      <li>A satellite point of B04 and B05, during Ramadan</li>
-      <li>A name, a district ticked on the form, a phone for seven in ten</li>
+      <li>A satellite point of B04 and B05 in Ramadan: a name, a district, a phone for seven in ten</li>
       <li>4,937 active households of the two branches to search</li>
       <li>Staff labelled 848 candidate pairs by hand: 255 true, 593 not</li>
     </ul>
@@ -259,11 +258,8 @@
     <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · Score</b>how alike are the two name keys, from 0 to 100</div>
     <div class="arrow frag" data-frag="c">→</div><div class="step c-purple frag" data-frag="c"><b>3 · Decide</b>accept, reject, or send to a person</div>
   </div>
-  <ul class="bullets small mt frag">
-    <li>Blocking: 311,703 candidate pairs instead of 1,481,100, and all 255 true pairs survive it</li>
-    <li>A true pair that disagrees on the blocking field is never compared: check that on the labelled pairs</li>
-  </ul>
-  <aside class="notes"><p>The score in the lab is token_sort_ratio from RapidFuzz: sort the words, then an edit-based similarity. It is one of many; the method of measuring does not depend on the choice. Sources: RapidFuzz documentation.</p></aside>
+  <p class="small mt frag">Blocking: 311,703 candidate pairs instead of 1,481,100, and all 255 true pairs survive it.</p>
+  <aside class="notes"><p>A true pair that disagrees on the blocking field is never compared: check that on the labelled pairs.The score in the lab is token_sort_ratio from RapidFuzz: sort the words, then an edit-based similarity. It is one of many; the method of measuring does not depend on the choice. Sources: RapidFuzz documentation.</p></aside>
 </section>
 
 <section class="slide" id="threshold-trade" data-lo="LO3">

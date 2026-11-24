@@ -148,8 +148,7 @@
     <div class="card c-purple"><h4>One value for all</h4><p class="small mb0">Fill with the median. Assumes every blank household is typical.</p></div>
     <div class="card c-teal"><h4>A value from similar households</h4><p class="small mb0">Fill from a group. Assumes that within the group, blank and recorded households are alike.</p></div>
   </div>
-  <p class="small mt">Lab 3.2 computes the headline all three ways, on the same 35,665 households.</p>
-  <aside class="notes"><p>"I did not impute, I only dropped the rows" is the sentence to defuse. Dropping is the strongest assumption of the three here, because Lab 3.1 showed the dropped households are larger. Sources: van Buuren, Flexible Imputation of Missing Data, sections on listwise deletion and single imputation.</p></aside>
+  <aside class="notes"><p>Lab 3.2 computes the headline all three ways, on the same 35,665 households. "I did not impute, I only dropped the rows" is the sentence to defuse. Dropping is the strongest assumption of the three here, because Lab 3.1 showed the dropped households are larger. Sources: van Buuren, Flexible Imputation of Missing Data, sections on listwise deletion and single imputation.</p></aside>
 </section>
 
 <section class="slide" id="complete-case" data-lo="LO5">
@@ -173,8 +172,7 @@
   <div class="cols cols-2">
     <ul class="bullets">
       <li>Estimate: <b>2.003</b>. Everybody is classified; nobody is dropped</li>
-      <li>But most blank households have 7 members or more</li>
-      <li>Income 6,000 SAR, 7 members in reality: 857 per member, eligible. With the imputed 5: 1,200, "not eligible"</li>
+      <li>But most blank households have 7 members or more: 6,000 SAR over 7 is 857, eligible; over the imputed 5 it is 1,200, "not eligible"</li>
       <li>Their parcels leave the numerator with them</li>
     </ul>
     <div class="card c-purple"><h4>And the spread shrinks</h4><p class="small mb0">6,461 households at exactly one size: the distribution of sizes gets a spike that was never there.</p></div>
@@ -236,7 +234,7 @@
     <div class="arrow">→</div><div class="step c-coral"><b>Weight</b>each phase 2 answer stands for 561 ÷ 123 = 4.56 nonrespondents</div>
   </div>
   <div class="callout note mt"><b>Unit nonresponse</b> is a whole household with no answer, not a blank field. A small follow-up, chased hard, beats a large one chased lightly: it is the only evidence about the people who do not answer.</div>
-  <aside class="notes"><p>A parallel example: an October phone survey of the network, "did last month's parcels last the month?". Two-phase sampling for nonresponse means: take a random subsample of the nonrespondents, spend effort on them (a visit, a second language, a better time), and weight their answers by the inverse of the subsampling rate among responders. The 18 subsampled households who still did not answer are assumed to be like the 123 who did: say so. Figures from labs/_tools/practice_figures.py (nonresponse).</p></aside>
+  <aside class="notes"><p>A parallel example: an October phone survey of the network, "did last month's parcels last the month?". Two-phase sampling for nonresponse means: take a random subsample of the nonrespondents, spend effort on them (a visit, a second language, a better time), and weight their answers by the inverse of the subsampling rate among responders. The 17 subsampled households who still did not answer are assumed to be like the 123 who did: say so. Figures from labs/_tools/practice_figures.py (nonresponse).</p></aside>
 </section>
 
 <section class="slide" id="nonresponse-weights" data-lo="LO1 LO5">
@@ -394,8 +392,7 @@
   <div class="cols cols-2">
     <ul class="bullets">
       <li>Household size is <b>reported by the household</b> at registration and is not verified</li>
-      <li>It passes every rule: an integer between 1 and 20</li>
-      <li>No validation suite can see that 7 should have been 5</li>
+      <li>It passes every rule, an integer between 1 and 20, and no rule can see that 7 should have been 5</li>
       <li>Only a second measurement can: here, 289 audited households with a recorded size</li>
     </ul>
     <div class="card c-purple"><h4>Two kinds of error</h4><p class="small mb0"><b>Random:</b> up as often as down, for anybody.<br><b>Systematic:</b> in one direction, or for one kind of household.</p></div>
@@ -474,8 +471,7 @@
     <ul class="bullets">
       <li>Parcels per handout are set by the desk from the family card: a proxy for the verified size band</li>
       <li>It disagrees with the recorded size for 1.5% of households that collected: a list for review</li>
-      <li>It is silent about households that never collected</li>
-      <li>323 households are eligible by the register and never collected in nine months</li>
+      <li>It is silent about households that never collected: 323 eligible by the register, none in nine months</li>
     </ul>
     <div class="callout warn"><b>What goes wrong.</b> Defining "eligible" as "collected regularly". Every eligible household that was not served leaves the denominator, and every district looks well served.</div>
   </div>
@@ -498,7 +494,7 @@
       <li>Linking factor 0.776: October 2025 at 32.9% on the old question reads 25.5% on the new basis</li>
     </ul>
   </div>
-  <aside class="notes"><p>A parallel series of the network, not from the lab files. Without the overlap the chart would show a fall of seven points in January 2026 that is only the new wording. The factor is the overlap's new total divided by its old total; the three monthly ratios are within 0.02 of each other, which is what makes one factor defensible. Figures from labs/_tools/practice_figures.py (instrument_change).</p></aside>
+  <aside class="notes"><p>A parallel series of the network, not from the lab files. Without the overlap the chart would fall from 34.3% in December 2025 to 24.8% in January 2026: about nine and a half points that are only the new wording. The factor is the overlap's new total divided by its old total; the three monthly ratios are within 0.02 of each other, which is what makes one factor defensible. Figures from labs/_tools/practice_figures.py (instrument_change).</p></aside>
 </section>
 
 <section class="slide" id="comparability-break" data-lo="LO1">

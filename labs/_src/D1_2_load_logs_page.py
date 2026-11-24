@@ -281,11 +281,11 @@ try:
     G.check(doc == {"data": [1, 2]} and waits == [0.5, 1.0, 2.0], f"three busy answers, then the page: waits {waits}")
     waits = []
     try:
-        fetch_with_backoff(fake_service(["503"] * 9), "/v1/stock?cursor=c4", sleep=waits.append)
+        fetch_with_backoff(fake_service(["503"] * 9), "/v1/stock?cursor=c4", attempts=5, sleep=waits.append)
         gave_up = False
     except IngestionFailed:
         gave_up = True
-    G.check(gave_up and waits == [0.5, 1.0, 2.0], "always busy: four attempts, three waits capped at 2 s, then it fails")
+    G.check(gave_up and waits == [0.5, 1.0, 2.0, 2.0], f"always busy: five attempts, waits {waits} held at the 2 s cap, then it fails")
     waits = []
     try:
         fetch_with_backoff(fake_service(["404"]), "/v1/stock?cursor=zz", sleep=waits.append)
@@ -294,7 +294,7 @@ try:
         stopped = True
     G.check(stopped and waits == [], "a 404 is not retried: it fails at once")
     alerts = [json.loads(line) for line in ALERTS.read_text(encoding="utf-8").splitlines()]
-    G.check([a["attempts"] for a in alerts] == [4, 1] and alerts[0]["last_status"] == "503",
+    G.check([a["attempts"] for a in alerts] == [5, 1] and alerts[0]["last_status"] == "503",
             "two alerts written, each with the url, the attempts and the last status")
 except NotImplementedError:
     print("✱ Stretch not attempted")
