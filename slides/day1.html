@@ -171,11 +171,11 @@ while url:
     total, url = page["total"], page["next"]</code></pre>
     <ul class="bullets small">
       <li>The address of the next page comes from the answer; do not compute it</li>
-      <li>503 means "busy, ask again": wait, retry, give up after a few tries</li>
+      <li>503 means "busy, ask again"; how often, and then what, follows the paging proof</li>
       <li>Keep the <code>total</code> the service reports: it is its claim about itself</li>
     </ul>
   </div>
-  <aside class="notes"><p>The first request for page 5 answers 503 once; G.get_json waits and asks again, up to three times. Ask what a loop without the retry does: it stops with an error after 800 records, which is the good case. A loop that swallows the error and continues would silently skip a page.</p></aside>
+  <aside class="notes"><p>The first request for page 5 answers 503 once; G.get_json waits and asks again. Keep this slide short: the retry policy has its own slide after the paging proof.</p></aside>
 </section>
 
 <section class="slide" id="api-total" data-lo="LO3 LO6">
@@ -193,6 +193,69 @@ while url:
     </ul>
   </div>
   <aside class="notes"><p>From the Lab 1.2 solution run: 5,137 received, 12 ids repeated, 5,125 distinct, equal to the total. The duplicates would have added whole deliveries to four branches. The lesson is the comparison, not the cause: a count from the source that disagrees with yours is the cheapest test there is.</p></aside>
+</section>
+
+<section class="slide" id="cursor-proof" data-lo="LO3 LO6">
+  <div class="kicker">Proving the end</div>
+  <h2>A page number shifts while records arrive; a cursor does not, and four checks prove you read it all</h2>
+  <div class="cols cols-2">
+    <div class="stack">
+      <div class="card c-coral"><h4>Page numbers</h4><p class="small mb0">"Rows 401 to 600" of a table that grows. A new record shifts the rows after it: rows repeat across pages, or are skipped.</p></div>
+      <div class="card c-teal"><h4>A cursor</h4><p class="small mb0">The answer says "continue after this record". New arrivals do not move what is left to read.</p></div>
+    </div>
+    <ol class="bullets small">
+      <li><b>Chain:</b> every request sent the cursor the answer before returned</li>
+      <li><b>End:</b> the last answer's next cursor is null</li>
+      <li><b>Keys:</b> no id twice, or the repeats counted and dropped</li>
+      <li><b>Count:</b> distinct ids equal the total the source states, or a count from a second route</li>
+    </ol>
+  </div>
+  <aside class="notes"><p>About two minutes. The 12 repeats of the donations API came from page numbers on a live source. The four checks are what "complete" means for any paged source, whatever the paging style. When a source states no total, the fourth check needs another route: a count endpoint, a daily summary from the owner, or yesterday's count plus today's arrivals. Without one, the inventory says "complete as far as the chain shows" and no more.</p></aside>
+</section>
+
+<section class="slide" id="paging-log" data-lo="LO3 LO6">
+  <div class="kicker">Read the log, then decide</div>
+  <h2>The stock-movements API reports 2,346 records: was the retrieval complete?</h2>
+  <table class="t small">
+    <tr><th>Request</th><th>Cursor sent</th><th>Records (ids)</th><th>Next cursor</th></tr>
+    <tr><td>1</td><td>none</td><td>500 (1 to 500)</td><td>c1</td></tr>
+    <tr><td>2</td><td>c1</td><td>500 (501 to 1,000)</td><td>c2</td></tr>
+    <tr><td>3</td><td>c2</td><td>500 (1,001 to 1,500)</td><td>c3</td></tr>
+    <tr class="hl"><td>4</td><td>c4</td><td>346 (2,001 to 2,346)</td><td>null</td></tr>
+  </table>
+  <div class="callout warn mt frag"><b>No.</b> The end check passes and the keys are unique, but request 4 sent <code>c4</code> where the answer before returned <code>c3</code>. Ids 1,501 to 2,000 were never asked for: 1,846 received of 2,346.</div>
+  <aside class="notes"><p>A parallel example, not the donations API of the lab: a warehouse stock-movements API of the network, read with cursors. Give the room a minute with the four checks before the reveal. The cause was a retry after a timeout that resent the cursor of a later page; the next slide is about retries. Figures from labs/_tools/practice_figures.py (cursor_paging).</p></aside>
+</section>
+
+<section class="slide" id="retry-backoff" data-lo="LO6">
+  <div class="kicker">When the source is busy</div>
+  <h2>Retry only what may pass next time, wait longer each time, and stop at a limit</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Attempt</th><th>Answer</th><th>Wait before the next</th></tr>
+      <tr><td>1</td><td>503 busy</td><td>1 s</td></tr>
+      <tr><td>2</td><td>503 busy</td><td>2 s</td></tr>
+      <tr><td>3</td><td>timeout</td><td>4 s</td></tr>
+      <tr><td>4</td><td>429 too many</td><td>8 s, the cap</td></tr>
+      <tr class="hl"><td>5</td><td>503 busy</td><td>none: give up</td></tr>
+    </table>
+    <ul class="bullets small">
+      <li><b>Retry:</b> 503, 429 and timeouts. <b>Never:</b> 400, 401, 404; asking again gives the same answer</li>
+      <li>The wait doubles up to a cap, with a little random jitter so many clients do not retry in step</li>
+      <li>Five attempts and 15 seconds of waiting, then the run stops</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>The nightly ingestion of the stock-movements API on one night; the policy is base 1 second, factor 2, cap 8 seconds, five attempts (labs/_tools/practice_figures.py, retry_log). When a 429 answer carries a Retry-After header, wait at least that long. The helper of Lab 1.2 waits less, because its server is on the participant's own machine; its stretch asks participants to write this policy themselves.</p></aside>
+</section>
+
+<section class="slide" id="retry-alert" data-lo="LO6">
+  <div class="kicker">When retries run out</div>
+  <h2>A failed ingestion stops the build and tells a person; it never continues with what it has</h2>
+  <div class="cols cols-2">
+    <div class="card c-coral"><h4>What goes wrong</h4><p class="small mb0">The loop catches the last error, logs "warning" and moves on. The build finishes green with a page missing, and the paging log of the previous slide is what nobody reads.</p></div>
+    <div class="card c-teal"><h4>The alert</h4><p class="small mb0">Source, request and cursor, attempts and the last answer, the time of the last good extract, and the owner to call: Talal for the donations API. The build keeps yesterday's extract and says so.</p></div>
+  </div>
+  <aside class="notes"><p>The decision is binary: either the extract is complete by the four checks, or the run fails loudly. A partial extract labelled as complete is the worst outcome, because every later count reconciles against the wrong number. An alert goes to a person who can act, by role, and is written to a file the run keeps, so the next run can see that the last one failed.</p></aside>
 </section>
 
 <section class="slide" id="register-sql" data-lo="LO3">

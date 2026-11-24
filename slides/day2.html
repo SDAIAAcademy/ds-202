@@ -307,6 +307,41 @@
   <aside class="notes"><p>The 45 new households are known only because the data is synthetic; in real work the unmatched pile mixes new people with missed matches, and the review queue is how you find out. The stretch counts 128 walk-ins with no accepted candidate.</p></aside>
 </section>
 
+<section class="slide" id="master-record-rules" data-lo="LO3">
+  <div class="kicker">After the match</div>
+  <h2>A match joins records that disagree: decide field by field which value survives</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Field</th><th>Trusted first</th><th>Then</th></tr>
+      <tr><td>phone</td><td>the most recent the household gave</td><td>the older one</td></tr>
+      <tr><td>district</td><td>seen at a home visit</td><td>the latest form</td></tr>
+      <tr><td>size</td><td>verified at a visit</td><td>the register</td></tr>
+      <tr><td>income</td><td>the register</td><td>nothing else asks</td></tr>
+    </table>
+    <ul class="bullets small">
+      <li><b>Precedence:</b> per field, the most trusted source that has a value; a blank never wins</li>
+      <li><b>Tie:</b> two sources of equal trust that disagree go to the most recent, or to review</li>
+      <li><b>Lineage:</b> every surviving value keeps its source and date</li>
+    </ul>
+  </div>
+  <div class="callout warn mt"><b>What goes wrong.</b> Keeping one whole row, the first or the newest: an old phone survives a new one.</div>
+  <aside class="notes"><p>About two minutes. Lab 2.2 keeps the whole first registration of a repeated id, which is right for a join and would be wrong for a contact list. A master record (a golden record) is one row per real household, built from all the records a match put together. The rules are the network's own, written by the analyst and agreed with the owner of each field: Widad for the register. Trust follows how a value was obtained (verified, observed, reported) and how old it is, not which system is bigger.</p></aside>
+</section>
+
+<section class="slide" id="master-record-example" data-lo="LO3">
+  <div class="kicker">One household, three records</div>
+  <h2>Each field of the master record comes from a different source</h2>
+  <table class="t small">
+    <tr><th>Field</th><th>Register, 2023</th><th>Walk-in form, March 2026</th><th>Home visit, Sept. 2026</th></tr>
+    <tr><td>phone</td><td>ending 870</td><td><b>ending 225</b></td><td>blank</td></tr>
+    <tr><td>district</td><td>D11</td><td>D12</td><td><b>D12</b></td></tr>
+    <tr><td>size</td><td>5</td><td>7</td><td><b>6</b></td></tr>
+    <tr><td>income</td><td><b>4,800</b></td><td>blank</td><td>blank</td></tr>
+  </table>
+  <p class="small mt-s">The register alone says 5 members in D11 on an old phone. The master record says 6 members in D12 on the phone ending 225, and names the source of each value.</p>
+  <aside class="notes"><p>A parallel example, not from the lab files: one household of B04 that a match linked to a walk-in form and to a home visit. Cover the bold values (the survivors) and ask the room to choose each value with the rules of the previous slide before showing them. The size 7 on the walk-in form is reported; the visit verified 6. Figures from labs/_tools/practice_figures.py (master_record).</p></aside>
+</section>
+
 <section class="slide" id="check-threshold" data-lo="LO3">
   <div class="kicker">Checkpoint</div>
   <h2>Which rule goes into the build?</h2>

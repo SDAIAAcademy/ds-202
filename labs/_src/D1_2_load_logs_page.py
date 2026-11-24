@@ -18,6 +18,7 @@
 # - [ ] 3 · Query the register in SQL (6')
 # - [ ] 4 · The source inventory (4')
 # - [ ] ✱ Stretch · Does a smaller page size change what arrives?
+# - [ ] ✱ Also for those who finish early · A retry that gives up and raises an alert
 
 # %%
 import os, sys, subprocess
@@ -209,6 +210,92 @@ def fetch_small(per_page: int = 50) -> int:
 
 try:
     print("records with pages of 50:", fetch_small(G.pick(50, 100)))
+except NotImplementedError:
+    print("✱ Stretch not attempted")
+
+# %% [markdown]
+# ### ✱ Also for those who finish early · A retry that gives up and raises an alert
+#
+# `G.get_json` hides its retries. Write your own policy: retry only answers that may pass next time (503, 429,
+# a timeout), wait `base`, then twice as long each time up to `cap`, stop after `attempts` tries, and then write
+# an alert and raise instead of returning what you have. To keep the cell fast and repeatable, `get` and `sleep`
+# are passed in: the checks below use a fake service that answers from a list, and a fake clock.
+#
+# ✏️ **Exercise** · Write `fetch_with_backoff(get, url, attempts=4, base=0.5, cap=2.0, sleep=time.sleep)`. `get(url)`
+# returns a document or raises `ServiceError(status)`. On final failure append one line to
+# `artifacts/D1_2/alerts.jsonl` with the url, the attempts made and the last status, then raise `IngestionFailed`.
+
+# %%
+import json, time
+
+
+class ServiceError(Exception):
+    def __init__(self, status):
+        super().__init__(status)
+        self.status = status
+
+
+class IngestionFailed(Exception):
+    pass
+
+
+RETRYABLE = {"503", "429", "timeout"}
+ALERTS = G.lab_dir("D1_2") / "alerts.jsonl"
+
+
+def fetch_with_backoff(get, url, attempts=4, base=0.5, cap=2.0, sleep=time.sleep):
+    # BEGIN SOLUTION
+    last = None
+    for k in range(attempts):
+        try:
+            return get(url)
+        except ServiceError as e:
+            last = e.status
+            if last not in RETRYABLE or k == attempts - 1:
+                break
+            sleep(min(cap, base * 2 ** k))
+    alert = {"source": "stock-movements API", "url": url, "attempts": k + 1, "last_status": last}
+    with open(ALERTS, "a", encoding="utf-8") as f:
+        f.write(json.dumps(alert) + "\n")
+    raise IngestionFailed(f"{url}: {last} after {k + 1} attempts")
+    # END SOLUTION
+
+
+# %%
+def fake_service(answers):
+    """A service that gives the answers in order: a status string raises, anything else is returned."""
+    it = iter(answers)
+
+    def get(url):
+        a = next(it)
+        if isinstance(a, str):
+            raise ServiceError(a)
+        return a
+    return get
+
+
+try:
+    ALERTS.unlink(missing_ok=True)
+    waits = []
+    doc = fetch_with_backoff(fake_service(["503", "timeout", "429", {"data": [1, 2]}]), "/v1/stock?cursor=c3", sleep=waits.append)
+    G.check(doc == {"data": [1, 2]} and waits == [0.5, 1.0, 2.0], f"three busy answers, then the page: waits {waits}")
+    waits = []
+    try:
+        fetch_with_backoff(fake_service(["503"] * 9), "/v1/stock?cursor=c4", sleep=waits.append)
+        gave_up = False
+    except IngestionFailed:
+        gave_up = True
+    G.check(gave_up and waits == [0.5, 1.0, 2.0], "always busy: four attempts, three waits capped at 2 s, then it fails")
+    waits = []
+    try:
+        fetch_with_backoff(fake_service(["404"]), "/v1/stock?cursor=zz", sleep=waits.append)
+        stopped = False
+    except IngestionFailed:
+        stopped = True
+    G.check(stopped and waits == [], "a 404 is not retried: it fails at once")
+    alerts = [json.loads(line) for line in ALERTS.read_text(encoding="utf-8").splitlines()]
+    G.check([a["attempts"] for a in alerts] == [4, 1] and alerts[0]["last_status"] == "503",
+            "two alerts written, each with the url, the attempts and the last status")
 except NotImplementedError:
     print("✱ Stretch not attempted")
 

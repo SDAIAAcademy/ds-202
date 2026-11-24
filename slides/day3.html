@@ -227,6 +227,37 @@
   <aside class="notes"><p>The reveal is in the last cell of Lab 3.2 and reads data/reference/sealed_sizes.csv.gz. Be careful with the lesson: imputation within groups is not always right. It was right here because the group field was strongly related to the missing value. In real work you cannot check, which is why the next session replaces "the answer" by "a range".</p></aside>
 </section>
 
+<section class="slide" id="unit-nonresponse" data-lo="LO1 LO5">
+  <div class="kicker">When whole answers are missing</div>
+  <h2>A survey's nonrespondents are not filled in: you go back for a sample of them</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>Phase 1 · phone</b>1,200 households sampled; 639 answer (53%)</div>
+    <div class="arrow">→</div><div class="step c-purple"><b>Phase 2 · follow-up</b>a random 1 in 4 of the 561 who did not: 140 visited at home, 123 answer</div>
+    <div class="arrow">→</div><div class="step c-coral"><b>Weight</b>each phase 2 answer stands for 561 ÷ 123 = 4.56 nonrespondents</div>
+  </div>
+  <div class="callout note mt"><b>Unit nonresponse</b> is a whole household with no answer, not a blank field. A small follow-up, chased hard, beats a large one chased lightly: it is the only evidence about the people who do not answer.</div>
+  <aside class="notes"><p>A parallel example: an October phone survey of the network, "did last month's parcels last the month?". Two-phase sampling for nonresponse means: take a random subsample of the nonrespondents, spend effort on them (a visit, a second language, a better time), and weight their answers by the inverse of the subsampling rate among responders. The 18 subsampled households who still did not answer are assumed to be like the 123 who did: say so. Figures from labs/_tools/practice_figures.py (nonresponse).</p></aside>
+</section>
+
+<section class="slide" id="nonresponse-weights" data-lo="LO1 LO5">
+  <div class="kicker">Three estimates of one share</div>
+  <h2>Weights for distance help a little; only the follow-up sees that nonrespondents differ</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Method</th><th>"Parcels lasted"</th><th>Assumes</th></tr>
+      <tr><td>phone respondents only</td><td>64.8%</td><td>nonrespondents answer like respondents</td></tr>
+      <tr><td>weighted by distance class</td><td>63.4%</td><td>alike within near and far</td></tr>
+      <tr class="hl"><td>two-phase, with the follow-up</td><td>55.4%</td><td>the 123 speak for the 561</td></tr>
+    </table>
+    <ul class="bullets small">
+      <li>Class weights: near households answered 63% of the time (weight 1.58), far ones 42% (weight 2.40)</li>
+      <li>They fix the share of far households, not who answers within a class</li>
+      <li>The follow-up shows nonrespondents in difficulty more often: MNAR, measured</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>Two-phase arithmetic: (414 + 4.56 × 55) ÷ 1,200 = 55.4%. The generator's own value is 54.2%, which only synthetic data can show. Weighting classes are the survey version of imputing within groups: right when the class explains who answers. Report the weighted and the follow-up figures side by side when they differ, with the response rate of each phase.</p></aside>
+</section>
+
 <section class="slide" id="check-imputation" data-lo="LO5">
   <div class="kicker">Checkpoint</div>
   <h2>Which estimate do you put first?</h2>
@@ -449,6 +480,43 @@
     <div class="callout warn"><b>What goes wrong.</b> Defining "eligible" as "collected regularly". Every eligible household that was not served leaves the denominator, and every district looks well served.</div>
   </div>
   <aside class="notes"><p>The 323 are two groups the proxy cannot separate: households that over-reported and were turned away at the desk, and under-served households, who are the reason for the whole analysis. Use a proxy to flag records for review; do not let it redefine the question.</p></aside>
+</section>
+
+<section class="slide" id="instrument-change" data-lo="LO1">
+  <div class="kicker">When the question itself changes</div>
+  <h2>Ask the old and the new question side by side for a while, and link the series with the ratio</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Month</th><th>Old: last month</th><th>New: last 7 days</th><th>Ratio</th></tr>
+      <tr><td>2026-01</td><td>31.5%</td><td>24.8%</td><td>0.787</td></tr>
+      <tr><td>2026-02</td><td>32.1%</td><td>24.8%</td><td>0.773</td></tr>
+      <tr><td>2026-03</td><td>32.7%</td><td>25.1%</td><td>0.768</td></tr>
+    </table>
+    <ul class="bullets small">
+      <li>Share of households at the desk who say someone skipped a meal for lack of food; the wording changed in January 2026</li>
+      <li>Three months of overlap, half the households asked each version</li>
+      <li>Linking factor 0.776: October 2025 at 32.9% on the old question reads 25.5% on the new basis</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>A parallel series of the network, not from the lab files. Without the overlap the chart would show a fall of seven points in January 2026 that is only the new wording. The factor is the overlap's new total divided by its old total; the three monthly ratios are within 0.02 of each other, which is what makes one factor defensible. Figures from labs/_tools/practice_figures.py (instrument_change).</p></aside>
+</section>
+
+<section class="slide" id="comparability-break" data-lo="LO1">
+  <div class="kicker">When not to link</div>
+  <h2>If the ratio is not stable across months or groups, the series breaks: report two</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>A partner network's overlap</th><th>Old</th><th>New</th><th>Ratio</th></tr>
+      <tr><td>at the desk, on a card</td><td>33.4%</td><td>30.1%</td><td>0.90</td></tr>
+      <tr class="hl"><td>by phone, read aloud</td><td>29.6%</td><td>16.8%</td><td>0.57</td></tr>
+    </table>
+    <ul class="bullets small">
+      <li>One factor would move desk and phone households by different amounts</li>
+      <li>Break the series when the ratio drifts, differs by group, the reference period or definition changes, or there is no overlap</li>
+      <li>Then: two series with a marked break, and no trend drawn across it</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>A second, unnamed partner network made the same change of wording and split its overlap by channel. Read aloud by phone, the new question lost more than the card at the desk: the instrument is the question and the way it is asked. Ask the room what a district comparison would show if one district registered mostly by phone. A changed instrument is measurement error that arrives on one date; Day 4's quality report names it as a limit.</p></aside>
 </section>
 
 <section class="slide" id="check-direction" data-lo="LO1">
