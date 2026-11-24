@@ -1,7 +1,7 @@
 ---
 course: "Data Acquisition, Preparation and Quality"
 code: "DS-202"
-version: "2027.1.0"
+version: "2027.2.0"
 deck: "day1"
 day: 1
 language: "en"
@@ -160,6 +160,7 @@ Take the question of the programmes director apart, list the variables it needs 
 - Load files as text whatever their encoding
 - Page through an API and reconcile with its total
 - Query a register in SQL and build a source inventory
+- Prove a paged retrieval complete; retry with a limit, then alert
 
 #### [day1#three-doors] Files, an API and a database fail in three different ways
 
@@ -169,15 +170,12 @@ Take the question of the programmes director apart, list the variables it needs 
 - **An API.** Data come in pages, the service can be busy, and records change while you read. It usually states a total.
 - **A database.** Types and keys are declared, but only the ones somebody declared. Your query decides what you see.
 
-One habit covers all three: before reading a value, count what arrived against what the source says it sent.
-
 #### [day1#text-first] Load every column as text first; decide types later, in steps you can count
 
 *Recap of FN-104, one step further*
 
 - B01 reads as UTF-8. **B03 fails** at its first Arabic name: it is in Windows-1256
 - B08 opens, but begins with three extra bytes, `EF BB BF`: a byte order mark that a spreadsheet wrote
-- A loader that guesses types reads `03/07/2026` as March or as July, and does not say which
 - As text, nothing is lost: 14 files, **210,000 rows**, every repair still ahead and countable
 
 > **What goes wrong.** The mark becomes part of the first column name, and `log_id` is "not found" in one file of fourteen.
@@ -196,7 +194,7 @@ while url:
 ```
 
 - The address of the next page comes from the answer; do not compute it
-- 503 means "busy, ask again": wait, retry, give up after a few tries
+- 503 means "busy, ask again"; how often, and then what, follows the paging proof
 - Keep the `total` the service reports: it is its claim about itself
 
 #### [day1#api-total] The API sent 12 records more than its own total
@@ -206,9 +204,56 @@ while url:
 **5,137 · 5,125** records received, and the total the API reports
 
 - Donations kept arriving while the 26 pages were read
-- Four pages begin with records the page before ended with
-- 12 donation ids arrive twice; distinct ids are exactly 5,125
+- Four pages begin with records the page before ended with: 12 ids arrive twice; distinct ids are exactly 5,125
 - The inventory records the distinct count **and** the 12 that were dropped
+
+#### [day1#cursor-proof] A page number shifts while records arrive; a cursor does not, and four checks prove you read it all
+
+*Proving the end*
+
+- **Page numbers.** "Rows 401 to 600" of a table that grows. A new record shifts the rows after it: rows repeat across pages, or are skipped.
+- **A cursor.** The answer says "continue after this record". New arrivals do not move what is left to read.
+
+1. **Chain:** every request sent the cursor the answer before returned
+2. **End:** the last answer's next cursor is null
+3. **Keys:** no id twice, or the repeats counted and dropped
+4. **Count:** distinct ids equal the total the source states, or a count from a second route
+
+#### [day1#paging-log] The stock-movements API reports 2,346 records: was the retrieval complete?
+
+*Read the log, then decide*
+
+| Request | Cursor sent | Records (ids) | Next cursor |
+| --- | --- | --- | --- |
+| 1 | none | 500 (1 to 500) | c1 |
+| 2 | c1 | 500 (501 to 1,000) | c2 |
+| 3 | c2 | 500 (1,001 to 1,500) | c3 |
+| 4 | c4 | 346 (2,001 to 2,346) | null |
+
+> **No.** The end check passes and the keys are unique, but request 4 sent `c4` where the answer before returned `c3`. Ids 1,501 to 2,000 were never asked for: 1,846 received of 2,346.
+
+#### [day1#retry-backoff] Retry only what may pass next time, wait longer each time, and stop at a limit
+
+*When the source is busy*
+
+| Attempt | Answer | Wait before the next |
+| --- | --- | --- |
+| 1 | 503 busy | 1 s |
+| 2 | 503 busy | 2 s |
+| 3 | timeout | 4 s |
+| 4 | 429 too many | 8 s, the cap |
+| 5 | 503 busy | none: give up |
+
+- **Retry:** 503, 429 and timeouts. **Never:** 400, 401, 404; asking again gives the same answer
+- The wait doubles up to a cap, with a little random jitter so many clients do not retry in step
+- Five attempts and 15 seconds of waiting, then the run stops
+
+#### [day1#retry-alert] A failed ingestion stops the build and tells a person; it never continues with what it has
+
+*When retries run out*
+
+- **What goes wrong.** The loop catches the last error, logs "warning" and moves on. The build finishes green with a page missing, and the paging log that would show it is what nobody reads.
+- **The alert.** Source, request and cursor, attempts and the last answer, the time of the last good extract, and the owner to call, by role. The build keeps yesterday's extract and says so.
 
 #### [day1#register-sql] 40,000 rows describe 39,820 households
 

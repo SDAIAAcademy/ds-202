@@ -6,7 +6,7 @@
     "code": "DS-202",
     "title": "Data Acquisition, Preparation and Quality",
     "lang": "en",
-    "version": "2027.1.0"
+    "version": "2027.2.0"
   },
   "questions": [
     {
@@ -1502,6 +1502,156 @@
       "day": 2,
       "session": 4,
       "level": "analyze",
+      "pool": "practice",
+      "weight": 1,
+      "timer": 30
+    },
+    {
+      "id": "q-lo3-paging-proof",
+      "type": "single",
+      "prompt": "A cursor API states no total. You made 12 requests; each sent the cursor that the answer before returned, the last answer's next cursor is null, and the 4,410 records received have 4,410 distinct ids. What does the source inventory say?",
+      "options": [
+        "Complete beyond doubt, since the chain is unbroken and ends in a null cursor",
+        "Incomplete, since a source that states no total can never be read in full",
+        "Complete as far as the chain shows; one count from elsewhere would prove it",
+        "Unknown until every record is compared by hand with the source system itself"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "Three checks pass: the chain, the end and the keys. The fourth, the count, needs a figure from somewhere else, such as a count endpoint or a daily summary from the owner, so the inventory states what was proved and what is still open.",
+      "misconceptions": [
+        "Takes three checks for four: a chain can be unbroken and still start after records the service never served",
+        "Believes completeness needs a stated total, when a count from a second route can stand in for it",
+        "",
+        "Asks for a manual comparison when one independent count would settle the question"
+      ],
+      "lo": [
+        "LO3"
+      ],
+      "day": 1,
+      "session": 2,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1,
+      "timer": 30
+    },
+    {
+      "id": "q-lo6-retry-which",
+      "type": "single",
+      "prompt": "A nightly ingestion calls an API of a partner organisation. Which answer should the job retry with a growing wait, rather than stop at once and raise an alert?",
+      "options": [
+        "400 Bad Request: the query string has a field the API does not know",
+        "401 Unauthorized: the access token expired during the night",
+        "404 Not Found: the endpoint was renamed in a new version",
+        "429 Too Many Requests: the service asks the job to wait 30 seconds"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "A 429 says the service is limiting requests for now; waiting at least as long as it asks and trying again can succeed. The other three give the same answer however often they are asked, so the job stops and a person is alerted.",
+      "misconceptions": [
+        "Retries a malformed request, which fails the same way every time",
+        "Expects an expired token to become valid by waiting; it needs a person or a renewal step",
+        "Treats a missing endpoint as a busy one; asking again cannot find it",
+        ""
+      ],
+      "lo": [
+        "LO6"
+      ],
+      "day": 1,
+      "session": 2,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1,
+      "timer": 30
+    },
+    {
+      "id": "q-lo3-survivorship",
+      "type": "single",
+      "prompt": "A match links three records of one household: the register (2022, size 4, phone ending 314), a walk-in form (April 2026, size 6, phone ending 902) and a home visit (October 2026, size 5, no phone). The rules: a verified value beats a reported one, the most recent phone wins, and a blank never wins. Which master record follows?",
+      "options": [
+        "Size 5 from the home visit, and the phone ending 902 from the walk-in form",
+        "Size 6 and phone ending 902: the walk-in form is the newest complete record",
+        "Size 4 and phone ending 314: the register is the system of record",
+        "Size 5 from the visit and no phone, since the visit is the newest record of all"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "Each field is decided on its own: the size verified at the visit beats the reported sizes, and the most recent phone given is on the walk-in form, because the visit recorded none and a blank never wins.",
+      "misconceptions": [
+        "",
+        "Keeps one whole record, so a reported size overrides the verified one",
+        "Trusts the oldest system for every field, keeping a size and a phone that are out of date",
+        "Lets the newest record win every field, so its blank phone erases a known number"
+      ],
+      "lo": [
+        "LO3"
+      ],
+      "day": 2,
+      "session": 3,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1,
+      "timer": 30
+    },
+    {
+      "id": "q-lo5-two-phase",
+      "type": "single",
+      "prompt": "A survey samples 900 households. 540 answer by phone and 300 of them say yes. A random 1 in 3 of the 360 nonrespondents are visited at home; 100 of the 120 visited answer and 30 say yes. What is the two-phase estimate of the share that says yes?",
+      "options": [
+        "55.6%: the phone answers, since the visits were only a sample",
+        "51.6%: all 640 answers pooled, each counted once",
+        "43.3%: each visited answer counts three times, the subsampling rate",
+        "45.3%: each visited answer stands for 3.6 nonrespondents"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "The 100 visited answers stand for all 360 nonrespondents, 3.6 each: (300 + 3.6 × 30) ÷ 900 = 45.3%. This assumes the 20 visited households that still did not answer are like the 100 that did.",
+      "misconceptions": [
+        "Assumes nonrespondents answer like respondents, which the follow-up exists to test",
+        "Pools answers from two phases with different sampling rates as if each stood for one household",
+        "Weights by the share visited and forgets the 20 visited households that still did not answer",
+        ""
+      ],
+      "lo": [
+        "LO5"
+      ],
+      "day": 3,
+      "session": 2,
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1,
+      "timer": 30
+    },
+    {
+      "id": "q-lo1-instrument-link",
+      "type": "single",
+      "prompt": "Two monthly series changed their question in July, each with a three-month overlap in which both versions were asked. Series A: new-to-old ratios 0.81, 0.80 and 0.82, alike at the desk and by phone. Series B: ratios 0.92, 0.74 and 0.61. What do you do?",
+      "options": [
+        "Link both, each with the mean ratio of its overlap: 0.81 and 0.76",
+        "Link A with its factor; report B as two series with a marked break",
+        "Link neither: any change of wording ends a series for good",
+        "Link B only, since its larger ratios show the stronger effect of the change"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "A ratio that holds across months and groups lets one factor put the old series on the new basis. B's ratio drifts by 0.31 in three months, so no single factor is right for its past: the series breaks.",
+      "misconceptions": [
+        "Averages a drifting ratio as if it were noise around one factor",
+        "",
+        "Gives up a stable overlap that was collected to make the link possible",
+        "Reads the size of the ratio, not its stability, as the reason to link"
+      ],
+      "lo": [
+        "LO1"
+      ],
+      "day": 3,
+      "session": 4,
+      "level": "apply",
       "pool": "practice",
       "weight": 1,
       "timer": 30

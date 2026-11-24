@@ -1,7 +1,7 @@
 ---
 course: "Data Acquisition, Preparation and Quality"
 code: "DS-202"
-version: "2027.1.0"
+version: "2027.2.0"
 deck: "day3"
 day: 3
 language: "en"
@@ -159,6 +159,7 @@ Tabulate where household sizes are missing, read the audit of home visits, inspe
 - Compute a complete-case estimate and say what it assumes
 - Impute a single value and a value within groups
 - Compare the estimates overall and by district
+- Weight a survey for nonresponse after a follow-up of nonrespondents
 
 #### [day3#no-neutral-option] Every way of handling a blank is an assumption about the households behind it
 
@@ -167,8 +168,6 @@ Tabulate where household sizes are missing, read the audit of home visits, inspe
 - **Complete cases.** Drop the rows. Assumes the dropped households are like the kept ones.
 - **One value for all.** Fill with the median. Assumes every blank household is typical.
 - **A value from similar households.** Fill from a group. Assumes that within the group, blank and recorded households are alike.
-
-Lab 3.2 computes the headline all three ways, on the same 35,665 households.
 
 #### [day3#complete-case] Complete cases: 1.985, from the households that were easy to record
 
@@ -186,8 +185,7 @@ Lab 3.2 computes the headline all three ways, on the same 35,665 households.
 *Lab 3.2, step 2*
 
 - Estimate: **2.003**. Everybody is classified; nobody is dropped
-- But most blank households have 7 members or more
-- Income 6,000 SAR, 7 members in reality: 857 per member, eligible. With the imputed 5: 1,200, "not eligible"
+- But most blank households have 7 members or more: 6,000 SAR over 7 is 857, eligible; over the imputed 5 it is 1,200, "not eligible"
 - Their parcels leave the numerator with them
 
 - **And the spread shrinks.** 6,461 households at exactly one size: the distribution of sizes gets a spike that was never there.
@@ -230,6 +228,30 @@ Lab 3.2 computes the headline all three ways, on the same 35,665 households.
 | imputed within groups | −0.002 |
 
 Distance from the value that complete data would have given. The generator knows the size every household would have reported; in real work this cell does not exist.
+
+#### [day3#unit-nonresponse] A survey's nonrespondents are not filled in: you go back for a sample of them
+
+*When whole answers are missing*
+
+1. **Phase 1 · phone** 1,200 households sampled; 639 answer (53%)
+2. **Phase 2 · follow-up** a random 1 in 4 of the 561 who did not: 140 visited at home, 123 answer
+3. **Weight** each phase 2 answer stands for 561 ÷ 123 = 4.56 nonrespondents
+
+> **Unit nonresponse** is a whole household with no answer, not a blank field. A small follow-up, chased hard, beats a large one chased lightly: it is the only evidence about the people who do not answer.
+
+#### [day3#nonresponse-weights] Weights for distance help a little; only the follow-up sees that nonrespondents differ
+
+*Three estimates of one share*
+
+| Method | "Parcels lasted" | Assumes |
+| --- | --- | --- |
+| phone respondents only | 64.8% | nonrespondents answer like respondents |
+| weighted by distance class | 63.4% | alike within near and far |
+| two-phase, with the follow-up | 55.4% | the 123 speak for the 561 |
+
+- Class weights: near households answered 63% of the time (weight 1.58), far ones 42% (weight 2.40)
+- They fix the share of far households, not who answers within a class
+- The follow-up shows nonrespondents in difficulty more often: MNAR, measured
 
 #### [day3#check-imputation] Which estimate do you put first?
 
@@ -367,14 +389,14 @@ Bound the estimate under best-case and worst-case assumptions about the househol
 - Measure reporting error against an audit
 - Simulate random and one-directional error
 - Say what a proxy measures and what it does not
+- Link a series across a changed question, or report the break
 
 #### [day3#recorded-and-wrong] A value can be present, valid, and wrong
 
 *The other half of data quality*
 
 - Household size is **reported by the household** at registration and is not verified
-- It passes every rule: an integer between 1 and 20
-- No validation suite can see that 7 should have been 5
+- It passes every rule, an integer between 1 and 20, and no rule can see that 7 should have been 5
 - Only a second measurement can: here, 289 audited households with a recorded size
 
 - **Two kinds of error.** **Random:** up as often as down, for anybody.
@@ -438,10 +460,36 @@ Shift of the headline from 2.060, averaged over 200 simulated registers. Over-re
 
 - Parcels per handout are set by the desk from the family card: a proxy for the verified size band
 - It disagrees with the recorded size for 1.5% of households that collected: a list for review
-- It is silent about households that never collected
-- 323 households are eligible by the register and never collected in nine months
+- It is silent about households that never collected: 323 eligible by the register, none in nine months
 
 > **What goes wrong.** Defining "eligible" as "collected regularly". Every eligible household that was not served leaves the denominator, and every district looks well served.
+
+#### [day3#instrument-change] Ask the old and the new question side by side for a while, and link the series with the ratio
+
+*When the question itself changes*
+
+| Month | Old: last month | New: last 7 days | Ratio |
+| --- | --- | --- | --- |
+| 2026-01 | 31.5% | 24.8% | 0.787 |
+| 2026-02 | 32.1% | 24.8% | 0.773 |
+| 2026-03 | 32.7% | 25.1% | 0.768 |
+
+- Share of households at the desk who say someone skipped a meal for lack of food; the wording changed in January 2026
+- Three months of overlap, half the households asked each version
+- Linking factor 0.776: October 2025 at 32.9% on the old question reads 25.5% on the new basis
+
+#### [day3#comparability-break] If the ratio is not stable across months or groups, the series breaks: report two
+
+*When not to link*
+
+| A partner network's overlap | Old | New | Ratio |
+| --- | --- | --- | --- |
+| at the desk, on a card | 33.4% | 30.1% | 0.90 |
+| by phone, read aloud | 29.6% | 16.8% | 0.57 |
+
+- One factor would move desk and phone households by different amounts
+- Break the series when the ratio drifts, differs by group, the reference period or definition changes, or there is no overlap
+- Then: two series with a marked break, and no trend drawn across it
 
 #### [day3#check-direction] Which way does the headline move?
 

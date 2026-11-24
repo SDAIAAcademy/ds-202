@@ -1,7 +1,7 @@
 ---
 course: "Data Acquisition, Preparation and Quality"
 code: "DS-202"
-version: "2027.1.0"
+version: "2027.2.0"
 deck: "day2"
 day: 2
 language: "en"
@@ -264,13 +264,13 @@ Repair the household ids of the logs, test the join against the register for one
 - Block and score candidate pairs
 - Measure false matches and missed matches on labelled pairs
 - Choose a threshold and state its cost
+- Build a master record field by field from records that disagree
 
 #### [day2#no-key] 300 handouts were written on paper, with a name and no id
 
 *The problem*
 
-- A satellite point of B04 and B05, during Ramadan
-- A name, a district ticked on the form, a phone for seven in ten
+- A satellite point of B04 and B05 in Ramadan: a name, a district, a phone for seven in ten
 - 4,937 active households of the two branches to search
 - Staff labelled 848 candidate pairs by hand: 255 true, 593 not
 
@@ -285,8 +285,7 @@ Repair the household ids of the logs, test the join against the register for one
 2. **2 · Score** how alike are the two name keys, from 0 to 100
 3. **3 · Decide** accept, reject, or send to a person
 
-- Blocking: 311,703 candidate pairs instead of 1,481,100, and all 255 true pairs survive it
-- A true pair that disagrees on the blocking field is never compared: check that on the labelled pairs
+Blocking: 311,703 candidate pairs instead of 1,481,100, and all 255 true pairs survive it.
 
 #### [day2#threshold-trade] A higher threshold buys fewer false matches with more missed ones
 
@@ -319,6 +318,36 @@ Repair the household ids of the logs, test the join against the register for one
 - **Leave unmatched.** 45 walk-ins are new households. An unmatched record is an honest result.
 
 > **Report it like a join:** 300 records in, so many matched by rule, so many by review, so many unmatched.
+
+#### [day2#master-record-rules] A match joins records that disagree: decide field by field which value survives
+
+*After the match*
+
+| Field | Trusted first | Then |
+| --- | --- | --- |
+| phone | the most recent the household gave | the older one |
+| district | seen at a home visit | the latest form |
+| size | verified at a visit | the register |
+| income | the register | nothing else asks |
+
+- **Precedence:** per field, the most trusted source that has a value; a blank never wins
+- **Tie:** two sources of equal trust that disagree go to the most recent, or to review
+- **Lineage:** every surviving value keeps its source and date
+
+> **What goes wrong.** Keeping one whole row, the first or the newest: an old phone survives a new one.
+
+#### [day2#master-record-example] Each field of the master record comes from a different source
+
+*One household, three records*
+
+| Field | Register, 2023 | Walk-in form, March 2026 | Home visit, Sept. 2026 |
+| --- | --- | --- | --- |
+| phone | ending 870 | **ending 225** | blank |
+| district | D11 | D12 | **D12** |
+| size | 5 | 7 | **6** |
+| income | **4,800** | blank | blank |
+
+The register alone says 5 members in D11 on an old phone. The master record says 6 members in D12 on the phone ending 225, and names the source of each value.
 
 #### [day2#check-threshold] Which rule goes into the build?
 

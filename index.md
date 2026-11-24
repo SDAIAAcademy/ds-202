@@ -1,7 +1,7 @@
 ---
 course: "Data Acquisition, Preparation and Quality"
 code: "DS-202"
-version: "2027.1.0"
+version: "2027.2.0"
 language: "en"
 view: "trainee"
 source: "https://sdaiaacademy.github.io/ds-202/index.html"
@@ -40,6 +40,7 @@ Slides: https://sdaiaacademy.github.io/ds-202/slides/day1.md
   - Load files as text whatever their encoding
   - Page through an API and reconcile with its total
   - Query a register in SQL and build a source inventory
+  - Prove a paged retrieval complete; retry with a limit, then alert
   - [Lab 1.2: Three ways in (25 min)](https://sdaiaacademy.github.io/ds-202/labs/D1_2_load_logs_page.ipynb)
 - **Session 3: Provenance and sharing basis**
   - Write a provenance record with its six fields and a classification level
@@ -70,6 +71,7 @@ Slides: https://sdaiaacademy.github.io/ds-202/slides/day2.md
   - Block and score candidate pairs
   - Measure false matches and missed matches on labelled pairs
   - Choose a threshold and state its cost
+  - Build a master record field by field from records that disagree
   - [Lab 2.3: 300 records without a key (25 min)](https://sdaiaacademy.github.io/ds-202/labs/D2_3_match_300_records.ipynb)
 - **Session 4: Types, units and dates**
   - Decide a date layout per source from evidence
@@ -90,6 +92,7 @@ Slides: https://sdaiaacademy.github.io/ds-202/slides/day3.md
   - Compute a complete-case estimate and say what it assumes
   - Impute a single value and a value within groups
   - Compare the estimates overall and by district
+  - Weight a survey for nonresponse after a follow-up of nonrespondents
   - [Lab 3.2: Three estimates of one number (25 min)](https://sdaiaacademy.github.io/ds-202/labs/D3_2_estimate_parcels_per.ipynb)
 - **Session 3: Sensitivity ranges**
   - Compute the logical bounds of an estimate
@@ -100,6 +103,7 @@ Slides: https://sdaiaacademy.github.io/ds-202/slides/day3.md
   - Measure reporting error against an audit
   - Simulate random and one-directional error
   - Say what a proxy measures and what it does not
+  - Link a series across a changed question, or report the break
   - [Lab 3.4: When the answer itself is wrong (25 min)](https://sdaiaacademy.github.io/ds-202/labs/D3_4_simulate_self_report.ipynb)
 
 ### Day 4: Validate and protect
@@ -204,4 +208,4 @@ A rebuildable dataset for one of three synthetic questions, in a public reposito
 
 SDAIA Academy · Data Science Track · Data Acquisition, Preparation and Quality
 
-Course version 2027.1.0 · engine 1.0.0 · built 2026-11-15 · commit 87b98e4
+Course version 2027.2.0 · engine 1.0.0 · built 2026-11-24 · commit 1cc3909

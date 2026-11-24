@@ -1,7 +1,7 @@
 ---
 course: "Data Acquisition, Preparation and Quality"
 code: "DS-202"
-version: "2027.1.0"
+version: "2027.2.0"
 scope: "course"
 language: "en"
 view: "trainee"
@@ -176,6 +176,7 @@ Take the question of the programmes director apart, list the variables it needs 
 - Load files as text whatever their encoding
 - Page through an API and reconcile with its total
 - Query a register in SQL and build a source inventory
+- Prove a paged retrieval complete; retry with a limit, then alert
 
 #### [day1#three-doors] Files, an API and a database fail in three different ways
 
@@ -185,15 +186,12 @@ Take the question of the programmes director apart, list the variables it needs 
 - **An API.** Data come in pages, the service can be busy, and records change while you read. It usually states a total.
 - **A database.** Types and keys are declared, but only the ones somebody declared. Your query decides what you see.
 
-One habit covers all three: before reading a value, count what arrived against what the source says it sent.
-
 #### [day1#text-first] Load every column as text first; decide types later, in steps you can count
 
 *Recap of FN-104, one step further*
 
 - B01 reads as UTF-8. **B03 fails** at its first Arabic name: it is in Windows-1256
 - B08 opens, but begins with three extra bytes, `EF BB BF`: a byte order mark that a spreadsheet wrote
-- A loader that guesses types reads `03/07/2026` as March or as July, and does not say which
 - As text, nothing is lost: 14 files, **210,000 rows**, every repair still ahead and countable
 
 > **What goes wrong.** The mark becomes part of the first column name, and `log_id` is "not found" in one file of fourteen.
@@ -212,7 +210,7 @@ while url:
 ```
 
 - The address of the next page comes from the answer; do not compute it
-- 503 means "busy, ask again": wait, retry, give up after a few tries
+- 503 means "busy, ask again"; how often, and then what, follows the paging proof
 - Keep the `total` the service reports: it is its claim about itself
 
 #### [day1#api-total] The API sent 12 records more than its own total
@@ -222,9 +220,56 @@ while url:
 **5,137 · 5,125** records received, and the total the API reports
 
 - Donations kept arriving while the 26 pages were read
-- Four pages begin with records the page before ended with
-- 12 donation ids arrive twice; distinct ids are exactly 5,125
+- Four pages begin with records the page before ended with: 12 ids arrive twice; distinct ids are exactly 5,125
 - The inventory records the distinct count **and** the 12 that were dropped
+
+#### [day1#cursor-proof] A page number shifts while records arrive; a cursor does not, and four checks prove you read it all
+
+*Proving the end*
+
+- **Page numbers.** "Rows 401 to 600" of a table that grows. A new record shifts the rows after it: rows repeat across pages, or are skipped.
+- **A cursor.** The answer says "continue after this record". New arrivals do not move what is left to read.
+
+1. **Chain:** every request sent the cursor the answer before returned
+2. **End:** the last answer's next cursor is null
+3. **Keys:** no id twice, or the repeats counted and dropped
+4. **Count:** distinct ids equal the total the source states, or a count from a second route
+
+#### [day1#paging-log] The stock-movements API reports 2,346 records: was the retrieval complete?
+
+*Read the log, then decide*
+
+| Request | Cursor sent | Records (ids) | Next cursor |
+| --- | --- | --- | --- |
+| 1 | none | 500 (1 to 500) | c1 |
+| 2 | c1 | 500 (501 to 1,000) | c2 |
+| 3 | c2 | 500 (1,001 to 1,500) | c3 |
+| 4 | c4 | 346 (2,001 to 2,346) | null |
+
+> **No.** The end check passes and the keys are unique, but request 4 sent `c4` where the answer before returned `c3`. Ids 1,501 to 2,000 were never asked for: 1,846 received of 2,346.
+
+#### [day1#retry-backoff] Retry only what may pass next time, wait longer each time, and stop at a limit
+
+*When the source is busy*
+
+| Attempt | Answer | Wait before the next |
+| --- | --- | --- |
+| 1 | 503 busy | 1 s |
+| 2 | 503 busy | 2 s |
+| 3 | timeout | 4 s |
+| 4 | 429 too many | 8 s, the cap |
+| 5 | 503 busy | none: give up |
+
+- **Retry:** 503, 429 and timeouts. **Never:** 400, 401, 404; asking again gives the same answer
+- The wait doubles up to a cap, with a little random jitter so many clients do not retry in step
+- Five attempts and 15 seconds of waiting, then the run stops
+
+#### [day1#retry-alert] A failed ingestion stops the build and tells a person; it never continues with what it has
+
+*When retries run out*
+
+- **What goes wrong.** The loop catches the last error, logs "warning" and moves on. The build finishes green with a page missing, and the paging log that would show it is what nobody reads.
+- **The alert.** Source, request and cursor, attempts and the last answer, the time of the last good extract, and the owner to call, by role. The build keeps yesterday's extract and says so.
 
 #### [day1#register-sql] 40,000 rows describe 39,820 households
 
@@ -763,13 +808,13 @@ Repair the household ids of the logs, test the join against the register for one
 - Block and score candidate pairs
 - Measure false matches and missed matches on labelled pairs
 - Choose a threshold and state its cost
+- Build a master record field by field from records that disagree
 
 #### [day2#no-key] 300 handouts were written on paper, with a name and no id
 
 *The problem*
 
-- A satellite point of B04 and B05, during Ramadan
-- A name, a district ticked on the form, a phone for seven in ten
+- A satellite point of B04 and B05 in Ramadan: a name, a district, a phone for seven in ten
 - 4,937 active households of the two branches to search
 - Staff labelled 848 candidate pairs by hand: 255 true, 593 not
 
@@ -784,8 +829,7 @@ Repair the household ids of the logs, test the join against the register for one
 2. **2 · Score** how alike are the two name keys, from 0 to 100
 3. **3 · Decide** accept, reject, or send to a person
 
-- Blocking: 311,703 candidate pairs instead of 1,481,100, and all 255 true pairs survive it
-- A true pair that disagrees on the blocking field is never compared: check that on the labelled pairs
+Blocking: 311,703 candidate pairs instead of 1,481,100, and all 255 true pairs survive it.
 
 #### [day2#threshold-trade] A higher threshold buys fewer false matches with more missed ones
 
@@ -818,6 +862,36 @@ Repair the household ids of the logs, test the join against the register for one
 - **Leave unmatched.** 45 walk-ins are new households. An unmatched record is an honest result.
 
 > **Report it like a join:** 300 records in, so many matched by rule, so many by review, so many unmatched.
+
+#### [day2#master-record-rules] A match joins records that disagree: decide field by field which value survives
+
+*After the match*
+
+| Field | Trusted first | Then |
+| --- | --- | --- |
+| phone | the most recent the household gave | the older one |
+| district | seen at a home visit | the latest form |
+| size | verified at a visit | the register |
+| income | the register | nothing else asks |
+
+- **Precedence:** per field, the most trusted source that has a value; a blank never wins
+- **Tie:** two sources of equal trust that disagree go to the most recent, or to review
+- **Lineage:** every surviving value keeps its source and date
+
+> **What goes wrong.** Keeping one whole row, the first or the newest: an old phone survives a new one.
+
+#### [day2#master-record-example] Each field of the master record comes from a different source
+
+*One household, three records*
+
+| Field | Register, 2023 | Walk-in form, March 2026 | Home visit, Sept. 2026 |
+| --- | --- | --- | --- |
+| phone | ending 870 | **ending 225** | blank |
+| district | D11 | D12 | **D12** |
+| size | 5 | 7 | **6** |
+| income | **4,800** | blank | blank |
+
+The register alone says 5 members in D11 on an old phone. The master record says 6 members in D12 on the phone ending 225, and names the source of each value.
 
 #### [day2#check-threshold] Which rule goes into the build?
 
@@ -1115,6 +1189,7 @@ Tabulate where household sizes are missing, read the audit of home visits, inspe
 - Compute a complete-case estimate and say what it assumes
 - Impute a single value and a value within groups
 - Compare the estimates overall and by district
+- Weight a survey for nonresponse after a follow-up of nonrespondents
 
 #### [day3#no-neutral-option] Every way of handling a blank is an assumption about the households behind it
 
@@ -1123,8 +1198,6 @@ Tabulate where household sizes are missing, read the audit of home visits, inspe
 - **Complete cases.** Drop the rows. Assumes the dropped households are like the kept ones.
 - **One value for all.** Fill with the median. Assumes every blank household is typical.
 - **A value from similar households.** Fill from a group. Assumes that within the group, blank and recorded households are alike.
-
-Lab 3.2 computes the headline all three ways, on the same 35,665 households.
 
 #### [day3#complete-case] Complete cases: 1.985, from the households that were easy to record
 
@@ -1142,8 +1215,7 @@ Lab 3.2 computes the headline all three ways, on the same 35,665 households.
 *Lab 3.2, step 2*
 
 - Estimate: **2.003**. Everybody is classified; nobody is dropped
-- But most blank households have 7 members or more
-- Income 6,000 SAR, 7 members in reality: 857 per member, eligible. With the imputed 5: 1,200, "not eligible"
+- But most blank households have 7 members or more: 6,000 SAR over 7 is 857, eligible; over the imputed 5 it is 1,200, "not eligible"
 - Their parcels leave the numerator with them
 
 - **And the spread shrinks.** 6,461 households at exactly one size: the distribution of sizes gets a spike that was never there.
@@ -1186,6 +1258,30 @@ Lab 3.2 computes the headline all three ways, on the same 35,665 households.
 | imputed within groups | −0.002 |
 
 Distance from the value that complete data would have given. The generator knows the size every household would have reported; in real work this cell does not exist.
+
+#### [day3#unit-nonresponse] A survey's nonrespondents are not filled in: you go back for a sample of them
+
+*When whole answers are missing*
+
+1. **Phase 1 · phone** 1,200 households sampled; 639 answer (53%)
+2. **Phase 2 · follow-up** a random 1 in 4 of the 561 who did not: 140 visited at home, 123 answer
+3. **Weight** each phase 2 answer stands for 561 ÷ 123 = 4.56 nonrespondents
+
+> **Unit nonresponse** is a whole household with no answer, not a blank field. A small follow-up, chased hard, beats a large one chased lightly: it is the only evidence about the people who do not answer.
+
+#### [day3#nonresponse-weights] Weights for distance help a little; only the follow-up sees that nonrespondents differ
+
+*Three estimates of one share*
+
+| Method | "Parcels lasted" | Assumes |
+| --- | --- | --- |
+| phone respondents only | 64.8% | nonrespondents answer like respondents |
+| weighted by distance class | 63.4% | alike within near and far |
+| two-phase, with the follow-up | 55.4% | the 123 speak for the 561 |
+
+- Class weights: near households answered 63% of the time (weight 1.58), far ones 42% (weight 2.40)
+- They fix the share of far households, not who answers within a class
+- The follow-up shows nonrespondents in difficulty more often: MNAR, measured
 
 #### [day3#check-imputation] Which estimate do you put first?
 
@@ -1323,14 +1419,14 @@ Bound the estimate under best-case and worst-case assumptions about the househol
 - Measure reporting error against an audit
 - Simulate random and one-directional error
 - Say what a proxy measures and what it does not
+- Link a series across a changed question, or report the break
 
 #### [day3#recorded-and-wrong] A value can be present, valid, and wrong
 
 *The other half of data quality*
 
 - Household size is **reported by the household** at registration and is not verified
-- It passes every rule: an integer between 1 and 20
-- No validation suite can see that 7 should have been 5
+- It passes every rule, an integer between 1 and 20, and no rule can see that 7 should have been 5
 - Only a second measurement can: here, 289 audited households with a recorded size
 
 - **Two kinds of error.** **Random:** up as often as down, for anybody.
@@ -1394,10 +1490,36 @@ Shift of the headline from 2.060, averaged over 200 simulated registers. Over-re
 
 - Parcels per handout are set by the desk from the family card: a proxy for the verified size band
 - It disagrees with the recorded size for 1.5% of households that collected: a list for review
-- It is silent about households that never collected
-- 323 households are eligible by the register and never collected in nine months
+- It is silent about households that never collected: 323 eligible by the register, none in nine months
 
 > **What goes wrong.** Defining "eligible" as "collected regularly". Every eligible household that was not served leaves the denominator, and every district looks well served.
+
+#### [day3#instrument-change] Ask the old and the new question side by side for a while, and link the series with the ratio
+
+*When the question itself changes*
+
+| Month | Old: last month | New: last 7 days | Ratio |
+| --- | --- | --- | --- |
+| 2026-01 | 31.5% | 24.8% | 0.787 |
+| 2026-02 | 32.1% | 24.8% | 0.773 |
+| 2026-03 | 32.7% | 25.1% | 0.768 |
+
+- Share of households at the desk who say someone skipped a meal for lack of food; the wording changed in January 2026
+- Three months of overlap, half the households asked each version
+- Linking factor 0.776: October 2025 at 32.9% on the old question reads 25.5% on the new basis
+
+#### [day3#comparability-break] If the ratio is not stable across months or groups, the series breaks: report two
+
+*When not to link*
+
+| A partner network's overlap | Old | New | Ratio |
+| --- | --- | --- | --- |
+| at the desk, on a card | 33.4% | 30.1% | 0.90 |
+| by phone, read aloud | 29.6% | 16.8% | 0.57 |
+
+- One factor would move desk and phone households by different amounts
+- Break the series when the ratio drifts, differs by group, the reference period or definition changes, or there is no overlap
+- Then: two series with a marked break, and no trend drawn across it
 
 #### [day3#check-direction] Which way does the headline move?
 

@@ -2,9 +2,9 @@
   "v": 1,
   "engine": "1.0.0",
   "build": {
-    "at": "2026-11-15T11:22:42Z",
-    "version": "2027.1.0",
-    "commit": "87b98e4"
+    "at": "2026-11-24T14:24:26Z",
+    "version": "2027.2.0",
+    "commit": "1cc3909"
   },
   "lang": "en",
   "dir": "ltr",
@@ -15,7 +15,7 @@
   "course": {
     "id": "ds-202",
     "code": "DS-202",
-    "version": "2027.1.0",
+    "version": "2027.2.0",
     "title": "Data Acquisition, Preparation and Quality",
     "tagline": "Turn four raw sources into an analysis dataset that rebuilds with one command, with its provenance, its rules and an honest account of what is missing",
     "description": "Participants assemble an analysis dataset for a fictional food bank network from four sources: registrations with personal data, branch logs, a donations API and open population data. They record provenance, join with key and cardinality checks, clean Arabic and English text, dates and units, write validation rules that rerun on every build, and measure how missing data and measurement error move a headline estimate. Personal data are minimised and pseudonymised, and the dataset rebuilds from raw sources with one command.",
@@ -155,7 +155,8 @@
             "outcomes": [
               "Load files as text whatever their encoding",
               "Page through an API and reconcile with its total",
-              "Query a register in SQL and build a source inventory"
+              "Query a register in SQL and build a source inventory",
+              "Prove a paged retrieval complete; retry with a limit, then alert"
             ],
             "lo": [
               "LO6",
@@ -377,7 +378,8 @@
             "outcomes": [
               "Block and score candidate pairs",
               "Measure false matches and missed matches on labelled pairs",
-              "Choose a threshold and state its cost"
+              "Choose a threshold and state its cost",
+              "Build a master record field by field from records that disagree"
             ],
             "lo": [
               "LO3"
@@ -515,7 +517,8 @@
             "outcomes": [
               "Compute a complete-case estimate and say what it assumes",
               "Impute a single value and a value within groups",
-              "Compare the estimates overall and by district"
+              "Compare the estimates overall and by district",
+              "Weight a survey for nonresponse after a follow-up of nonrespondents"
             ],
             "lo": [
               "LO5"
@@ -597,7 +600,8 @@
             "outcomes": [
               "Measure reporting error against an audit",
               "Simulate random and one-directional error",
-              "Say what a proxy measures and what it does not"
+              "Say what a proxy measures and what it does not",
+              "Link a series across a changed question, or report the break"
             ],
             "lo": [
               "LO1"
